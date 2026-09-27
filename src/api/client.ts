@@ -7,6 +7,16 @@ import { tokenStorage } from "./tokenStorage";
 // task's explicit instruction to hit production, not a mock.
 export const API_BASE_URL = "https://sg-krashi-server-production-8583.up.railway.app/api/v1";
 const REFRESH_ENDPOINT = "/auth/mobile/refresh";
+// A 401 here must never escalate to onAuthFailure() (full logout) — this is
+// a best-effort background call (see pushNotifications.ts's own try/catch),
+// and a real incident confirmed why: a 401 on this exact endpoint,
+// immediately after a real successful Google login, forced a full logout
+// and sent the user straight back to the login screen — the worst possible
+// outcome for a call whose only job is registering a push token. Whatever
+// benign timing quirk caused that 401 (still being investigated), a device
+// token registration failing is never a reason to end the session; it's
+// swallowed by pushNotifications.ts's own catch either way.
+const NON_CRITICAL_ENDPOINTS = ["/notifications/device-tokens"];
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -33,6 +43,32 @@ export const registerAuthHandlers = (handlers: {
   onAuthFailure = handlers.onAuthFailure;
 };
 
+// De-duplicates concurrent refresh attempts into one in-flight promise.
+// Confirmed live as a real bug, not theoretical: a burst of simultaneous
+// authenticated calls (products/cart/notifications/device-tokens all
+// firing together right after login) each independently 401'd on a
+// stale token and each called refreshTokens() on its own — since the
+// refresh token rotates on every use (AuthServiceImpl.refresh — "Rotation
+// happens on every call, not just on expiry"), only the first of those
+// concurrent calls could actually succeed; the rest hit the server with
+// an already-rotated refresh token and failed with a second 401. Every
+// 401 handler below now calls getOrStartRefresh() instead of
+// refreshTokens() directly: the first caller starts the real request and
+// stores the promise here; anyone arriving while it's still pending gets
+// the exact same promise instead of starting a second one. Cleared via
+// .finally() once it settles (success or failure) so the next genuinely
+// new expiry starts a fresh refresh rather than reusing a stale result.
+let refreshPromise: Promise<string | null> | null = null;
+
+const getOrStartRefresh = (): Promise<string | null> => {
+  if (!refreshPromise) {
+    refreshPromise = refreshTokens().finally(() => {
+      refreshPromise = null;
+    });
+  }
+  return refreshPromise;
+};
+
 type RetriableConfig = InternalAxiosRequestConfig & { _retry?: boolean };
 
 // Same unwrap as sg-krashi-client/src/shared/services/axiosInstance.ts: every
@@ -52,6 +88,7 @@ apiClient.interceptors.response.use(
   async (error: AxiosError<ApiErrorResponse>) => {
     const originalRequest = error.config as RetriableConfig | undefined;
     const isRefreshCall = originalRequest?.url?.includes(REFRESH_ENDPOINT) ?? false;
+    const isNonCritical = NON_CRITICAL_ENDPOINTS.some((path) => originalRequest?.url?.includes(path));
 
     // Same shape as the web app's axiosInstance.ts: on a 401 from anything
     // OTHER than the refresh call itself, try one silent refresh-and-retry
@@ -59,14 +96,16 @@ apiClient.interceptors.response.use(
     // request 401s again.
     if (error.response?.status === 401 && originalRequest && !originalRequest._retry && !isRefreshCall) {
       originalRequest._retry = true;
-      const newAccessToken = await refreshTokens();
+      const newAccessToken = await getOrStartRefresh();
 
       if (newAccessToken) {
         originalRequest.headers.set("Authorization", `Bearer ${newAccessToken}`);
         return apiClient(originalRequest);
       }
 
-      onAuthFailure();
+      if (!isNonCritical) {
+        onAuthFailure();
+      }
     }
 
     const responseBody = error.response?.data;

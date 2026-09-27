@@ -35,9 +35,13 @@ const ANDROID_CHANNEL_ID = "default";
  * notifications yet should still be able to log in and use everything else.
  */
 export const ensurePushPermissionAndRegister = async (): Promise<void> => {
+  const startedAt = Date.now();
+  const callId = startedAt % 100000; // short id to correlate this call's own log lines when multiple overlap
+  console.log(`[PushNotif #${callId}] starting`);
   try {
     if (!Device.isDevice) {
-      return; // Simulators/emulators have no real push capability.
+      console.log(`[PushNotif #${callId}] not a physical device, skipping`);
+      return;
     }
 
     const existing = await Notifications.getPermissionsAsync();
@@ -46,6 +50,7 @@ export const ensurePushPermissionAndRegister = async (): Promise<void> => {
       const requested = await Notifications.requestPermissionsAsync();
       status = requested.status;
     }
+    console.log(`[PushNotif #${callId}] permission status:`, status, `(+${Date.now() - startedAt}ms)`);
     if (status !== "granted") {
       return;
     }
@@ -58,12 +63,21 @@ export const ensurePushPermissionAndRegister = async (): Promise<void> => {
     }
 
     const devicePushToken = await Notifications.getDevicePushTokenAsync();
+    console.log(`[PushNotif #${callId}] got device token, length:`, devicePushToken.data?.length ?? 0, `(+${Date.now() - startedAt}ms)`);
     const platform: DevicePlatform = Platform.OS === "ios" ? "IOS" : "ANDROID";
+
+    // Logged right at the point of failure last time — checking the exact
+    // access token this specific call is about to send, immediately before
+    // sending it, to catch whether it's missing/stale at the actual moment
+    // of the request rather than assuming from earlier in the flow.
+    const accessTokenAtCallTime = await tokenStorage.getAccessToken();
+    console.log(`[PushNotif #${callId}] access token present at call time:`, !!accessTokenAtCallTime, `(+${Date.now() - startedAt}ms)`);
 
     await notificationService.registerDeviceToken(devicePushToken.data, platform);
     await tokenStorage.setDevicePushToken(devicePushToken.data);
+    console.log(`[PushNotif #${callId}] registered successfully (+${Date.now() - startedAt}ms)`);
   } catch (error) {
-    console.warn("Push notification registration skipped:", error);
+    console.warn(`[PushNotif #${callId}] registration skipped (+${Date.now() - startedAt}ms):`, error);
   }
 };
 
