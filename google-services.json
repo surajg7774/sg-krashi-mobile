@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "663365327747",
+    "project_id": "sg-krashi",
+    "storage_bucket": "sg-krashi.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:663365327747:android:26e1954d6b7104ec5734b6",
+        "android_client_info": {
+          "package_name": "com.sgkrashi.mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8FaLOG3jQWfsim-JPMFVtWeg6yHxxPS0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

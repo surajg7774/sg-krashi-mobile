@@ -1,0 +1,70 @@
+{
+  "expo": {
+    "name": "sg-krashi-mobile",
+    "slug": "sg-krashi-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.sgkrashi.mobile"
+    },
+    "android": {
+      "package": "com.sgkrashi.mobile",
+      "googleServicesFile": "./google-services.json",
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.RECORD_AUDIO"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-image",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "SG Krashi uses your location to show current weather for your farm."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "SG Krashi uses your photos to analyze crop health with AI Crop Doctor.",
+          "cameraPermission": "SG Krashi uses your camera to take photos of crops for AI Crop Doctor."
+        }
+      ],
+      "expo-sharing",
+      "@react-native-community/datetimepicker",
+      [
+        "expo-notifications",
+        {
+          "defaultChannel": "default"
+        }
+      ],
+      [
+        "react-native-nitro-google-signin",
+        {
+          "androidGoogleServicesFile": "./google-services.json"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "d2941b57-03df-405c-b5eb-f2112c46755e"
+      }
+    },
+    "owner": "sg-krashi"
+  }
+}
