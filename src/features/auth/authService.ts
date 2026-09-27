@@ -22,7 +22,14 @@ export const authService = {
   },
 
   google: async (idToken: string): Promise<MobileAuthResponse> => {
-    const response = await apiClient.post<MobileAuthResponse>("/auth/mobile/google", { idToken });
-    return response.data;
+    console.log("[authService.google] POST /auth/mobile/google — idToken length:", idToken?.length ?? 0);
+    try {
+      const response = await apiClient.post<MobileAuthResponse>("/auth/mobile/google", { idToken });
+      console.log("[authService.google] success — user id:", response.data.user.id);
+      return response.data;
+    } catch (err) {
+      console.error("[authService.google] request failed:", err);
+      throw err;
+    }
   },
 };

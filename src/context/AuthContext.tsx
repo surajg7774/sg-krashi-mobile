@@ -30,12 +30,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   // "the server gave us tokens" is identical regardless of which flow got
   // us there.
   const applyAuthResult = useCallback(async (response: MobileAuthResponse): Promise<AuthUser> => {
+    console.log("[AuthContext] applyAuthResult — persisting tokens for user id:", response.user.id);
     await Promise.all([
       tokenStorage.setAccessToken(response.accessToken),
       tokenStorage.setRefreshToken(response.refreshToken),
       tokenStorage.setStoredUser(JSON.stringify(response.user)),
     ]);
     setUser(response.user);
+    console.log("[AuthContext] applyAuthResult — setUser() called, isAuthenticated should now flip");
     // Fire-and-forget, deliberately after login rather than on app launch —
     // requesting notification permission before the user has even seen the
     // app would be the "surprising, trust-damaging" pattern this codebase
@@ -51,7 +53,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   );
 
   const loginWithGoogle = useCallback(
-    async (idToken: string): Promise<AuthUser> => applyAuthResult(await authService.google(idToken)),
+    async (idToken: string): Promise<AuthUser> => {
+      console.log("[AuthContext] loginWithGoogle called, idToken length:", idToken?.length ?? 0);
+      const result = await applyAuthResult(await authService.google(idToken));
+      console.log("[AuthContext] loginWithGoogle completed");
+      return result;
+    },
     [applyAuthResult]
   );
 
