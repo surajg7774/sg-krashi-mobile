@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import { Image } from "expo-image";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation, type CompositeNavigationProp } from "@react-navigation/native";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -41,11 +42,13 @@ interface QuickLink {
 }
 
 const QUICK_LINKS: QuickLink[] = [
-  { label: "Store", emoji: "🛒", onPress: (nav) => nav.navigate("Store", { screen: "StoreList" }) },
+  // 🏪 (storefront), not 🛒 — the cart look now belongs to the header's
+  // dedicated Cart button, so Store needs a visually distinct icon.
+  { label: "Store", emoji: "🏪", onPress: (nav) => nav.navigate("Store", { screen: "StoreList" }) },
   { label: "Crop Doctor", emoji: "🌿", onPress: (nav) => nav.navigate("CropDoctor", { screen: "CropDoctorHome" }) },
   { label: "Weather", emoji: "☀️", onPress: (nav) => nav.navigate("Weather") },
   { label: "Mandi Prices", emoji: "📈", onPress: (nav) => nav.navigate("Mandi") },
-  { label: "Chat", emoji: "💬", onPress: (nav) => nav.navigate("Chat") },
+  { label: "AI Assistant", emoji: "🤖", onPress: (nav) => nav.navigate("Chat") },
   {
     label: "Crop Marketplace",
     emoji: "🌾",
@@ -71,6 +74,7 @@ const ProductCard = ({ item, onPress }: { item: ProductSummary; onPress: () => v
 export const HomeScreen = () => {
   const { user, isAuthenticated } = useAuth();
   const navigation = useNavigation<Navigation>();
+  const insets = useSafeAreaInsets();
 
   // "Latest products" — the recommendation endpoints ("for you"/similar)
   // need real order history to return anything meaningful, and this test
@@ -115,27 +119,34 @@ export const HomeScreen = () => {
       style={styles.container}
       refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
     >
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
         <View style={styles.headerTopRow}>
-          <Text style={styles.greeting}>Welcome{user ? `, ${user.name}` : ""}</Text>
-          <Pressable style={styles.bellButton} onPress={() => navigation.navigate("Notifications")}>
-            <Text style={styles.bellEmoji}>🔔</Text>
-            {!!notificationsQuery.data?.unreadCount && (
-              <View style={styles.bellBadge}>
-                <Text style={styles.bellBadgeText}>
-                  {notificationsQuery.data.unreadCount > 9 ? "9+" : notificationsQuery.data.unreadCount}
-                </Text>
-              </View>
-            )}
-          </Pressable>
+          <Text style={styles.greeting} numberOfLines={1}>
+            Welcome{user ? `, ${user.name}` : ""}
+          </Text>
+          <View style={styles.headerIcons}>
+            <Pressable style={styles.iconButton} onPress={() => navigation.navigate("Cart")}>
+              <Text style={styles.iconEmoji}>🛒</Text>
+              {!!cartQuery.data?.itemCount && (
+                <View style={styles.iconBadge}>
+                  <Text style={styles.iconBadgeText}>
+                    {cartQuery.data.itemCount > 9 ? "9+" : cartQuery.data.itemCount}
+                  </Text>
+                </View>
+              )}
+            </Pressable>
+            <Pressable style={styles.iconButton} onPress={() => navigation.navigate("Notifications")}>
+              <Text style={styles.iconEmoji}>🔔</Text>
+              {!!notificationsQuery.data?.unreadCount && (
+                <View style={styles.iconBadge}>
+                  <Text style={styles.iconBadgeText}>
+                    {notificationsQuery.data.unreadCount > 9 ? "9+" : notificationsQuery.data.unreadCount}
+                  </Text>
+                </View>
+              )}
+            </Pressable>
+          </View>
         </View>
-        {cartQuery.data && (
-          <Pressable onPress={() => navigation.navigate("Cart")}>
-            <Text style={styles.subheadingLink}>
-              Cart: {cartQuery.data.itemCount} item{cartQuery.data.itemCount === 1 ? "" : "s"} →
-            </Text>
-          </Pressable>
-        )}
       </View>
 
       <View style={styles.quickLinksRow}>
@@ -201,17 +212,24 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   greeting: {
+    flex: 1,
     fontSize: 22,
     fontWeight: "700",
     color: colors.textPrimary,
+    marginRight: 12,
   },
-  bellButton: {
+  headerIcons: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  iconButton: {
     padding: 4,
   },
-  bellEmoji: {
+  iconEmoji: {
     fontSize: 22,
   },
-  bellBadge: {
+  iconBadge: {
     position: "absolute",
     top: -2,
     right: -2,
@@ -223,21 +241,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 3,
   },
-  bellBadgeText: {
+  iconBadgeText: {
     color: "#fff",
     fontSize: 9,
     fontWeight: "700",
-  },
-  subheading: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginTop: 4,
-  },
-  subheadingLink: {
-    fontSize: 14,
-    color: colors.primary,
-    fontWeight: "600",
-    marginTop: 4,
   },
   quickLinksRow: {
     flexDirection: "row",

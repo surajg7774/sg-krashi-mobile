@@ -49,7 +49,7 @@ export const MainStackNavigator = () => (
     />
     <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} options={{ title: "My Orders" }} />
     <Stack.Screen name="Mandi" component={MandiScreen} options={{ title: "Mandi Prices" }} />
-    <Stack.Screen name="Chat" component={ChatScreen} options={{ title: "Chat Assistant" }} />
+    <Stack.Screen name="Chat" component={ChatScreen} options={{ title: "AI Assistant" }} />
     <Stack.Screen name="Notifications" component={NotificationCenterScreen} options={{ title: "Notifications" }} />
   </Stack.Navigator>
 );

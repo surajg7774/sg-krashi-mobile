@@ -10,6 +10,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "@/theme/colors";
 import { chatService } from "./chatService";
 import type { ChatMessage } from "./types";
@@ -17,6 +18,7 @@ import type { ChatMessage } from "./types";
 let clientMessageIdCounter = -1;
 
 export const ChatScreen = () => {
+  const insets = useSafeAreaInsets();
   const [sessionId, setSessionId] = useState<number | null>(null);
   const [sessionError, setSessionError] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -98,7 +100,7 @@ export const ChatScreen = () => {
       {sendError && <Text style={styles.sendErrorText}>{sendError}</Text>}
       {isSending && <ActivityIndicator color={colors.primary} style={{ marginBottom: 8 }} />}
 
-      <View style={styles.inputRow}>
+      <View style={[styles.inputRow, { paddingBottom: insets.bottom + 12 }]}>
         <TextInput
           style={styles.input}
           placeholder="Type a message…"

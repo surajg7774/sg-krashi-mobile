@@ -1,4 +1,5 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation, type CompositeNavigationProp } from "@react-navigation/native";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -12,76 +13,150 @@ type Navigation = CompositeNavigationProp<
   NativeStackNavigationProp<MainStackParamList>
 >;
 
-// Not a pure placeholder like Store/Weather — needs a real logout button so
-// the login flow can actually be re-tested without reinstalling the app.
+// Scrollable menu list up top (just Notifications today, but built to take
+// more rows — addresses/settings etc. — without restructuring again), with
+// My Orders/Log out pinned in a fixed footer below it, never scrolling out
+// of reach the way a long menu list eventually would.
 export const ProfileScreen = () => {
   const { user, logout } = useAuth();
   const navigation = useNavigation<Navigation>();
+  const insets = useSafeAreaInsets();
+
+  const initial = user?.name?.trim().charAt(0).toUpperCase() || "?";
 
   return (
     <View style={styles.container}>
-      <Text style={styles.name}>{user?.name}</Text>
-      <Text style={styles.email}>{user?.email}</Text>
-      <Text style={styles.roles}>Roles: {user?.roles.join(", ")}</Text>
+      <ScrollView
+        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 24 }]}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.avatar}>
+          <Text style={styles.avatarText}>{initial}</Text>
+        </View>
+        <Text style={styles.name}>{user?.name}</Text>
+        <Text style={styles.email}>{user?.email}</Text>
+        {!!user?.roles?.length && <Text style={styles.roles}>{user.roles.join(", ")}</Text>}
 
-      <TouchableOpacity style={styles.linkButton} onPress={() => navigation.navigate("OrderHistory")}>
-        <Text style={styles.linkButtonText}>My Orders</Text>
-      </TouchableOpacity>
+        <View style={styles.menuCard}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => navigation.navigate("Notifications")}
+          >
+            <Text style={styles.menuItemText}>Notifications</Text>
+            <Text style={styles.menuItemChevron}>›</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
 
-      <TouchableOpacity style={styles.linkButton} onPress={() => navigation.navigate("Notifications")}>
-        <Text style={styles.linkButtonText}>Notifications</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.button} onPress={() => void logout()}>
-        <Text style={styles.buttonText}>Log out</Text>
-      </TouchableOpacity>
+      <View style={[styles.footer, { paddingBottom: insets.bottom + 16 }]}>
+        <TouchableOpacity style={styles.ordersButton} onPress={() => navigation.navigate("OrderHistory")}>
+          <Text style={styles.ordersButtonText}>My Orders</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.logoutButton} onPress={() => void logout()}>
+          <Text style={styles.logoutButtonText}>Log out</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
+
+const AVATAR_SIZE = 88;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    paddingTop: 40,
+  },
+  scrollContent: {
     paddingHorizontal: 24,
+    paddingBottom: 24,
+    alignItems: "center",
+  },
+  avatar: {
+    width: AVATAR_SIZE,
+    height: AVATAR_SIZE,
+    borderRadius: AVATAR_SIZE / 2,
+    backgroundColor: colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+  },
+  avatarText: {
+    fontSize: 34,
+    fontWeight: "700",
+    color: colors.primaryContrastText,
   },
   name: {
     fontSize: 20,
     fontWeight: "700",
     color: colors.textPrimary,
+    textAlign: "center",
   },
   email: {
     fontSize: 14,
     color: colors.textSecondary,
     marginTop: 4,
+    textAlign: "center",
   },
   roles: {
-    fontSize: 13,
+    fontSize: 12,
     color: colors.textSecondary,
-    marginTop: 8,
+    marginTop: 2,
+    textAlign: "center",
+    textTransform: "capitalize",
   },
-  linkButton: {
-    marginTop: 24,
+  menuCard: {
+    width: "100%",
+    marginTop: 32,
+    backgroundColor: colors.surface,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.divider,
+    overflow: "hidden",
+  },
+  menuItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+  },
+  menuItemText: {
+    fontSize: 15,
+    color: colors.textPrimary,
+    fontWeight: "500",
+  },
+  menuItemChevron: {
+    fontSize: 20,
+    color: colors.textSecondary,
+  },
+  footer: {
+    paddingHorizontal: 24,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: colors.divider,
+    backgroundColor: colors.background,
+    gap: 10,
+  },
+  ordersButton: {
     borderWidth: 1,
     borderColor: colors.primary,
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: "center",
   },
-  linkButtonText: {
+  ordersButtonText: {
     color: colors.primary,
     fontWeight: "600",
   },
-  button: {
-    marginTop: 12,
+  logoutButton: {
     borderWidth: 1,
     borderColor: colors.error,
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: "center",
   },
-  buttonText: {
+  logoutButtonText: {
     color: colors.error,
     fontWeight: "600",
   },

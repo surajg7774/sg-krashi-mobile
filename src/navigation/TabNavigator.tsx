@@ -29,7 +29,9 @@ const Tab = createBottomTabNavigator<TabParamList>();
 // not part of "get one real screen working end-to-end."
 const TAB_ICONS: Record<keyof TabParamList, string> = {
   Home: "🏠",
-  Store: "🛒",
+  // 🏪 (storefront), not 🛒 — the Home screen header now has a dedicated
+  // Cart icon, so Store needs to look visually distinct from it.
+  Store: "🏪",
   CropDoctor: "🌿",
   Weather: "☀️",
   Farmer: "🚜",
