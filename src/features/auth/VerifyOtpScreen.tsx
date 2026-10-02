@@ -1,0 +1,222 @@
+import { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { RouteProp } from "@react-navigation/native";
+import { colors } from "@/theme/colors";
+import { useAuth } from "@/context/AuthContext";
+import { authService } from "./authService";
+import type { ApiError } from "@/api/types";
+import type { GuestStackParamList } from "@/navigation/GuestStackNavigator";
+
+type Navigation = NativeStackNavigationProp<GuestStackParamList, "VerifyOtp">;
+type Route = RouteProp<GuestStackParamList, "VerifyOtp">;
+
+// Matches the server's own cooldown (AuthServiceImpl.OTP_RESEND_COOLDOWN_SECONDS)
+// — kept here only to drive the countdown UI, not to enforce anything; the
+// server is the real source of truth and rejects an early resend regardless.
+const RESEND_COOLDOWN_SECONDS = 60;
+
+export const VerifyOtpScreen = () => {
+  const navigation = useNavigation<Navigation>();
+  const route = useRoute<Route>();
+  const { email } = route.params;
+  const { verifyOtp } = useAuth();
+
+  const [otp, setOtp] = useState("");
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [cooldown, setCooldown] = useState(RESEND_COOLDOWN_SECONDS);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = setInterval(() => setCooldown((prev) => Math.max(0, prev - 1)), 1000);
+    return () => clearInterval(timer);
+  }, [cooldown]);
+
+  const handleVerify = async () => {
+    setError(null);
+    setIsVerifying(true);
+    try {
+      await verifyOtp({ email, otp });
+      // No navigation call needed — AuthContext's setUser() flips
+      // isAuthenticated, and RootNavigator (not this screen) reacts to that
+      // by swapping the whole guest stack out, same as after a normal login.
+    } catch (err) {
+      const apiError = err as ApiError;
+      const detail = apiError.details?.length ? apiError.details.join("\n") : null;
+      setError(detail || apiError.message || "Could not verify this code. Please try again.");
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const handleResend = async () => {
+    setError(null);
+    setIsResending(true);
+    try {
+      await authService.resendOtp({ email });
+      setCooldown(RESEND_COOLDOWN_SECONDS);
+    } catch (err) {
+      const apiError = err as ApiError;
+      setError(apiError.message || "Could not resend the code. Please try again.");
+    } finally {
+      setIsResending(false);
+    }
+  };
+
+  return (
+    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+      <View style={styles.content}>
+        <Text style={styles.title}>Verify your email</Text>
+        <Text style={styles.subtitle}>
+          We&apos;ve sent a 6-digit code to{"\n"}
+          <Text style={styles.emailText}>{email}</Text>
+        </Text>
+
+        {error && <Text style={styles.errorText}>{error}</Text>}
+
+        <TextInput
+          style={styles.otpInput}
+          placeholder="------"
+          placeholderTextColor={colors.textSecondary}
+          keyboardType="number-pad"
+          maxLength={6}
+          value={otp}
+          onChangeText={(value) => setOtp(value.replace(/\D/g, "").slice(0, 6))}
+          editable={!isVerifying}
+          autoFocus
+        />
+
+        <TouchableOpacity
+          style={[styles.button, (isVerifying || otp.length !== 6) && styles.buttonDisabled]}
+          onPress={handleVerify}
+          disabled={isVerifying || otp.length !== 6}
+        >
+          {isVerifying ? (
+            <ActivityIndicator color={colors.primaryContrastText} />
+          ) : (
+            <Text style={styles.buttonText}>Verify</Text>
+          )}
+        </TouchableOpacity>
+
+        <View style={styles.resendRow}>
+          <Text style={styles.resendText}>Didn&apos;t get a code?</Text>
+          {cooldown > 0 ? (
+            <Text style={styles.resendCooldown}>Resend in {cooldown}s</Text>
+          ) : (
+            <TouchableOpacity onPress={handleResend} disabled={isResending}>
+              <Text style={styles.resendLink}>{isResending ? "Sending..." : "Resend code"}</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        <TouchableOpacity style={styles.backLink} onPress={() => navigation.navigate("Login")}>
+          <Text style={styles.backLinkText}>Back to Log In</Text>
+        </TouchableOpacity>
+      </View>
+    </KeyboardAvoidingView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  content: {
+    flex: 1,
+    justifyContent: "center",
+    paddingHorizontal: 24,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "700",
+    color: colors.textPrimary,
+    textAlign: "center",
+    marginBottom: 12,
+  },
+  subtitle: {
+    fontSize: 15,
+    color: colors.textSecondary,
+    textAlign: "center",
+    marginBottom: 28,
+    lineHeight: 22,
+  },
+  emailText: {
+    fontWeight: "600",
+    color: colors.textPrimary,
+  },
+  errorText: {
+    color: colors.error,
+    marginBottom: 12,
+    textAlign: "center",
+  },
+  otpInput: {
+    borderWidth: 1,
+    borderColor: colors.divider,
+    borderRadius: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    marginBottom: 20,
+    fontSize: 24,
+    letterSpacing: 8,
+    textAlign: "center",
+    color: colors.textPrimary,
+    backgroundColor: colors.surface,
+  },
+  button: {
+    backgroundColor: colors.primary,
+    borderRadius: 8,
+    paddingVertical: 14,
+    alignItems: "center",
+  },
+  buttonDisabled: {
+    opacity: 0.6,
+  },
+  buttonText: {
+    color: colors.primaryContrastText,
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  resendRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 20,
+  },
+  resendText: {
+    color: colors.textSecondary,
+    fontSize: 14,
+  },
+  resendCooldown: {
+    color: colors.textSecondary,
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  resendLink: {
+    color: colors.primary,
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  backLink: {
+    marginTop: 24,
+  },
+  backLinkText: {
+    color: colors.primary,
+    fontSize: 14,
+    fontWeight: "600",
+    textAlign: "center",
+  },
+});

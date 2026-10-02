@@ -35,7 +35,6 @@ export const RegisterScreen = () => {
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [submitted, setSubmitted] = useState(false);
 
   // Trimmed once, reused for both the submit-button guard below and the
   // actual submitted payload — previously the guard checked the raw
@@ -51,7 +50,7 @@ export const RegisterScreen = () => {
     setIsSubmitting(true);
     try {
       await authService.register({ name: trimmedName, email: trimmedEmail, password, phone: phone.trim() || undefined });
-      setSubmitted(true);
+      navigation.navigate("VerifyOtp", { email: trimmedEmail });
     } catch (err) {
       const apiError = err as ApiError;
       // The backend's per-field reason (e.g. "email: Email must be a valid
@@ -65,20 +64,6 @@ export const RegisterScreen = () => {
       setIsSubmitting(false);
     }
   };
-
-  if (submitted) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Check your email</Text>
-        <Text style={styles.successText}>
-          Please check your email to verify your account and finish creating it.
-        </Text>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Login")}>
-          <Text style={styles.buttonText}>Back to Log In</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : undefined}>
@@ -165,13 +150,6 @@ const styles = StyleSheet.create({
     color: colors.error,
     marginBottom: 12,
     textAlign: "center",
-  },
-  successText: {
-    color: colors.textSecondary,
-    textAlign: "center",
-    fontSize: 15,
-    marginBottom: 24,
-    paddingHorizontal: 12,
   },
   input: {
     borderWidth: 1,

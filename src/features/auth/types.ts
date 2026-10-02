@@ -12,15 +12,24 @@ export interface LoginPayload {
 // Same shape as the web app's RegisterRequest — POST /auth/register itself
 // is unauthenticated and identical for web and mobile (no mobile-specific
 // variant needed here, unlike login/refresh), since it returns no tokens at
-// all: registration only sends a verification email (link points at the WEB
-// frontend's /verify-email page — completing an account is a one-time,
-// web-side step regardless of which client registered it), and the mobile
-// app's own /auth/mobile/login only becomes usable once that's done.
+// all: it only emails a 6-digit OTP. Completing the account happens via
+// /auth/mobile/verify-otp (see authService.verifyOtp), entered right in the
+// app — no browser hand-off needed, unlike the old link-based flow this
+// replaced.
 export interface RegisterPayload {
   name: string;
   email: string;
   password: string;
   phone?: string;
+}
+
+export interface VerifyOtpPayload {
+  email: string;
+  otp: string;
+}
+
+export interface ResendOtpPayload {
+  email: string;
 }
 
 export interface AuthUser {

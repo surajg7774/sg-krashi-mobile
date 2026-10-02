@@ -1,5 +1,12 @@
 import { apiClient } from "@/api/client";
-import type { LoginPayload, MobileAuthResponse, MobileRefreshResponse, RegisterPayload } from "./types";
+import type {
+  LoginPayload,
+  MobileAuthResponse,
+  MobileRefreshResponse,
+  RegisterPayload,
+  ResendOtpPayload,
+  VerifyOtpPayload,
+} from "./types";
 
 // Hits the mobile-specific endpoints (MobileAuthController.java) for
 // login/refresh — those stay cookie-based on the web side and return no
@@ -19,6 +26,17 @@ export const authService = {
 
   register: async (payload: RegisterPayload): Promise<void> => {
     await apiClient.post("/auth/register", payload);
+  },
+
+  verifyOtp: async (payload: VerifyOtpPayload): Promise<MobileAuthResponse> => {
+    const response = await apiClient.post<MobileAuthResponse>("/auth/mobile/verify-otp", payload);
+    return response.data;
+  },
+
+  // No mobile-specific variant needed — returns no tokens either way, same
+  // reasoning as register() above.
+  resendOtp: async (payload: ResendOtpPayload): Promise<void> => {
+    await apiClient.post("/auth/resend-otp", payload);
   },
 
   google: async (idToken: string): Promise<MobileAuthResponse> => {

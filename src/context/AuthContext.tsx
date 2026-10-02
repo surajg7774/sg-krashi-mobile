@@ -3,7 +3,13 @@ import { authService } from "@/features/auth/authService";
 import { tokenStorage } from "@/api/tokenStorage";
 import { registerAuthHandlers } from "@/api/client";
 import { ensurePushPermissionAndRegister, unregisterPushToken } from "@/notifications/pushNotifications";
-import type { AuthUser, LoginPayload, MobileAuthResponse } from "@/features/auth/types";
+import type {
+  AuthUser,
+  LoginPayload,
+  MobileAuthResponse,
+  ResendOtpPayload,
+  VerifyOtpPayload,
+} from "@/features/auth/types";
 
 interface AuthContextValue {
   user: AuthUser | null;
@@ -11,6 +17,8 @@ interface AuthContextValue {
   isLoading: boolean;
   login: (payload: LoginPayload) => Promise<AuthUser>;
   loginWithGoogle: (idToken: string) => Promise<AuthUser>;
+  verifyOtp: (payload: VerifyOtpPayload) => Promise<AuthUser>;
+  resendOtp: (payload: ResendOtpPayload) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -60,6 +68,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       return result;
     },
     [applyAuthResult]
+  );
+
+  const verifyOtp = useCallback(
+    async (payload: VerifyOtpPayload): Promise<AuthUser> => applyAuthResult(await authService.verifyOtp(payload)),
+    [applyAuthResult]
+  );
+
+  const resendOtp = useCallback(
+    async (payload: ResendOtpPayload): Promise<void> => {
+      await authService.resendOtp(payload);
+    },
+    []
   );
 
   const logout = useCallback(async (): Promise<void> => {
@@ -142,6 +162,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     isLoading,
     login,
     loginWithGoogle,
+    verifyOtp,
+    resendOtp,
     logout,
   };
 

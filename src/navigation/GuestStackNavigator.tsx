@@ -1,6 +1,7 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { LoginScreen } from "@/features/auth/LoginScreen";
 import { RegisterScreen } from "@/features/auth/RegisterScreen";
+import { VerifyOtpScreen } from "@/features/auth/VerifyOtpScreen";
 import { CropDoctorStackNavigator } from "./CropDoctorStackNavigator";
 import { colors } from "@/theme/colors";
 
@@ -15,6 +16,7 @@ import { colors } from "@/theme/colors";
 export type GuestStackParamList = {
   Login: undefined;
   Register: undefined;
+  VerifyOtp: { email: string };
   CropDoctorGuest: undefined;
 };
 
@@ -30,6 +32,7 @@ export const GuestStackNavigator = () => (
   >
     <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
     <Stack.Screen name="Register" component={RegisterScreen} options={{ headerShown: false }} />
+    <Stack.Screen name="VerifyOtp" component={VerifyOtpScreen} options={{ headerShown: false }} />
     <Stack.Screen name="CropDoctorGuest" component={CropDoctorStackNavigator} options={{ headerShown: false }} />
   </Stack.Navigator>
 );
