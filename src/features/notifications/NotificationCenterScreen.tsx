@@ -4,6 +4,7 @@ import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from "
 import { colors } from "@/theme/colors";
 import { ErrorState } from "@/components/ErrorState";
 import { EmptyState } from "@/components/EmptyState";
+import { ListRowSkeletonList } from "@/components/Skeleton";
 import { notificationService } from "./notificationService";
 import { navigateToNotificationTarget } from "@/navigation/navigationRef";
 import type { AppNotification } from "./types";
@@ -81,11 +82,7 @@ export const NotificationCenterScreen = () => {
         </Pressable>
       )}
 
-      {notificationsQuery.isLoading && (
-        <View style={styles.centered}>
-          <ActivityIndicator color={colors.primary} />
-        </View>
-      )}
+      {notificationsQuery.isLoading && <ListRowSkeletonList count={6} lines={3} variant="flat" />}
 
       {notificationsQuery.isError && (
         <ErrorState message="Could not load notifications." onRetry={() => void notificationsQuery.refetch()} />
@@ -122,7 +119,6 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   markAllButton: { padding: 14, alignItems: "center", borderBottomWidth: 1, borderBottomColor: colors.divider },
   markAllButtonText: { color: colors.primary, fontWeight: "600", fontSize: 13 },
-  centered: { flex: 1, justifyContent: "center", alignItems: "center" },
   list: { paddingBottom: 24 },
   row: {
     flexDirection: "row",

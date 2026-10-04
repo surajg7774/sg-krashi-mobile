@@ -9,6 +9,7 @@ import type { OrderSummary } from "./types";
 import type { MainStackParamList } from "@/navigation/MainStackNavigator";
 import { ErrorState } from "@/components/ErrorState";
 import { EmptyState } from "@/components/EmptyState";
+import { ListRowSkeletonList } from "@/components/Skeleton";
 
 type Navigation = NativeStackNavigationProp<MainStackParamList, "OrderHistory">;
 const PAGE_SIZE = 10;
@@ -42,8 +43,8 @@ export const OrderHistoryScreen = () => {
 
   if (ordersQuery.isLoading) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator color={colors.primary} />
+      <View style={styles.list}>
+        <ListRowSkeletonList count={6} lines={2} trailing />
       </View>
     );
   }

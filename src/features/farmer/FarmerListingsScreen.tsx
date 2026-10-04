@@ -8,6 +8,7 @@ import { useDebouncedValue } from "@/shared/useDebouncedValue";
 import { colors } from "@/theme/colors";
 import { ErrorState } from "@/components/ErrorState";
 import { EmptyState } from "@/components/EmptyState";
+import { ListRowSkeletonList } from "@/components/Skeleton";
 import { farmerService } from "./farmerService";
 import type { CropListingSummary } from "./types";
 import type { FarmerStackParamList } from "@/navigation/FarmerStackNavigator";
@@ -62,11 +63,7 @@ export const FarmerListingsScreen = () => {
         </Pressable>
       </View>
 
-      {listingsQuery.isLoading && (
-        <View style={styles.centered}>
-          <ActivityIndicator color={colors.primary} />
-        </View>
-      )}
+      {listingsQuery.isLoading && <ListRowSkeletonList count={6} thumbnailSize={56} lines={2} trailing />}
 
       {listingsQuery.isError && (
         <ErrorState message="Could not load your listings." onRetry={() => void listingsQuery.refetch()} />
@@ -135,7 +132,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   addButtonText: { color: colors.primaryContrastText, fontWeight: "600" },
-  centered: { alignItems: "center", paddingVertical: 40 },
   emptyAddButton: {
     marginTop: 4,
     backgroundColor: colors.primary,

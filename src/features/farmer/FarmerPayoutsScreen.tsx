@@ -6,6 +6,7 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { colors } from "@/theme/colors";
 import { ErrorState } from "@/components/ErrorState";
 import { EmptyState } from "@/components/EmptyState";
+import { ListRowSkeletonList } from "@/components/Skeleton";
 import { farmerPayoutService } from "./farmerPayoutService";
 import type { FarmerPayoutSummary, PayoutStatus } from "./types";
 import type { FarmerStackParamList } from "@/navigation/FarmerStackNavigator";
@@ -59,11 +60,7 @@ export const FarmerPayoutsScreen = () => {
         </View>
       )}
 
-      {payoutsQuery.isLoading && (
-        <View style={styles.centered}>
-          <ActivityIndicator color={colors.primary} />
-        </View>
-      )}
+      {payoutsQuery.isLoading && <ListRowSkeletonList count={6} lines={2} trailing />}
 
       {payoutsQuery.isError && (
         <ErrorState message="Could not load your payout history." onRetry={() => void payoutsQuery.refetch()} />
@@ -109,7 +106,6 @@ const styles = StyleSheet.create({
   pendingLabel: { fontSize: 12, color: colors.textSecondary },
   pendingAmount: { fontSize: 22, fontWeight: "700", color: colors.textPrimary, marginTop: 4 },
   pendingMeta: { fontSize: 12, color: colors.textSecondary, marginTop: 2 },
-  centered: { alignItems: "center", paddingVertical: 40 },
   list: { paddingBottom: 24 },
   row: {
     flexDirection: "row",

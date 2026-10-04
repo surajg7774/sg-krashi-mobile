@@ -18,6 +18,7 @@ import { colors } from "@/theme/colors";
 import { useAuth } from "@/context/AuthContext";
 import { ErrorState } from "@/components/ErrorState";
 import { EmptyState } from "@/components/EmptyState";
+import { ListRowSkeletonList } from "@/components/Skeleton";
 import { SelectField } from "@/components/SelectField";
 import { cropDoctorService } from "./cropDoctorService";
 import { OTHER_CROP_VALUE, SUPPORTED_LANGUAGES, type CropScan, type CropScanSummary, type PickedImage } from "./types";
@@ -293,7 +294,9 @@ export const CropDoctorScreen = () => {
       {isAuthenticated && (
         <View style={styles.historySection}>
           <Text style={styles.sectionTitle}>Scan History</Text>
-          {historyQuery.isLoading && <ActivityIndicator color={colors.primary} />}
+          {historyQuery.isLoading && (
+            <ListRowSkeletonList count={3} thumbnailSize={48} lines={2} trailing />
+          )}
           {historyQuery.isError && (
             <ErrorState message="Could not load scan history." onRetry={() => void historyQuery.refetch()} />
           )}
