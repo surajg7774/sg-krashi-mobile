@@ -143,6 +143,8 @@ const styles = StyleSheet.create({
     borderColor: colors.primary,
     borderRadius: 8,
     paddingVertical: 12,
+    minHeight: 44,
+    justifyContent: "center",
     alignItems: "center",
   },
   ordersButtonText: {
@@ -154,6 +156,8 @@ const styles = StyleSheet.create({
     borderColor: colors.error,
     borderRadius: 8,
     paddingVertical: 12,
+    minHeight: 44,
+    justifyContent: "center",
     alignItems: "center",
   },
   logoutButtonText: {

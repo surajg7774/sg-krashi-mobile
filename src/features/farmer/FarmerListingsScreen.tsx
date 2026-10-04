@@ -123,7 +123,17 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     backgroundColor: colors.surface,
   },
-  addButton: { backgroundColor: colors.primary, borderRadius: 8, paddingHorizontal: 16, justifyContent: "center" },
+  // minHeight/minWidth — previously relied entirely on stretching to match
+  // searchInput's intrinsic height (~42pt), just under the 44pt minimum.
+  addButton: {
+    backgroundColor: colors.primary,
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    minHeight: 44,
+    minWidth: 44,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   addButtonText: { color: colors.primaryContrastText, fontWeight: "600" },
   centered: { alignItems: "center", paddingVertical: 40 },
   emptyAddButton: {
@@ -132,6 +142,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 20,
     paddingVertical: 12,
+    minHeight: 44,
+    justifyContent: "center",
   },
   emptyAddButtonText: { color: colors.primaryContrastText, fontWeight: "600" },
   list: { paddingBottom: 24 },

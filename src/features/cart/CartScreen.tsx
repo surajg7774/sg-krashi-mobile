@@ -37,6 +37,7 @@ const CartItemRow = ({
           style={styles.qtyButton}
           onPress={onDecrement}
           disabled={isMutating || item.quantity <= 1}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
           <Text style={styles.qtyButtonText}>−</Text>
         </Pressable>
@@ -45,10 +46,16 @@ const CartItemRow = ({
           style={styles.qtyButton}
           onPress={onIncrement}
           disabled={isMutating || item.quantity >= item.availableQuantity}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
           <Text style={styles.qtyButtonText}>+</Text>
         </Pressable>
-        <Pressable style={styles.removeButton} onPress={onRemove} disabled={isMutating}>
+        <Pressable
+          style={styles.removeButton}
+          onPress={onRemove}
+          disabled={isMutating}
+          hitSlop={{ top: 14, bottom: 14, left: 10, right: 10 }}
+        >
           <Text style={styles.removeButtonText}>Remove</Text>
         </Pressable>
       </View>
@@ -163,6 +170,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 24,
     paddingVertical: 12,
+    minHeight: 44,
+    justifyContent: "center",
   },
   browseButtonText: {
     color: colors.primaryContrastText,

@@ -115,13 +115,17 @@ export const VerifyOtpScreen = () => {
           {cooldown > 0 ? (
             <Text style={styles.resendCooldown}>Resend in {cooldown}s</Text>
           ) : (
-            <TouchableOpacity onPress={handleResend} disabled={isResending}>
+            <TouchableOpacity onPress={handleResend} disabled={isResending} hitSlop={{ top: 12, bottom: 12, left: 8, right: 8 }}>
               <Text style={styles.resendLink}>{isResending ? "Sending..." : "Resend code"}</Text>
             </TouchableOpacity>
           )}
         </View>
 
-        <TouchableOpacity style={styles.backLink} onPress={() => navigation.navigate("Login")}>
+        <TouchableOpacity
+          style={styles.backLink}
+          onPress={() => navigation.navigate("Login")}
+          hitSlop={{ top: 12, bottom: 12 }}
+        >
           <Text style={styles.backLinkText}>Back to Log In</Text>
         </TouchableOpacity>
       </View>

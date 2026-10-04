@@ -343,14 +343,26 @@ export const FarmerListingFormScreen = () => {
             <View key={item.id} style={styles.mediaRow}>
               <Image source={item.url} style={styles.mediaThumb} contentFit="cover" />
               <View style={styles.mediaControls}>
-                <Pressable disabled={index === 0} onPress={() => moveMedia(index, -1)}>
+                <Pressable
+                  disabled={index === 0}
+                  onPress={() => moveMedia(index, -1)}
+                  hitSlop={{ top: 10, bottom: 10, left: 14, right: 14 }}
+                >
                   <Text style={[styles.mediaControlText, index === 0 && styles.mediaControlDisabled]}>▲</Text>
                 </Pressable>
-                <Pressable disabled={index === media.length - 1} onPress={() => moveMedia(index, 1)}>
+                <Pressable
+                  disabled={index === media.length - 1}
+                  onPress={() => moveMedia(index, 1)}
+                  hitSlop={{ top: 10, bottom: 10, left: 14, right: 14 }}
+                >
                   <Text style={[styles.mediaControlText, index === media.length - 1 && styles.mediaControlDisabled]}>▼</Text>
                 </Pressable>
               </View>
-              <Pressable style={styles.mediaDeleteButton} onPress={() => handleDeleteMedia(item.id)}>
+              <Pressable
+                style={styles.mediaDeleteButton}
+                onPress={() => handleDeleteMedia(item.id)}
+                hitSlop={{ top: 14, bottom: 14, left: 10, right: 10 }}
+              >
                 <Text style={styles.mediaDeleteText}>Remove</Text>
               </Pressable>
             </View>
@@ -392,6 +404,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 12,
+    minHeight: 44,
+    justifyContent: "center",
     fontSize: 14,
     color: colors.textPrimary,
     backgroundColor: colors.background,
@@ -423,8 +437,8 @@ const styles = StyleSheet.create({
   mediaDeleteButton: { marginLeft: "auto" },
   mediaDeleteText: { color: colors.error, fontWeight: "600", fontSize: 13 },
   pickButtonRow: { flexDirection: "row", gap: 10, marginTop: 8 },
-  pickButton: { flex: 1, borderWidth: 1, borderColor: colors.primary, borderRadius: 8, paddingVertical: 12, alignItems: "center" },
+  pickButton: { flex: 1, borderWidth: 1, borderColor: colors.primary, borderRadius: 8, paddingVertical: 12, minHeight: 44, alignItems: "center", justifyContent: "center" },
   pickButtonText: { color: colors.primary, fontWeight: "600", fontSize: 13 },
-  deactivateButton: { borderWidth: 1, borderColor: colors.error, borderRadius: 8, paddingVertical: 12, alignItems: "center", marginTop: 20 },
+  deactivateButton: { borderWidth: 1, borderColor: colors.error, borderRadius: 8, paddingVertical: 12, minHeight: 44, alignItems: "center", justifyContent: "center", marginTop: 20 },
   deactivateButtonText: { color: colors.error, fontWeight: "600" },
 });

@@ -94,13 +94,17 @@ export const WeatherScreen = () => {
       )}
 
       {showKhandwaSuggestion && (
-        <Pressable style={styles.suggestionChip} onPress={() => handleSelectLocation(KHANDWA_SUGGESTION)}>
+        <Pressable
+          style={styles.suggestionChip}
+          onPress={() => handleSelectLocation(KHANDWA_SUGGESTION)}
+          hitSlop={{ top: 7, bottom: 7 }}
+        >
           <Text style={styles.suggestionChipText}>Try Khandwa, Madhya Pradesh</Text>
         </Pressable>
       )}
 
       {location && (
-        <Pressable onPress={useCurrentLocation}>
+        <Pressable onPress={useCurrentLocation} hitSlop={{ top: 12, bottom: 12 }}>
           <Text style={styles.locationLabel}>
             {location.source === "geolocation" ? "📍 " : "📌 "}
             {location.label}
@@ -205,7 +209,14 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     overflow: "hidden",
   },
-  resultRow: { paddingHorizontal: 14, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: colors.divider },
+  resultRow: {
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    minHeight: 44,
+    justifyContent: "center",
+    borderBottomWidth: 1,
+    borderBottomColor: colors.divider,
+  },
   resultText: { fontSize: 14, color: colors.textPrimary },
   emptyResultsText: { marginTop: 8, color: colors.textSecondary, fontSize: 13 },
   suggestionChip: {

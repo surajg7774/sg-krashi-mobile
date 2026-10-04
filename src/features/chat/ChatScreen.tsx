@@ -155,10 +155,16 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     maxHeight: 100,
   },
+  // minHeight/minWidth — previously relied entirely on stretching to match
+  // the TextInput sibling's intrinsic height (~38-40pt), just under the
+  // 44pt minimum tap target.
   sendButton: {
     backgroundColor: colors.primary,
     borderRadius: 20,
     paddingHorizontal: 18,
+    minHeight: 44,
+    minWidth: 44,
+    alignItems: "center",
     justifyContent: "center",
   },
   sendButtonDisabled: { opacity: 0.5 },

@@ -90,6 +90,7 @@ export const StoreScreen = () => {
             <Pressable
               style={[styles.chip, categoryId === item.id && styles.chipActive]}
               onPress={() => setCategoryId(categoryId === item.id ? undefined : item.id)}
+              hitSlop={{ top: 7, bottom: 7 }}
             >
               <Text style={[styles.chipText, categoryId === item.id && styles.chipTextActive]}>{item.name}</Text>
             </Pressable>
@@ -174,6 +175,9 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingBottom: 12,
   },
+  // paddingVertical:6 renders a ~31pt-tall pill — under the 44pt minimum
+  // tap target. Fixed via hitSlop at the call site (not more padding) so
+  // the chip's visual size stays the same.
   chip: {
     borderWidth: 1,
     borderColor: colors.divider,
@@ -201,6 +205,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 20,
     paddingVertical: 10,
+    minHeight: 44,
+    justifyContent: "center",
   },
   clearSearchButtonText: {
     color: colors.primary,

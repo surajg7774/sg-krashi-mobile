@@ -224,7 +224,7 @@ export const CropDoctorScreen = () => {
             </View>
           )}
 
-          <Pressable onPress={handleReset}>
+          <Pressable onPress={handleReset} hitSlop={{ top: 8, bottom: 8 }}>
             <Text style={styles.linkText}>Scan another photo</Text>
           </Pressable>
         </View>
@@ -254,7 +254,11 @@ export const CropDoctorScreen = () => {
             {images.map((img) => (
               <View key={img.uri} style={styles.imageThumbWrap}>
                 <Image source={img.uri} style={styles.imageThumb} contentFit="cover" />
-                <Pressable style={styles.removeImageButton} onPress={() => removeImage(img.uri)}>
+                <Pressable
+                  style={styles.removeImageButton}
+                  onPress={() => removeImage(img.uri)}
+                  hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                >
                   <Text style={styles.removeImageButtonText}>×</Text>
                 </Pressable>
               </View>
@@ -301,13 +305,21 @@ export const CropDoctorScreen = () => {
           ))}
           {scans.length > 0 && (
             <View style={styles.pagerRow}>
-              <Pressable disabled={historyPage === 0} onPress={() => setHistoryPage((p) => p - 1)}>
+              <Pressable
+                disabled={historyPage === 0}
+                onPress={() => setHistoryPage((p) => p - 1)}
+                hitSlop={{ top: 14, bottom: 14, left: 10, right: 10 }}
+              >
                 <Text style={[styles.pagerText, historyPage === 0 && styles.pagerTextDisabled]}>Previous</Text>
               </Pressable>
               <Text style={styles.pagerLabel}>
                 Page {historyPage + 1} of {totalPages}
               </Text>
-              <Pressable disabled={historyPage + 1 >= totalPages} onPress={() => setHistoryPage((p) => p + 1)}>
+              <Pressable
+                disabled={historyPage + 1 >= totalPages}
+                onPress={() => setHistoryPage((p) => p + 1)}
+                hitSlop={{ top: 14, bottom: 14, left: 10, right: 10 }}
+              >
                 <Text style={[styles.pagerText, historyPage + 1 >= totalPages && styles.pagerTextDisabled]}>Next</Text>
               </Pressable>
             </View>
@@ -380,12 +392,14 @@ const styles = StyleSheet.create({
     borderColor: colors.primary,
     borderRadius: 8,
     paddingVertical: 12,
+    minHeight: 44,
     alignItems: "center",
+    justifyContent: "center",
   },
   pickButtonText: { color: colors.primary, fontWeight: "600", fontSize: 13 },
   primaryButton: { backgroundColor: colors.primary, borderRadius: 8, paddingVertical: 14, alignItems: "center", marginTop: 16 },
   primaryButtonText: { color: colors.primaryContrastText, fontSize: 16, fontWeight: "600" },
-  secondaryButton: { borderWidth: 1, borderColor: colors.primary, borderRadius: 8, paddingVertical: 12, alignItems: "center", marginTop: 16 },
+  secondaryButton: { borderWidth: 1, borderColor: colors.primary, borderRadius: 8, paddingVertical: 12, minHeight: 44, alignItems: "center", justifyContent: "center", marginTop: 16 },
   secondaryButtonText: { color: colors.primary, fontWeight: "600" },
   disabledButton: { opacity: 0.5 },
   errorText: { color: colors.error, marginTop: 12, textAlign: "center" },

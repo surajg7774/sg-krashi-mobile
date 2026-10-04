@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
   metaText: { fontSize: 13, color: colors.textSecondary },
   bodyText: { fontSize: 13, color: colors.textPrimary, lineHeight: 19 },
   limitationsText: { fontSize: 11, color: colors.textSecondary, marginTop: 16, fontStyle: "italic" },
-  reportButton: { borderWidth: 1, borderColor: colors.primary, borderRadius: 8, paddingVertical: 12, alignItems: "center", marginTop: 20 },
+  reportButton: { borderWidth: 1, borderColor: colors.primary, borderRadius: 8, paddingVertical: 12, minHeight: 44, alignItems: "center", justifyContent: "center", marginTop: 20 },
   reportButtonText: { color: colors.primary, fontWeight: "600" },
   disabledButton: { opacity: 0.5 },
 });

@@ -244,6 +244,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 10,
     paddingHorizontal: 20,
+    minHeight: 44,
+    justifyContent: "center",
   },
   refreshButtonText: { color: colors.primary, fontWeight: "600" },
   failedText: { color: colors.textSecondary, textAlign: "center", marginTop: 16 },
@@ -255,6 +257,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 10,
     paddingHorizontal: 16,
+    minHeight: 44,
+    alignItems: "center",
+    justifyContent: "center",
   },
   secondaryButtonText: { color: colors.primary, fontWeight: "600" },
 });

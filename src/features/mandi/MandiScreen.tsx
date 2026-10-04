@@ -74,6 +74,7 @@ export const MandiScreen = () => {
             <Pressable
               style={[styles.chip, state === item && styles.chipActive]}
               onPress={() => setState(state === item ? undefined : item)}
+              hitSlop={{ top: 7, bottom: 7 }}
             >
               <Text style={[styles.chipText, state === item && styles.chipTextActive]}>{item}</Text>
             </Pressable>
@@ -92,6 +93,7 @@ export const MandiScreen = () => {
             <Pressable
               style={[styles.chip, commodity === item && styles.chipActive]}
               onPress={() => setCommodity(commodity === item ? undefined : item)}
+              hitSlop={{ top: 7, bottom: 7 }}
             >
               <Text style={[styles.chipText, commodity === item && styles.chipTextActive]}>{item}</Text>
             </Pressable>
@@ -140,6 +142,9 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background, paddingHorizontal: 16, paddingTop: 12 },
   syncText: { fontSize: 12, color: colors.textSecondary, marginBottom: 8 },
   chipRow: { gap: 8, paddingBottom: 10 },
+  // paddingVertical:6 renders a ~31pt-tall pill — under the 44pt minimum
+  // tap target. Fixed via hitSlop at the call site (not more padding) so
+  // the chip's visual size stays the same.
   chip: {
     borderWidth: 1,
     borderColor: colors.divider,

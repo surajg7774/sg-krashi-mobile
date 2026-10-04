@@ -42,8 +42,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.textPrimary,
   },
+  // minWidth/minHeight — the row's alignItems:"center" means this doesn't
+  // stretch to match the input's height; it was sizing to just the emoji
+  // glyph itself (~20pt), well under the 44pt minimum tap target.
   toggle: {
-    paddingHorizontal: 12,
+    minWidth: 44,
+    minHeight: 44,
+    alignItems: "center",
+    justifyContent: "center",
   },
   toggleText: {
     fontSize: 18,

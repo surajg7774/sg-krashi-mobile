@@ -104,6 +104,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 24,
     paddingVertical: 12,
+    minHeight: 44,
+    justifyContent: "center",
   },
   browseButtonText: { color: colors.primaryContrastText, fontWeight: "600" },
   list: { padding: 16, backgroundColor: colors.background },

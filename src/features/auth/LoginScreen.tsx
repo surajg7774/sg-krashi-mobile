@@ -86,11 +86,19 @@ export const LoginScreen = () => {
 
       <GoogleSignInButton onError={setError} />
 
-      <TouchableOpacity style={styles.signupLink} onPress={() => navigation.navigate("Register")}>
+      <TouchableOpacity
+        style={styles.signupLink}
+        onPress={() => navigation.navigate("Register")}
+        hitSlop={{ top: 12, bottom: 12 }}
+      >
         <Text style={styles.signupLinkText}>Don't have an account? Sign up</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.guestLink} onPress={() => navigation.navigate("CropDoctorGuest")}>
+      <TouchableOpacity
+        style={styles.guestLink}
+        onPress={() => navigation.navigate("CropDoctorGuest")}
+        hitSlop={{ top: 12, bottom: 12 }}
+      >
         <Text style={styles.guestLinkText}>Try AI Crop Doctor without an account →</Text>
       </TouchableOpacity>
     </KeyboardAvoidingView>

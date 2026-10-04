@@ -120,7 +120,11 @@ export const RegisterScreen = () => {
 
         <GoogleSignInButton onError={setError} />
 
-        <TouchableOpacity style={styles.loginLink} onPress={() => navigation.navigate("Login")}>
+        <TouchableOpacity
+          style={styles.loginLink}
+          onPress={() => navigation.navigate("Login")}
+          hitSlop={{ top: 12, bottom: 12 }}
+        >
           <Text style={styles.loginLinkText}>Already have an account? Log in</Text>
         </TouchableOpacity>
       </ScrollView>

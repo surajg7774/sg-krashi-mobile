@@ -88,6 +88,7 @@ export const OnboardingScreen = ({ onDone }: OnboardingScreenProps) => {
         <TouchableOpacity
           style={[styles.skipButton, { top: insets.top + 12 }]}
           onPress={onDone}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
           <Text style={styles.skipText}>Skip</Text>
         </TouchableOpacity>

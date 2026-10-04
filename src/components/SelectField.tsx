@@ -64,6 +64,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 12,
+    minHeight: 44,
+    justifyContent: "center",
     backgroundColor: colors.background,
   },
   selectButtonText: { color: colors.textPrimary, fontSize: 14 },

@@ -228,16 +228,26 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 12,
   },
+  // minWidth/minHeight (not just padding) so the tappable area hits the
+  // 44x44pt minimum regardless of the emoji glyph's own rendered box —
+  // confirmed undersized before this fix: padding:4 around a 22px emoji
+  // computed to roughly 30x30pt.
   iconButton: {
-    padding: 4,
+    minWidth: 44,
+    minHeight: 44,
+    alignItems: "center",
+    justifyContent: "center",
   },
   iconEmoji: {
     fontSize: 22,
   },
+  // top/right account for iconButton's new 44x44 hit area (centered
+  // content) — without this the badge would anchor to the enlarged box's
+  // corner instead of staying visually tight to the emoji glyph itself.
   iconBadge: {
     position: "absolute",
-    top: -2,
-    right: -2,
+    top: 9,
+    right: 9,
     backgroundColor: colors.error,
     borderRadius: 8,
     minWidth: 16,
