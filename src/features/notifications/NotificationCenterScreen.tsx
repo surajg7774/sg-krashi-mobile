@@ -23,7 +23,7 @@ const timeAgo = (iso: string): string => {
 };
 
 const NotificationRow = ({ item, onPress }: { item: AppNotification; onPress: () => void }) => (
-  <Pressable style={[styles.row, !item.read && styles.rowUnread]} onPress={onPress}>
+  <Pressable style={({ pressed }) => [styles.row, !item.read && styles.rowUnread, pressed && { opacity: 0.6 }]} onPress={onPress}>
     {!item.read && <View style={styles.unreadDot} />}
     <View style={{ flex: 1 }}>
       <Text style={styles.title}>{item.title}</Text>
@@ -74,7 +74,7 @@ export const NotificationCenterScreen = () => {
     <View style={styles.container}>
       {unreadCount > 0 && (
         <Pressable
-          style={styles.markAllButton}
+          style={({ pressed }) => [styles.markAllButton, pressed && { opacity: 0.6 }]}
           disabled={markAllReadMutation.isPending}
           onPress={() => markAllReadMutation.mutate()}
         >

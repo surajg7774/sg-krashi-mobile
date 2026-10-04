@@ -22,7 +22,7 @@ const statusColor: Record<PayoutStatus, string> = {
 };
 
 const PayoutRow = ({ item, onPress }: { item: FarmerPayoutSummary; onPress: () => void }) => (
-  <Pressable style={styles.row} onPress={onPress}>
+  <Pressable style={({ pressed }) => [styles.row, pressed && { opacity: 0.6 }]} onPress={onPress}>
     <View style={{ flex: 1 }}>
       <Text style={styles.cycleText}>
         {item.cycleStartDate} → {item.cycleEndDate}

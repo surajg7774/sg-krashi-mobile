@@ -18,7 +18,7 @@ const PAGE_SIZE = 20;
 type Navigation = NativeStackNavigationProp<FarmerStackParamList, "FarmerListings">;
 
 const ListingRow = ({ item, onPress }: { item: CropListingSummary; onPress: () => void }) => (
-  <Pressable style={styles.row} onPress={onPress}>
+  <Pressable style={({ pressed }) => [styles.row, pressed && { opacity: 0.6 }]} onPress={onPress}>
     <Image source={item.thumbnailUrl ?? undefined} style={styles.thumb} contentFit="cover" />
     <View style={{ flex: 1 }}>
       <Text style={styles.name} numberOfLines={1}>
@@ -58,7 +58,7 @@ export const FarmerListingsScreen = () => {
           value={searchInput}
           onChangeText={setSearchInput}
         />
-        <Pressable style={styles.addButton} onPress={() => navigation.navigate("FarmerListingForm", {})}>
+        <Pressable style={({ pressed }) => [styles.addButton, pressed && { opacity: 0.6 }]} onPress={() => navigation.navigate("FarmerListingForm", {})}>
           <Text style={styles.addButtonText}>+ Add</Text>
         </Pressable>
       </View>
@@ -74,7 +74,7 @@ export const FarmerListingsScreen = () => {
           icon="🌾"
           message="You haven't added any crop listings yet."
           action={
-            <Pressable style={styles.emptyAddButton} onPress={() => navigation.navigate("FarmerListingForm", {})}>
+            <Pressable style={({ pressed }) => [styles.emptyAddButton, pressed && { opacity: 0.6 }]} onPress={() => navigation.navigate("FarmerListingForm", {})}>
               <Text style={styles.emptyAddButtonText}>+ Add Your First Listing</Text>
             </Pressable>
           }

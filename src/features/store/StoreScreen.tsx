@@ -26,7 +26,7 @@ const PAGE_SIZE = 12;
 type Navigation = NativeStackNavigationProp<StoreStackParamList, "StoreList">;
 
 const ProductCard = ({ item, onPress }: { item: ProductSummary; onPress: () => void }) => (
-  <Pressable style={styles.card} onPress={onPress}>
+  <Pressable style={({ pressed }) => [styles.card, pressed && { opacity: 0.6 }]} onPress={onPress}>
     <Image
       source={item.thumbnailUrl ?? undefined}
       style={styles.cardImage}
@@ -88,7 +88,7 @@ export const StoreScreen = () => {
           contentContainerStyle={styles.chipRow}
           renderItem={({ item }) => (
             <Pressable
-              style={[styles.chip, categoryId === item.id && styles.chipActive]}
+              style={({ pressed }) => [styles.chip, categoryId === item.id && styles.chipActive, pressed && { opacity: 0.6 }]}
               onPress={() => setCategoryId(categoryId === item.id ? undefined : item.id)}
               hitSlop={{ top: 7, bottom: 7 }}
             >
@@ -113,7 +113,7 @@ export const StoreScreen = () => {
           message={`No products found${search ? ` for "${search}"` : ""}.`}
           action={
             search ? (
-              <Pressable style={styles.clearSearchButton} onPress={() => setSearchInput("")}>
+              <Pressable style={({ pressed }) => [styles.clearSearchButton, pressed && { opacity: 0.6 }]} onPress={() => setSearchInput("")}>
                 <Text style={styles.clearSearchButtonText}>Clear search</Text>
               </Pressable>
             ) : undefined

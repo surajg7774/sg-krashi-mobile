@@ -15,7 +15,7 @@ type Navigation = NativeStackNavigationProp<MainStackParamList, "OrderHistory">;
 const PAGE_SIZE = 10;
 
 const OrderRow = ({ order, onPress }: { order: OrderSummary; onPress: () => void }) => (
-  <Pressable style={styles.row} onPress={onPress}>
+  <Pressable style={({ pressed }) => [styles.row, pressed && { opacity: 0.6 }]} onPress={onPress}>
     <View style={styles.rowLeft}>
       <Text style={styles.orderNumber}>#{order.orderNumber}</Text>
       <Text style={styles.itemCount}>
@@ -65,7 +65,7 @@ export const OrderHistoryScreen = () => {
           message="You haven't placed any orders yet."
           action={
             <Pressable
-              style={styles.browseButton}
+              style={({ pressed }) => [styles.browseButton, pressed && { opacity: 0.6 }]}
               onPress={() => navigation.navigate("MainTabs", { screen: "Store", params: { screen: "StoreList" } })}
             >
               <Text style={styles.browseButtonText}>Browse Store</Text>

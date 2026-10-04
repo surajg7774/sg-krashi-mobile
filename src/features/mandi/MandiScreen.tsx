@@ -73,7 +73,7 @@ export const MandiScreen = () => {
           contentContainerStyle={styles.chipRow}
           renderItem={({ item }) => (
             <Pressable
-              style={[styles.chip, state === item && styles.chipActive]}
+              style={({ pressed }) => [styles.chip, state === item && styles.chipActive, pressed && { opacity: 0.6 }]}
               onPress={() => setState(state === item ? undefined : item)}
               hitSlop={{ top: 7, bottom: 7 }}
             >
@@ -92,7 +92,7 @@ export const MandiScreen = () => {
           contentContainerStyle={styles.chipRow}
           renderItem={({ item }) => (
             <Pressable
-              style={[styles.chip, commodity === item && styles.chipActive]}
+              style={({ pressed }) => [styles.chip, commodity === item && styles.chipActive, pressed && { opacity: 0.6 }]}
               onPress={() => setCommodity(commodity === item ? undefined : item)}
               hitSlop={{ top: 7, bottom: 7 }}
             >

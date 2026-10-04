@@ -27,7 +27,7 @@ export const RecommendationRail = ({ title, items, onPressItem }: Recommendation
         keyExtractor={(item) => `${item.itemType}-${item.id}`}
         contentContainerStyle={styles.row}
         renderItem={({ item }) => (
-          <Pressable style={styles.card} onPress={() => onPressItem(item)}>
+          <Pressable style={({ pressed }) => [styles.card, pressed && { opacity: 0.6 }]} onPress={() => onPressItem(item)}>
             <Image source={item.thumbnailUrl ?? undefined} style={styles.image} contentFit="cover" transition={150} />
             <Text style={styles.name} numberOfLines={2}>
               {item.name}

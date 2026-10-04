@@ -112,7 +112,11 @@ export const RazorpayWebView = ({
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onDismiss}>
       <View style={styles.header}>
-        <Pressable onPress={onDismiss} hitSlop={{ top: 14, bottom: 14, left: 14, right: 14 }}>
+        <Pressable
+          style={({ pressed }) => pressed && { opacity: 0.6 }}
+          onPress={onDismiss}
+          hitSlop={{ top: 14, bottom: 14, left: 14, right: 14 }}
+        >
           <Text style={styles.closeText}>Cancel</Text>
         </Pressable>
       </View>

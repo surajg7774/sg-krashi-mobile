@@ -21,7 +21,7 @@ import { ErrorState } from "@/components/ErrorState";
 type Navigation = NativeStackNavigationProp<MainStackParamList, "AddressSelect">;
 
 const AddressCard = ({ address, selected, onSelect }: { address: Address; selected: boolean; onSelect: () => void }) => (
-  <Pressable style={[styles.card, selected && styles.cardSelected]} onPress={onSelect}>
+  <Pressable style={({ pressed }) => [styles.card, selected && styles.cardSelected, pressed && { opacity: 0.6 }]} onPress={onSelect}>
     <Text style={styles.cardLine}>{address.line1}</Text>
     {address.line2 && <Text style={styles.cardLine}>{address.line2}</Text>}
     <Text style={styles.cardLine}>
@@ -92,7 +92,7 @@ export const AddressSelectScreen = () => {
       )}
 
       {!showForm && (
-        <Pressable style={styles.addLink} onPress={() => setShowForm(true)}>
+        <Pressable style={({ pressed }) => [styles.addLink, pressed && { opacity: 0.6 }]} onPress={() => setShowForm(true)}>
           <Text style={styles.addLinkText}>+ Add a new address</Text>
         </Pressable>
       )}
@@ -139,11 +139,11 @@ export const AddressSelectScreen = () => {
           {createMutation.isError && <Text style={styles.errorText}>Could not save this address. Please try again.</Text>}
 
           <View style={styles.formButtonRow}>
-            <Pressable style={styles.formCancelButton} onPress={() => setShowForm(false)}>
+            <Pressable style={({ pressed }) => [styles.formCancelButton, pressed && { opacity: 0.6 }]} onPress={() => setShowForm(false)}>
               <Text style={styles.formCancelText}>Cancel</Text>
             </Pressable>
             <Pressable
-              style={[styles.formSaveButton, (!isFormValid || createMutation.isPending) && styles.disabledButton]}
+              style={({ pressed }) => [styles.formSaveButton, (!isFormValid || createMutation.isPending) && styles.disabledButton, pressed && { opacity: 0.6 }]}
               disabled={!isFormValid || createMutation.isPending}
               onPress={() => createMutation.mutate(form)}
             >
@@ -160,7 +160,7 @@ export const AddressSelectScreen = () => {
       {!showForm && (
         <View style={styles.footer}>
           <Pressable
-            style={[styles.continueButton, !selectedId && styles.disabledButton]}
+            style={({ pressed }) => [styles.continueButton, !selectedId && styles.disabledButton, pressed && { opacity: 0.6 }]}
             disabled={!selectedId}
             onPress={() => navigation.navigate("Checkout", { addressId: selectedId! })}
           >

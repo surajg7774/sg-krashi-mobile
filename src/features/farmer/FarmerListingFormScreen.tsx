@@ -304,7 +304,7 @@ export const FarmerListingFormScreen = () => {
       </View>
 
       <Text style={styles.fieldLabel}>Harvest Date</Text>
-      <Pressable style={styles.input} onPress={openDatePicker}>
+      <Pressable style={({ pressed }) => [styles.input, pressed && { opacity: 0.6 }]} onPress={openDatePicker}>
         <Text style={{ color: form.harvestDate ? colors.textPrimary : colors.textSecondary }}>
           {form.harvestDate || "Select a date"}
         </Text>
@@ -332,7 +332,7 @@ export const FarmerListingFormScreen = () => {
 
       {formError && <Text style={styles.errorText}>{formError}</Text>}
 
-      <Pressable style={[styles.primaryButton, isSaving && styles.disabledButton]} disabled={isSaving} onPress={handleSubmit}>
+      <Pressable style={({ pressed }) => [styles.primaryButton, isSaving && styles.disabledButton, pressed && { opacity: 0.6 }]} disabled={isSaving} onPress={handleSubmit}>
         {isSaving ? <ActivityIndicator color={colors.primaryContrastText} /> : <Text style={styles.primaryButtonText}>{isEditing ? "Save Changes" : "Create Listing"}</Text>}
       </Pressable>
 
@@ -344,6 +344,7 @@ export const FarmerListingFormScreen = () => {
               <Image source={item.url} style={styles.mediaThumb} contentFit="cover" />
               <View style={styles.mediaControls}>
                 <Pressable
+                  style={({ pressed }) => pressed && { opacity: 0.6 }}
                   disabled={index === 0}
                   onPress={() => moveMedia(index, -1)}
                   hitSlop={{ top: 10, bottom: 10, left: 14, right: 14 }}
@@ -351,6 +352,7 @@ export const FarmerListingFormScreen = () => {
                   <Text style={[styles.mediaControlText, index === 0 && styles.mediaControlDisabled]}>▲</Text>
                 </Pressable>
                 <Pressable
+                  style={({ pressed }) => pressed && { opacity: 0.6 }}
                   disabled={index === media.length - 1}
                   onPress={() => moveMedia(index, 1)}
                   hitSlop={{ top: 10, bottom: 10, left: 14, right: 14 }}
@@ -359,7 +361,7 @@ export const FarmerListingFormScreen = () => {
                 </Pressable>
               </View>
               <Pressable
-                style={styles.mediaDeleteButton}
+                style={({ pressed }) => [styles.mediaDeleteButton, pressed && { opacity: 0.6 }]}
                 onPress={() => handleDeleteMedia(item.id)}
                 hitSlop={{ top: 14, bottom: 14, left: 10, right: 10 }}
               >
@@ -371,16 +373,16 @@ export const FarmerListingFormScreen = () => {
           {uploadMediaMutation.isPending && <ActivityIndicator color={colors.primary} style={{ marginVertical: 8 }} />}
 
           <View style={styles.pickButtonRow}>
-            <Pressable style={styles.pickButton} onPress={() => void pickAndUpload(true)}>
+            <Pressable style={({ pressed }) => [styles.pickButton, pressed && { opacity: 0.6 }]} onPress={() => void pickAndUpload(true)}>
               <Text style={styles.pickButtonText}>📷 Take Photo</Text>
             </Pressable>
-            <Pressable style={styles.pickButton} onPress={() => void pickAndUpload(false)}>
+            <Pressable style={({ pressed }) => [styles.pickButton, pressed && { opacity: 0.6 }]} onPress={() => void pickAndUpload(false)}>
               <Text style={styles.pickButtonText}>🖼️ Add from Gallery</Text>
             </Pressable>
           </View>
 
           <Pressable
-            style={[styles.deactivateButton, deactivateMutation.isPending && styles.disabledButton]}
+            style={({ pressed }) => [styles.deactivateButton, deactivateMutation.isPending && styles.disabledButton, pressed && { opacity: 0.6 }]}
             disabled={deactivateMutation.isPending}
             onPress={handleDeactivate}
           >

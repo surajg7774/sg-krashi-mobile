@@ -11,6 +11,7 @@ import {
   View,
 } from "react-native";
 import { Image } from "expo-image";
+import * as Haptics from "expo-haptics";
 import { useNavigation, useRoute, type RouteProp } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { StoreStackParamList } from "@/navigation/StoreStackNavigator";
@@ -45,6 +46,7 @@ export const ProductDetailScreen = () => {
       // cart-count query shares this exact key, so it refetches on its own
       // next render without this screen needing to know Home exists.
       void queryClient.invalidateQueries({ queryKey: CART_QUERY_KEY });
+      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       setAddedFeedback(true);
       setTimeout(() => setAddedFeedback(false), 2000);
     },
@@ -129,7 +131,7 @@ export const ProductDetailScreen = () => {
         <Text style={styles.description}>{product.description}</Text>
 
         <Pressable
-          style={[styles.addButton, (product.stockQty === 0 || addToCartMutation.isPending) && styles.addButtonDisabled]}
+          style={({ pressed }) => [styles.addButton, (product.stockQty === 0 || addToCartMutation.isPending) && styles.addButtonDisabled, pressed && { opacity: 0.6 }]}
           disabled={product.stockQty === 0 || addToCartMutation.isPending}
           onPress={() => addToCartMutation.mutate()}
         >

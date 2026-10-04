@@ -65,12 +65,12 @@ export const FarmerDashboardScreen = () => {
         </View>
       )}
 
-      <Pressable style={styles.navCard} onPress={() => navigation.navigate("FarmerListings")}>
+      <Pressable style={({ pressed }) => [styles.navCard, pressed && { opacity: 0.6 }]} onPress={() => navigation.navigate("FarmerListings")}>
         <Text style={styles.navCardTitle}>My Crop Listings</Text>
         <Text style={styles.navCardSubtitle}>Manage your listings on the Crop Marketplace →</Text>
       </Pressable>
 
-      <Pressable style={styles.navCard} onPress={() => navigation.navigate("FarmerPayouts")}>
+      <Pressable style={({ pressed }) => [styles.navCard, pressed && { opacity: 0.6 }]} onPress={() => navigation.navigate("FarmerPayouts")}>
         <Text style={styles.navCardTitle}>Payout History</Text>
         <Text style={styles.navCardSubtitle}>View your batched, approved, and paid payouts →</Text>
       </Pressable>

@@ -58,7 +58,7 @@ const QUICK_LINKS: QuickLink[] = [
 ];
 
 const ProductCard = ({ item, onPress }: { item: ProductSummary; onPress: () => void }) => (
-  <Pressable style={styles.card} onPress={onPress}>
+  <Pressable style={({ pressed }) => [styles.card, pressed && { opacity: 0.6 }]} onPress={onPress}>
     <Image
       source={item.thumbnailUrl ?? undefined}
       style={styles.cardImage}
@@ -126,7 +126,7 @@ export const HomeScreen = () => {
             Welcome{user ? `, ${user.name}` : ""}
           </Text>
           <View style={styles.headerIcons}>
-            <Pressable style={styles.iconButton} onPress={() => navigation.navigate("Cart")}>
+            <Pressable style={({ pressed }) => [styles.iconButton, pressed && { opacity: 0.6 }]} onPress={() => navigation.navigate("Cart")}>
               <Text style={styles.iconEmoji}>🛒</Text>
               {!!cartQuery.data?.itemCount && (
                 <View style={styles.iconBadge}>
@@ -136,7 +136,7 @@ export const HomeScreen = () => {
                 </View>
               )}
             </Pressable>
-            <Pressable style={styles.iconButton} onPress={() => navigation.navigate("Notifications")}>
+            <Pressable style={({ pressed }) => [styles.iconButton, pressed && { opacity: 0.6 }]} onPress={() => navigation.navigate("Notifications")}>
               <Text style={styles.iconEmoji}>🔔</Text>
               {!!notificationsQuery.data?.unreadCount && (
                 <View style={styles.iconBadge}>
@@ -152,7 +152,7 @@ export const HomeScreen = () => {
 
       <View style={styles.quickLinksRow}>
         {QUICK_LINKS.map((link) => (
-          <Pressable key={link.label} style={styles.quickLink} onPress={() => link.onPress(navigation)}>
+          <Pressable key={link.label} style={({ pressed }) => [styles.quickLink, pressed && { opacity: 0.6 }]} onPress={() => link.onPress(navigation)}>
             <Text style={styles.quickLinkEmoji}>{link.emoji}</Text>
             <Text style={styles.quickLinkLabel}>{link.label}</Text>
           </Pressable>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
+import * as Haptics from "expo-haptics";
 import { useNavigation, useRoute, type RouteProp } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { colors } from "@/theme/colors";
@@ -75,6 +76,7 @@ export const OrderConfirmationScreen = () => {
     // by Razorpay's webhook, which orderQuery above is already polling for.
     setInitiation(null);
     setPaymentSubmitted(true);
+    void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
 
   const handlePaymentDismiss = () => {
@@ -125,7 +127,7 @@ export const OrderConfirmationScreen = () => {
           <>
             {paymentError && <Text style={styles.errorText}>{paymentError}</Text>}
             <Pressable
-              style={[styles.payButton, initiateMutation.isPending && styles.disabledButton]}
+              style={({ pressed }) => [styles.payButton, initiateMutation.isPending && styles.disabledButton, pressed && { opacity: 0.6 }]}
               disabled={initiateMutation.isPending}
               onPress={handlePayNow}
             >
@@ -151,7 +153,7 @@ export const OrderConfirmationScreen = () => {
               This is taking longer than expected. Your payment may still be processing — check Order History in
               a few minutes, or come back to this order later.
             </Text>
-            <Pressable style={styles.refreshButton} onPress={() => void orderQuery.refetch()}>
+            <Pressable style={({ pressed }) => [styles.refreshButton, pressed && { opacity: 0.6 }]} onPress={() => void orderQuery.refetch()}>
               <Text style={styles.refreshButtonText}>Check Again</Text>
             </Pressable>
           </View>
@@ -166,12 +168,12 @@ export const OrderConfirmationScreen = () => {
 
         <View style={styles.buttonRow}>
           <Pressable
-            style={styles.secondaryButton}
+            style={({ pressed }) => [styles.secondaryButton, pressed && { opacity: 0.6 }]}
             onPress={() => navigation.navigate("MainTabs", { screen: "Store", params: { screen: "StoreList" } })}
           >
             <Text style={styles.secondaryButtonText}>Continue Shopping</Text>
           </Pressable>
-          <Pressable style={styles.secondaryButton} onPress={() => navigation.navigate("OrderHistory")}>
+          <Pressable style={({ pressed }) => [styles.secondaryButton, pressed && { opacity: 0.6 }]} onPress={() => navigation.navigate("OrderHistory")}>
             <Text style={styles.secondaryButtonText}>View Orders</Text>
           </Pressable>
         </View>

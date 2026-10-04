@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import * as Haptics from "expo-haptics";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RouteProp } from "@react-navigation/native";
@@ -49,6 +50,7 @@ export const VerifyOtpScreen = () => {
     setIsVerifying(true);
     try {
       await verifyOtp({ email, otp });
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       // No navigation call needed — AuthContext's setUser() flips
       // isAuthenticated, and RootNavigator (not this screen) reacts to that
       // by swapping the whole guest stack out, same as after a normal login.

@@ -18,7 +18,7 @@ export const PasswordField = (props: PasswordFieldProps) => {
         secureTextEntry={!visible}
         placeholderTextColor={colors.textSecondary}
       />
-      <Pressable style={styles.toggle} onPress={() => setVisible((v) => !v)}>
+      <Pressable style={({ pressed }) => [styles.toggle, pressed && { opacity: 0.6 }]} onPress={() => setVisible((v) => !v)}>
         <Text style={styles.toggleText}>{visible ? "🙈" : "👁️"}</Text>
       </Pressable>
     </View>

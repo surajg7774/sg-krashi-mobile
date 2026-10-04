@@ -26,20 +26,20 @@ export const SelectField = ({ label, value, options, onSelect, placeholder = "Se
   return (
     <View style={{ flex: 1 }}>
       <Text style={styles.fieldLabel}>{label}</Text>
-      <Pressable style={styles.selectButton} onPress={() => setOpen(true)}>
+      <Pressable style={({ pressed }) => [styles.selectButton, pressed && { opacity: 0.6 }]} onPress={() => setOpen(true)}>
         <Text style={styles.selectButtonText} numberOfLines={1}>
           {selectedLabel}
         </Text>
       </Pressable>
       <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
-        <Pressable style={styles.modalBackdrop} onPress={() => setOpen(false)}>
+        <Pressable style={({ pressed }) => [styles.modalBackdrop, pressed && { opacity: 0.6 }]} onPress={() => setOpen(false)}>
           <View style={styles.modalCard}>
             <FlatList
               data={options}
               keyExtractor={(o) => o.value}
               renderItem={({ item }) => (
                 <Pressable
-                  style={styles.modalOption}
+                  style={({ pressed }) => [styles.modalOption, pressed && { opacity: 0.6 }]}
                   onPress={() => {
                     onSelect(item.value);
                     setOpen(false);

@@ -34,7 +34,7 @@ const CartItemRow = ({
       <Text style={styles.unitPrice}>₹{item.unitPrice} each</Text>
       <View style={styles.qtyRow}>
         <Pressable
-          style={styles.qtyButton}
+          style={({ pressed }) => [styles.qtyButton, pressed && { opacity: 0.6 }]}
           onPress={onDecrement}
           disabled={isMutating || item.quantity <= 1}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
@@ -43,7 +43,7 @@ const CartItemRow = ({
         </Pressable>
         <Text style={styles.qtyValue}>{item.quantity}</Text>
         <Pressable
-          style={styles.qtyButton}
+          style={({ pressed }) => [styles.qtyButton, pressed && { opacity: 0.6 }]}
           onPress={onIncrement}
           disabled={isMutating || item.quantity >= item.availableQuantity}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
@@ -51,7 +51,7 @@ const CartItemRow = ({
           <Text style={styles.qtyButtonText}>+</Text>
         </Pressable>
         <Pressable
-          style={styles.removeButton}
+          style={({ pressed }) => [styles.removeButton, pressed && { opacity: 0.6 }]}
           onPress={onRemove}
           disabled={isMutating}
           hitSlop={{ top: 14, bottom: 14, left: 10, right: 10 }}
@@ -111,7 +111,7 @@ export const CartScreen = () => {
           message="Your cart is empty. Add products from the Store to see them here."
           action={
             <Pressable
-              style={styles.browseButton}
+              style={({ pressed }) => [styles.browseButton, pressed && { opacity: 0.6 }]}
               onPress={() => navigation.navigate("MainTabs", { screen: "Store", params: { screen: "StoreList" } })}
             >
               <Text style={styles.browseButtonText}>Browse Store</Text>
@@ -144,7 +144,7 @@ export const CartScreen = () => {
           <Text style={styles.totalLabel}>Total</Text>
           <Text style={styles.totalValue}>₹{cart.subtotal}</Text>
         </View>
-        <Pressable style={styles.checkoutButton} onPress={() => navigation.navigate("AddressSelect")}>
+        <Pressable style={({ pressed }) => [styles.checkoutButton, pressed && { opacity: 0.6 }]} onPress={() => navigation.navigate("AddressSelect")}>
           <Text style={styles.checkoutButtonText}>Proceed to Checkout</Text>
         </Pressable>
       </View>

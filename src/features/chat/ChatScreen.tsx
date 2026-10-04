@@ -113,7 +113,11 @@ export const ChatScreen = () => {
           multiline
         />
         <Pressable
-          style={[styles.sendButton, (!input.trim() || !sessionId || isSending) && styles.sendButtonDisabled]}
+          style={({ pressed }) => [
+            styles.sendButton,
+            (!input.trim() || !sessionId || isSending) && styles.sendButtonDisabled,
+            pressed && { opacity: 0.6 },
+          ]}
           disabled={!input.trim() || !sessionId || isSending}
           onPress={() => void handleSend()}
         >

@@ -59,7 +59,7 @@ export const ScanDetailScreen = () => {
         <Text style={styles.limitationsText}>{scan.limitations}</Text>
 
         <Pressable
-          style={[styles.reportButton, reportMutation.isPending && styles.disabledButton]}
+          style={({ pressed }) => [styles.reportButton, reportMutation.isPending && styles.disabledButton, pressed && { opacity: 0.6 }]}
           disabled={reportMutation.isPending}
           onPress={() => reportMutation.mutate()}
         >

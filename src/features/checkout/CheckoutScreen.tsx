@@ -89,7 +89,7 @@ export const CheckoutScreen = () => {
 
       <View style={styles.footer}>
         <Pressable
-          style={[styles.placeOrderButton, checkoutMutation.isPending && styles.disabledButton]}
+          style={({ pressed }) => [styles.placeOrderButton, checkoutMutation.isPending && styles.disabledButton, pressed && { opacity: 0.6 }]}
           disabled={checkoutMutation.isPending}
           onPress={() => checkoutMutation.mutate({ addressId: params.addressId })}
         >

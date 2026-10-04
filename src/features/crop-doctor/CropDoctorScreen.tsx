@@ -12,6 +12,7 @@ import {
   View,
 } from "react-native";
 import { Image } from "expo-image";
+import * as Haptics from "expo-haptics";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { colors } from "@/theme/colors";
@@ -32,7 +33,7 @@ const confidenceLabel: Record<string, string> = { HIGH: "High confidence", MODER
 const healthColor: Record<string, string> = { HEALTHY: colors.success, DISEASED: colors.error, UNCERTAIN: colors.warning };
 
 const HistoryRow = ({ item, onPress }: { item: CropScanSummary; onPress: () => void }) => (
-  <Pressable style={styles.historyRow} onPress={onPress}>
+  <Pressable style={({ pressed }) => [styles.historyRow, pressed && { opacity: 0.6 }]} onPress={onPress}>
     <Image source={item.imageUrl} style={styles.historyThumb} contentFit="cover" />
     <View style={{ flex: 1 }}>
       <Text style={styles.historyCrop}>{item.identifiedCrop}</Text>
@@ -68,7 +69,10 @@ export const CropDoctorScreen = () => {
 
   const analyzeMutation = useMutation({
     mutationFn: () => cropDoctorService.analyze(images, declaredCrop, language),
-    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ["crop-doctor-history"] }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["crop-doctor-history"] });
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    },
   });
 
   const reportMutation = useMutation({
@@ -205,7 +209,7 @@ export const CropDoctorScreen = () => {
 
             {scan.id !== null && (
               <Pressable
-                style={[styles.secondaryButton, reportMutation.isPending && styles.disabledButton]}
+                style={({ pressed }) => [styles.secondaryButton, reportMutation.isPending && styles.disabledButton, pressed && { opacity: 0.6 }]}
                 disabled={reportMutation.isPending}
                 onPress={() => reportMutation.mutate(scan)}
               >
@@ -225,7 +229,11 @@ export const CropDoctorScreen = () => {
             </View>
           )}
 
-          <Pressable onPress={handleReset} hitSlop={{ top: 8, bottom: 8 }}>
+          <Pressable
+            style={({ pressed }) => pressed && { opacity: 0.6 }}
+            onPress={handleReset}
+            hitSlop={{ top: 8, bottom: 8 }}
+          >
             <Text style={styles.linkText}>Scan another photo</Text>
           </Pressable>
         </View>
@@ -256,7 +264,7 @@ export const CropDoctorScreen = () => {
               <View key={img.uri} style={styles.imageThumbWrap}>
                 <Image source={img.uri} style={styles.imageThumb} contentFit="cover" />
                 <Pressable
-                  style={styles.removeImageButton}
+                  style={({ pressed }) => [styles.removeImageButton, pressed && { opacity: 0.6 }]}
                   onPress={() => removeImage(img.uri)}
                   hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
                 >
@@ -267,10 +275,10 @@ export const CropDoctorScreen = () => {
           </View>
 
           <View style={styles.pickButtonRow}>
-            <Pressable style={styles.pickButton} onPress={pickFromCamera}>
+            <Pressable style={({ pressed }) => [styles.pickButton, pressed && { opacity: 0.6 }]} onPress={pickFromCamera}>
               <Text style={styles.pickButtonText}>📷 Take Photo</Text>
             </Pressable>
-            <Pressable style={styles.pickButton} onPress={pickFromGallery}>
+            <Pressable style={({ pressed }) => [styles.pickButton, pressed && { opacity: 0.6 }]} onPress={pickFromGallery}>
               <Text style={styles.pickButtonText}>🖼️ Add from Gallery</Text>
             </Pressable>
           </View>
@@ -282,7 +290,7 @@ export const CropDoctorScreen = () => {
           )}
 
           <Pressable
-            style={[styles.primaryButton, (images.length === 0 || !declaredCrop) && styles.disabledButton]}
+            style={({ pressed }) => [styles.primaryButton, (images.length === 0 || !declaredCrop) && styles.disabledButton, pressed && { opacity: 0.6 }]}
             disabled={images.length === 0 || !declaredCrop}
             onPress={() => analyzeMutation.mutate()}
           >
@@ -309,6 +317,7 @@ export const CropDoctorScreen = () => {
           {scans.length > 0 && (
             <View style={styles.pagerRow}>
               <Pressable
+                style={({ pressed }) => pressed && { opacity: 0.6 }}
                 disabled={historyPage === 0}
                 onPress={() => setHistoryPage((p) => p - 1)}
                 hitSlop={{ top: 14, bottom: 14, left: 10, right: 10 }}
@@ -319,6 +328,7 @@ export const CropDoctorScreen = () => {
                 Page {historyPage + 1} of {totalPages}
               </Text>
               <Pressable
+                style={({ pressed }) => pressed && { opacity: 0.6 }}
                 disabled={historyPage + 1 >= totalPages}
                 onPress={() => setHistoryPage((p) => p + 1)}
                 hitSlop={{ top: 14, bottom: 14, left: 10, right: 10 }}

@@ -9,7 +9,7 @@ interface ErrorStateProps {
 export const ErrorState = ({ message, onRetry }: ErrorStateProps) => (
   <View style={styles.container}>
     <Text style={styles.message}>{message}</Text>
-    <Pressable style={styles.button} onPress={onRetry}>
+    <Pressable style={({ pressed }) => [styles.button, pressed && { opacity: 0.6 }]} onPress={onRetry}>
       <Text style={styles.buttonText}>Retry</Text>
     </Pressable>
   </View>

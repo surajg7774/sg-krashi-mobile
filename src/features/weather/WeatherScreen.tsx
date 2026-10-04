@@ -68,7 +68,7 @@ export const WeatherScreen = () => {
             setHasSearchedOnce(true);
           }}
         />
-        <Pressable style={styles.currentLocationButton} onPress={() => void retryGeolocation()}>
+        <Pressable style={({ pressed }) => [styles.currentLocationButton, pressed && { opacity: 0.6 }]} onPress={() => void retryGeolocation()}>
           <Text style={styles.currentLocationButtonText}>📍</Text>
         </Pressable>
       </View>
@@ -80,7 +80,7 @@ export const WeatherScreen = () => {
           {searchQuery.data.map((result, index) => (
             <Pressable
               key={`${result.latitude}-${result.longitude}-${index}`}
-              style={styles.resultRow}
+              style={({ pressed }) => [styles.resultRow, pressed && { opacity: 0.6 }]}
               onPress={() => handleSelectLocation(result)}
             >
               <Text style={styles.resultText}>{formatLabel(result)}</Text>
@@ -95,7 +95,7 @@ export const WeatherScreen = () => {
 
       {showKhandwaSuggestion && (
         <Pressable
-          style={styles.suggestionChip}
+          style={({ pressed }) => [styles.suggestionChip, pressed && { opacity: 0.6 }]}
           onPress={() => handleSelectLocation(KHANDWA_SUGGESTION)}
           hitSlop={{ top: 7, bottom: 7 }}
         >
@@ -104,7 +104,11 @@ export const WeatherScreen = () => {
       )}
 
       {location && (
-        <Pressable onPress={useCurrentLocation} hitSlop={{ top: 12, bottom: 12 }}>
+        <Pressable
+          style={({ pressed }) => pressed && { opacity: 0.6 }}
+          onPress={useCurrentLocation}
+          hitSlop={{ top: 12, bottom: 12 }}
+        >
           <Text style={styles.locationLabel}>
             {location.source === "geolocation" ? "📍 " : "📌 "}
             {location.label}
