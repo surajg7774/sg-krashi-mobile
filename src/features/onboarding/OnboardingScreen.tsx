@@ -1,0 +1,197 @@
+import { useRef, useState } from "react";
+import {
+  Dimensions,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { colors } from "@/theme/colors";
+
+export interface OnboardingScreenProps {
+  onDone: () => void;
+}
+
+interface Slide {
+  emoji: string;
+  title: string;
+  description: string;
+}
+
+// Describes the app's real, working features only — confirmed against
+// TabNavigator.tsx/HomeScreen.tsx's actual nav destinations. Crop
+// Marketplace is deliberately excluded: it's just a "Coming soon" alert
+// today (HomeScreen.tsx QUICK_LINKS), not a real feature to promise here.
+// Farmer tools (listings/payouts) aren't given their own slide since
+// they're role-gated and only relevant post-registration, not to every
+// first-time opener.
+const SLIDES: Slide[] = [
+  {
+    emoji: "🌱",
+    title: "Welcome to SG Krashi",
+    description:
+      "One platform connecting farmers and buyers — shop fresh produce, manage your farm, and get smart farming help, all in one app.",
+  },
+  {
+    emoji: "🏪",
+    title: "Shop the Store",
+    description:
+      "Browse fresh, organic produce and farm essentials sourced directly from local farms.",
+  },
+  {
+    emoji: "🌿",
+    title: "AI Crop Doctor & Assistant",
+    description:
+      "Snap a photo of your crop to instantly diagnose issues, or chat with our AI Assistant for farming advice anytime.",
+  },
+  {
+    emoji: "☀️",
+    title: "Weather & Mandi Prices",
+    description:
+      "Check live weather forecasts for your farm and track daily mandi (market) prices before you sell.",
+  },
+];
+
+const { width } = Dimensions.get("window");
+
+/**
+ * Shown once per install, before Login — RootNavigator gates this behind
+ * useOnboardingStatus()'s AsyncStorage flag. Plain horizontal ScrollView +
+ * pagingEnabled, not a carousel library — no such dependency exists in
+ * this app and a 4-slide intro doesn't need one.
+ */
+export const OnboardingScreen = ({ onDone }: OnboardingScreenProps) => {
+  const insets = useSafeAreaInsets();
+  const [activeIndex, setActiveIndex] = useState(0);
+  const scrollRef = useRef<ScrollView>(null);
+  const isLastSlide = activeIndex === SLIDES.length - 1;
+
+  const handleScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    setActiveIndex(Math.round(event.nativeEvent.contentOffset.x / width));
+  };
+
+  const goToNext = () => {
+    if (isLastSlide) {
+      onDone();
+      return;
+    }
+    scrollRef.current?.scrollTo({ x: (activeIndex + 1) * width, animated: true });
+  };
+
+  return (
+    <View style={styles.container}>
+      {!isLastSlide && (
+        <TouchableOpacity
+          style={[styles.skipButton, { top: insets.top + 12 }]}
+          onPress={onDone}
+        >
+          <Text style={styles.skipText}>Skip</Text>
+        </TouchableOpacity>
+      )}
+
+      <ScrollView
+        ref={scrollRef}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        onMomentumScrollEnd={handleScrollEnd}
+      >
+        {SLIDES.map((slide) => (
+          <View key={slide.title} style={[styles.slide, { width }]}>
+            <Text style={styles.emoji}>{slide.emoji}</Text>
+            <Text style={styles.title}>{slide.title}</Text>
+            <Text style={styles.description}>{slide.description}</Text>
+          </View>
+        ))}
+      </ScrollView>
+
+      <View style={[styles.footer, { paddingBottom: insets.bottom + 24 }]}>
+        <View style={styles.dotsRow}>
+          {SLIDES.map((slide, index) => (
+            <View key={slide.title} style={[styles.dot, index === activeIndex && styles.dotActive]} />
+          ))}
+        </View>
+
+        <TouchableOpacity style={styles.nextButton} onPress={goToNext}>
+          <Text style={styles.nextButtonText}>{isLastSlide ? "Get Started" : "Next"}</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  skipButton: {
+    position: "absolute",
+    right: 20,
+    zIndex: 1,
+    padding: 8,
+  },
+  skipText: {
+    color: colors.textSecondary,
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  slide: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 32,
+  },
+  emoji: {
+    fontSize: 72,
+    marginBottom: 24,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "700",
+    color: colors.textPrimary,
+    textAlign: "center",
+    marginBottom: 12,
+  },
+  description: {
+    fontSize: 15,
+    color: colors.textSecondary,
+    textAlign: "center",
+    lineHeight: 22,
+  },
+  footer: {
+    paddingHorizontal: 24,
+    paddingTop: 8,
+  },
+  dotsRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 8,
+    marginBottom: 20,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: colors.grey300,
+  },
+  dotActive: {
+    backgroundColor: colors.primary,
+    width: 20,
+  },
+  nextButton: {
+    backgroundColor: colors.primary,
+    borderRadius: 8,
+    paddingVertical: 14,
+    alignItems: "center",
+  },
+  nextButtonText: {
+    color: colors.primaryContrastText,
+    fontSize: 16,
+    fontWeight: "600",
+  },
+});
