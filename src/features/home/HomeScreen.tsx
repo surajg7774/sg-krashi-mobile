@@ -26,6 +26,7 @@ import type { TabParamList } from "@/navigation/TabNavigator";
 import type { MainStackParamList } from "@/navigation/MainStackNavigator";
 import { CardSkeletonGrid } from "@/components/Skeleton";
 import { ErrorState } from "@/components/ErrorState";
+import { EmptyState } from "@/components/EmptyState";
 
 // Composite because Home needs to navigate both within its own tab
 // navigator (Store, Weather) AND up to the parent stack (Cart, which lives
@@ -166,7 +167,11 @@ export const HomeScreen = () => {
         <ErrorState message="Could not load products." onRetry={() => void productsQuery.refetch()} />
       )}
 
-      {productsQuery.data && (
+      {productsQuery.data && productsQuery.data.items.length === 0 && (
+        <EmptyState icon="📦" message="No featured products right now — check back soon." />
+      )}
+
+      {productsQuery.data && productsQuery.data.items.length > 0 && (
         <FlatList
           data={productsQuery.data.items}
           keyExtractor={(item) => String(item.id)}

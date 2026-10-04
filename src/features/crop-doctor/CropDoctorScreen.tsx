@@ -17,6 +17,7 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { colors } from "@/theme/colors";
 import { useAuth } from "@/context/AuthContext";
 import { ErrorState } from "@/components/ErrorState";
+import { EmptyState } from "@/components/EmptyState";
 import { SelectField } from "@/components/SelectField";
 import { cropDoctorService } from "./cropDoctorService";
 import { OTHER_CROP_VALUE, SUPPORTED_LANGUAGES, type CropScan, type CropScanSummary, type PickedImage } from "./types";
@@ -293,7 +294,7 @@ export const CropDoctorScreen = () => {
             <ErrorState message="Could not load scan history." onRetry={() => void historyQuery.refetch()} />
           )}
           {!historyQuery.isLoading && scans.length === 0 && (
-            <Text style={styles.emptyText}>No scans yet — analyze your first photo above.</Text>
+            <EmptyState icon="🌿" message="No scans yet — analyze your first photo above." />
           )}
           {scans.map((item) => (
             <HistoryRow key={item.id} item={item} onPress={() => navigation.navigate("ScanDetail", { scanId: item.id })} />
@@ -407,7 +408,6 @@ const styles = StyleSheet.create({
   linkText: { color: colors.primary, fontWeight: "600", textAlign: "center", paddingVertical: 8 },
   historySection: { marginTop: 28 },
   sectionTitle: { fontSize: 17, fontWeight: "700", color: colors.textPrimary, marginBottom: 10 },
-  emptyText: { color: colors.textSecondary, fontSize: 13 },
   historyRow: {
     flexDirection: "row",
     alignItems: "center",

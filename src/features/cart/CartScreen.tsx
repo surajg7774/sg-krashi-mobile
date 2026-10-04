@@ -8,6 +8,7 @@ import { cartService, CART_QUERY_KEY } from "./cartService";
 import type { CartItem } from "./types";
 import type { MainStackParamList } from "@/navigation/MainStackNavigator";
 import { ErrorState } from "@/components/ErrorState";
+import { EmptyState } from "@/components/EmptyState";
 
 type Navigation = NativeStackNavigationProp<MainStackParamList, "Cart">;
 
@@ -98,14 +99,18 @@ export const CartScreen = () => {
   if (cart.items.length === 0) {
     return (
       <View style={styles.centered}>
-        <Text style={styles.emptyTitle}>Your cart is empty</Text>
-        <Text style={styles.emptySubtitle}>Add products from the Store to see them here.</Text>
-        <Pressable
-          style={styles.browseButton}
-          onPress={() => navigation.navigate("MainTabs", { screen: "Store", params: { screen: "StoreList" } })}
-        >
-          <Text style={styles.browseButtonText}>Browse Store</Text>
-        </Pressable>
+        <EmptyState
+          icon="🛒"
+          message="Your cart is empty. Add products from the Store to see them here."
+          action={
+            <Pressable
+              style={styles.browseButton}
+              onPress={() => navigation.navigate("MainTabs", { screen: "Store", params: { screen: "StoreList" } })}
+            >
+              <Text style={styles.browseButtonText}>Browse Store</Text>
+            </Pressable>
+          }
+        />
       </View>
     );
   }
@@ -151,17 +156,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: colors.background,
     paddingHorizontal: 32,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: colors.textPrimary,
-  },
-  emptySubtitle: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginTop: 6,
-    textAlign: "center",
   },
   browseButton: {
     marginTop: 20,

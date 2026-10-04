@@ -3,6 +3,7 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { colors } from "@/theme/colors";
 import { ErrorState } from "@/components/ErrorState";
+import { EmptyState } from "@/components/EmptyState";
 import { mandiService } from "./mandiService";
 import type { MandiPrice } from "./types";
 
@@ -109,7 +110,7 @@ export const MandiScreen = () => {
       )}
 
       {!pricesQuery.isLoading && !pricesQuery.isError && prices.length === 0 && (
-        <Text style={styles.emptyText}>No mandi price records match these filters.</Text>
+        <EmptyState icon="📈" message="No mandi price records match these filters." />
       )}
 
       {prices.length > 0 && (
@@ -151,7 +152,6 @@ const styles = StyleSheet.create({
   chipText: { fontSize: 13, color: colors.textPrimary },
   chipTextActive: { color: colors.primaryContrastText, fontWeight: "600" },
   centered: { alignItems: "center", paddingVertical: 40 },
-  emptyText: { textAlign: "center", color: colors.textSecondary, marginTop: 40 },
   list: { paddingBottom: 24 },
   row: {
     backgroundColor: colors.surface,

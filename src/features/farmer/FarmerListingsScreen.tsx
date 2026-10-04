@@ -7,6 +7,7 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useDebouncedValue } from "@/shared/useDebouncedValue";
 import { colors } from "@/theme/colors";
 import { ErrorState } from "@/components/ErrorState";
+import { EmptyState } from "@/components/EmptyState";
 import { farmerService } from "./farmerService";
 import type { CropListingSummary } from "./types";
 import type { FarmerStackParamList } from "@/navigation/FarmerStackNavigator";
@@ -72,9 +73,15 @@ export const FarmerListingsScreen = () => {
       )}
 
       {!listingsQuery.isLoading && !listingsQuery.isError && listings.length === 0 && (
-        <Text style={styles.emptyText}>
-          You haven't added any crop listings yet. Tap "+ Add" to create your first one.
-        </Text>
+        <EmptyState
+          icon="🌾"
+          message="You haven't added any crop listings yet."
+          action={
+            <Pressable style={styles.emptyAddButton} onPress={() => navigation.navigate("FarmerListingForm", {})}>
+              <Text style={styles.emptyAddButtonText}>+ Add Your First Listing</Text>
+            </Pressable>
+          }
+        />
       )}
 
       {listings.length > 0 && (
@@ -119,7 +126,14 @@ const styles = StyleSheet.create({
   addButton: { backgroundColor: colors.primary, borderRadius: 8, paddingHorizontal: 16, justifyContent: "center" },
   addButtonText: { color: colors.primaryContrastText, fontWeight: "600" },
   centered: { alignItems: "center", paddingVertical: 40 },
-  emptyText: { textAlign: "center", color: colors.textSecondary, marginTop: 40, paddingHorizontal: 20 },
+  emptyAddButton: {
+    marginTop: 4,
+    backgroundColor: colors.primary,
+    borderRadius: 8,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  emptyAddButtonText: { color: colors.primaryContrastText, fontWeight: "600" },
   list: { paddingBottom: 24 },
   row: {
     flexDirection: "row",

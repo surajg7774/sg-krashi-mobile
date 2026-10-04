@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { colors } from "@/theme/colors";
 import { ErrorState } from "@/components/ErrorState";
+import { EmptyState } from "@/components/EmptyState";
 import { farmerPayoutService } from "./farmerPayoutService";
 import type { FarmerPayoutSummary, PayoutStatus } from "./types";
 import type { FarmerStackParamList } from "@/navigation/FarmerStackNavigator";
@@ -69,7 +70,7 @@ export const FarmerPayoutsScreen = () => {
       )}
 
       {!payoutsQuery.isLoading && !payoutsQuery.isError && payouts.length === 0 && (
-        <Text style={styles.emptyText}>No payouts yet — these are created weekly once your delivered orders accrue.</Text>
+        <EmptyState icon="💰" message="No payouts yet — these are created weekly once your delivered orders accrue." />
       )}
 
       {payouts.length > 0 && (
@@ -109,7 +110,6 @@ const styles = StyleSheet.create({
   pendingAmount: { fontSize: 22, fontWeight: "700", color: colors.textPrimary, marginTop: 4 },
   pendingMeta: { fontSize: 12, color: colors.textSecondary, marginTop: 2 },
   centered: { alignItems: "center", paddingVertical: 40 },
-  emptyText: { textAlign: "center", color: colors.textSecondary, marginTop: 40, paddingHorizontal: 20 },
   list: { paddingBottom: 24 },
   row: {
     flexDirection: "row",

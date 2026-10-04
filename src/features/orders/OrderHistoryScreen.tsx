@@ -8,6 +8,7 @@ import { orderService } from "./orderService";
 import type { OrderSummary } from "./types";
 import type { MainStackParamList } from "@/navigation/MainStackNavigator";
 import { ErrorState } from "@/components/ErrorState";
+import { EmptyState } from "@/components/EmptyState";
 
 type Navigation = NativeStackNavigationProp<MainStackParamList, "OrderHistory">;
 const PAGE_SIZE = 10;
@@ -58,7 +59,18 @@ export const OrderHistoryScreen = () => {
   if (orders.length === 0) {
     return (
       <View style={styles.centered}>
-        <Text style={styles.emptyText}>You haven't placed any orders yet.</Text>
+        <EmptyState
+          icon="📦"
+          message="You haven't placed any orders yet."
+          action={
+            <Pressable
+              style={styles.browseButton}
+              onPress={() => navigation.navigate("MainTabs", { screen: "Store", params: { screen: "StoreList" } })}
+            >
+              <Text style={styles.browseButtonText}>Browse Store</Text>
+            </Pressable>
+          }
+        />
       </View>
     );
   }
@@ -86,7 +98,14 @@ export const OrderHistoryScreen = () => {
 
 const styles = StyleSheet.create({
   centered: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: colors.background, padding: 24 },
-  emptyText: { color: colors.textSecondary, textAlign: "center" },
+  browseButton: {
+    marginTop: 16,
+    backgroundColor: colors.primary,
+    borderRadius: 8,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+  },
+  browseButtonText: { color: colors.primaryContrastText, fontWeight: "600" },
   list: { padding: 16, backgroundColor: colors.background },
   row: {
     flexDirection: "row",

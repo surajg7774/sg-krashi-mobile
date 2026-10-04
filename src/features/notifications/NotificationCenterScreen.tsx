@@ -3,6 +3,7 @@ import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-q
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { colors } from "@/theme/colors";
 import { ErrorState } from "@/components/ErrorState";
+import { EmptyState } from "@/components/EmptyState";
 import { notificationService } from "./notificationService";
 import { navigateToNotificationTarget } from "@/navigation/navigationRef";
 import type { AppNotification } from "./types";
@@ -91,7 +92,7 @@ export const NotificationCenterScreen = () => {
       )}
 
       {!notificationsQuery.isLoading && !notificationsQuery.isError && notifications.length === 0 && (
-        <Text style={styles.emptyText}>You have no notifications yet.</Text>
+        <EmptyState icon="🔔" message="You have no notifications yet." />
       )}
 
       {notifications.length > 0 && (
@@ -122,7 +123,6 @@ const styles = StyleSheet.create({
   markAllButton: { padding: 14, alignItems: "center", borderBottomWidth: 1, borderBottomColor: colors.divider },
   markAllButtonText: { color: colors.primary, fontWeight: "600", fontSize: 13 },
   centered: { flex: 1, justifyContent: "center", alignItems: "center" },
-  emptyText: { textAlign: "center", color: colors.textSecondary, marginTop: 40 },
   list: { paddingBottom: 24 },
   row: {
     flexDirection: "row",

@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "@/theme/colors";
+import { EmptyState } from "@/components/EmptyState";
 import { chatService } from "./chatService";
 import type { ChatMessage } from "./types";
 
@@ -85,9 +86,10 @@ export const ChatScreen = () => {
           keyExtractor={(item) => String(item.id)}
           contentContainerStyle={styles.messageList}
           ListEmptyComponent={
-            <Text style={styles.emptyText}>
-              Ask me anything about SG Krashi — orders, bookings, how the platform works, or farming questions.
-            </Text>
+            <EmptyState
+              icon="🤖"
+              message="Ask me anything about SG Krashi — orders, bookings, how the platform works, or farming questions."
+            />
           }
           renderItem={({ item }) => (
             <View style={[styles.bubble, item.role === "user" ? styles.userBubble : styles.assistantBubble]}>
@@ -127,7 +129,6 @@ const styles = StyleSheet.create({
   centered: { flex: 1, justifyContent: "center", alignItems: "center", padding: 24 },
   errorText: { color: colors.textSecondary, textAlign: "center" },
   messageList: { padding: 16, flexGrow: 1 },
-  emptyText: { color: colors.textSecondary, textAlign: "center", marginTop: 40, fontSize: 13, paddingHorizontal: 20 },
   bubble: { borderRadius: 14, paddingHorizontal: 14, paddingVertical: 10, marginBottom: 10, maxWidth: "85%" },
   userBubble: { backgroundColor: colors.primary, alignSelf: "flex-end" },
   assistantBubble: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.divider, alignSelf: "flex-start" },

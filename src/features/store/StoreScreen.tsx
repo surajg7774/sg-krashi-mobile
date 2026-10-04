@@ -19,6 +19,7 @@ import type { ProductSummary } from "./types";
 import type { StoreStackParamList } from "@/navigation/StoreStackNavigator";
 import { CardSkeletonGrid } from "@/components/Skeleton";
 import { ErrorState } from "@/components/ErrorState";
+import { EmptyState } from "@/components/EmptyState";
 
 const PAGE_SIZE = 12;
 
@@ -106,7 +107,17 @@ export const StoreScreen = () => {
       )}
 
       {!productsQuery.isLoading && !productsQuery.isError && products.length === 0 && (
-        <Text style={styles.emptyText}>No products found{search ? ` for "${search}"` : ""}.</Text>
+        <EmptyState
+          icon="📦"
+          message={`No products found${search ? ` for "${search}"` : ""}.`}
+          action={
+            search ? (
+              <Pressable style={styles.clearSearchButton} onPress={() => setSearchInput("")}>
+                <Text style={styles.clearSearchButtonText}>Clear search</Text>
+              </Pressable>
+            ) : undefined
+          }
+        />
       )}
 
       {products.length > 0 && (
@@ -183,10 +194,17 @@ const styles = StyleSheet.create({
     color: colors.primaryContrastText,
     fontWeight: "600",
   },
-  emptyText: {
-    textAlign: "center",
-    color: colors.textSecondary,
-    marginTop: 40,
+  clearSearchButton: {
+    marginTop: 4,
+    borderWidth: 1,
+    borderColor: colors.primary,
+    borderRadius: 8,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+  },
+  clearSearchButtonText: {
+    color: colors.primary,
+    fontWeight: "600",
   },
   list: {
     paddingBottom: 24,
