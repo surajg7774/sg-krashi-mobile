@@ -19,6 +19,7 @@ export interface ProductSummary {
   avgRating: number | null;
   reviewCount: number;
   isActive: boolean;
+  createdAt: string;
 }
 
 export interface ProductMedia {

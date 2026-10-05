@@ -1,6 +1,9 @@
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { Image } from "expo-image";
 import { colors } from "@/theme/colors";
+import { cardShadow } from "@/theme/shadow";
+import { PricePill } from "@/components/PricePill";
+import { Rating } from "@/components/Rating";
 import type { RecommendationItem } from "./types";
 
 interface RecommendationRailProps {
@@ -32,12 +35,8 @@ export const RecommendationRail = ({ title, items, onPressItem }: Recommendation
             <Text style={styles.name} numberOfLines={2}>
               {item.name}
             </Text>
-            <Text style={styles.price}>₹{item.price}</Text>
-            {item.avgRating !== null && (
-              <Text style={styles.rating}>
-                ★ {item.avgRating.toFixed(1)} ({item.reviewCount})
-              </Text>
-            )}
+            <PricePill label={`₹${item.price}`} />
+            <Rating avgRating={item.avgRating} reviewCount={item.reviewCount} />
           </Pressable>
         )}
       />
@@ -53,12 +52,9 @@ const styles = StyleSheet.create({
     width: 130,
     backgroundColor: colors.surface,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.divider,
     padding: 10,
+    ...cardShadow,
   },
-  image: { width: "100%", height: 90, borderRadius: 8, marginBottom: 8, backgroundColor: colors.grey100 },
+  image: { width: "100%", aspectRatio: 1, borderRadius: 8, marginBottom: 8, backgroundColor: colors.grey100 },
   name: { fontSize: 13, fontWeight: "600", color: colors.textPrimary },
-  price: { fontSize: 13, fontWeight: "700", color: colors.primary, marginTop: 4 },
-  rating: { fontSize: 11, color: colors.textSecondary, marginTop: 2 },
 });

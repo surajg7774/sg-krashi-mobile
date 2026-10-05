@@ -14,34 +14,52 @@ import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useDebouncedValue } from "@/shared/useDebouncedValue";
 import { colors } from "@/theme/colors";
+import { cardShadow } from "@/theme/shadow";
 import { productService } from "./productService";
 import type { ProductSummary } from "./types";
 import type { StoreStackParamList } from "@/navigation/StoreStackNavigator";
 import { CardSkeletonGrid } from "@/components/Skeleton";
 import { ErrorState } from "@/components/ErrorState";
 import { EmptyState } from "@/components/EmptyState";
+import { PricePill } from "@/components/PricePill";
+import { NewBadge } from "@/components/NewBadge";
+import { Rating } from "@/components/Rating";
 
 const PAGE_SIZE = 12;
 
 type Navigation = NativeStackNavigationProp<StoreStackParamList, "StoreList">;
 
-const ProductCard = ({ item, onPress }: { item: ProductSummary; onPress: () => void }) => (
-  <Pressable style={({ pressed }) => [styles.card, pressed && { opacity: 0.6 }]} onPress={onPress}>
-    <Image
-      source={item.thumbnailUrl ?? undefined}
-      style={styles.cardImage}
-      contentFit="cover"
-      placeholder={require("../../../assets/icon.png")}
-      placeholderContentFit="contain"
-      transition={150}
-    />
-    <Text style={styles.cardName} numberOfLines={2}>
-      {item.name}
-    </Text>
-    <Text style={styles.cardPrice}>₹{item.price}</Text>
-    {item.stockQty === 0 && <Text style={styles.outOfStock}>Out of stock</Text>}
-  </Pressable>
-);
+const ProductCard = ({ item, onPress }: { item: ProductSummary; onPress: () => void }) => {
+  const outOfStock = item.stockQty === 0;
+  return (
+    <Pressable style={({ pressed }) => [styles.card, pressed && { opacity: 0.6 }]} onPress={onPress}>
+      <View style={styles.imageWrap}>
+        <Image
+          source={item.thumbnailUrl ?? undefined}
+          style={styles.cardImage}
+          contentFit="cover"
+          placeholder={require("../../../assets/icon.png")}
+          placeholderContentFit="contain"
+          transition={150}
+        />
+        {outOfStock ? (
+          <View style={styles.outOfStockBadge}>
+            <Text style={styles.outOfStockText}>Out of Stock</Text>
+          </View>
+        ) : (
+          <View style={styles.badgeSlot}>
+            <NewBadge createdAt={item.createdAt} />
+          </View>
+        )}
+      </View>
+      <Text style={styles.cardName} numberOfLines={2}>
+        {item.name}
+      </Text>
+      <PricePill label={`₹${item.price}`} />
+      <Rating avgRating={item.avgRating} reviewCount={item.reviewCount} />
+    </Pressable>
+  );
+};
 
 export const StoreScreen = () => {
   const navigation = useNavigation<Navigation>();
@@ -224,31 +242,41 @@ const styles = StyleSheet.create({
     padding: 10,
     width: "48%",
     marginBottom: 14,
-    borderWidth: 1,
-    borderColor: colors.divider,
+    ...cardShadow,
+  },
+  imageWrap: {
+    position: "relative",
   },
   cardImage: {
     width: "100%",
-    height: 110,
+    aspectRatio: 1,
     borderRadius: 8,
     marginBottom: 8,
     backgroundColor: colors.grey100,
+  },
+  badgeSlot: {
+    position: "absolute",
+    top: 6,
+    left: 6,
+  },
+  outOfStockBadge: {
+    position: "absolute",
+    top: 6,
+    left: 6,
+    backgroundColor: colors.error,
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  outOfStockText: {
+    color: colors.primaryContrastText,
+    fontSize: 10,
+    fontWeight: "700",
   },
   cardName: {
     fontSize: 14,
     fontWeight: "600",
     color: colors.textPrimary,
-  },
-  cardPrice: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: colors.primary,
-    marginTop: 4,
-  },
-  outOfStock: {
-    fontSize: 12,
-    color: colors.error,
-    marginTop: 2,
   },
   footerLoader: {
     marginVertical: 16,

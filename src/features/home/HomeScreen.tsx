@@ -27,6 +27,10 @@ import type { MainStackParamList } from "@/navigation/MainStackNavigator";
 import { CardSkeletonGrid } from "@/components/Skeleton";
 import { ErrorState } from "@/components/ErrorState";
 import { EmptyState } from "@/components/EmptyState";
+import { PricePill } from "@/components/PricePill";
+import { NewBadge } from "@/components/NewBadge";
+import { Rating } from "@/components/Rating";
+import { cardShadow } from "@/theme/shadow";
 
 // Composite because Home needs to navigate both within its own tab
 // navigator (Store, Weather) AND up to the parent stack (Cart, which lives
@@ -59,16 +63,22 @@ const QUICK_LINKS: QuickLink[] = [
 
 const ProductCard = ({ item, onPress }: { item: ProductSummary; onPress: () => void }) => (
   <Pressable style={({ pressed }) => [styles.card, pressed && { opacity: 0.6 }]} onPress={onPress}>
-    <Image
-      source={item.thumbnailUrl ?? undefined}
-      style={styles.cardImage}
-      contentFit="cover"
-      transition={150}
-    />
+    <View style={styles.imageWrap}>
+      <Image
+        source={item.thumbnailUrl ?? undefined}
+        style={styles.cardImage}
+        contentFit="cover"
+        transition={150}
+      />
+      <View style={styles.badgeSlot}>
+        <NewBadge createdAt={item.createdAt} />
+      </View>
+    </View>
     <Text style={styles.cardName} numberOfLines={2}>
       {item.name}
     </Text>
-    <Text style={styles.cardPrice}>₹{item.price}</Text>
+    <PricePill label={`₹${item.price}`} />
+    <Rating avgRating={item.avgRating} reviewCount={item.reviewCount} />
   </Pressable>
 );
 
@@ -305,25 +315,26 @@ const styles = StyleSheet.create({
     padding: 10,
     width: "48%",
     marginBottom: 14,
-    borderWidth: 1,
-    borderColor: colors.divider,
+    ...cardShadow,
+  },
+  imageWrap: {
+    position: "relative",
   },
   cardImage: {
     width: "100%",
-    height: 100,
+    aspectRatio: 1,
     borderRadius: 8,
     marginBottom: 8,
     backgroundColor: colors.grey100,
+  },
+  badgeSlot: {
+    position: "absolute",
+    top: 6,
+    left: 6,
   },
   cardName: {
     fontSize: 14,
     fontWeight: "600",
     color: colors.textPrimary,
-  },
-  cardPrice: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: colors.primary,
-    marginTop: 4,
   },
 });

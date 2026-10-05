@@ -9,6 +9,8 @@ import { colors } from "@/theme/colors";
 import { ErrorState } from "@/components/ErrorState";
 import { EmptyState } from "@/components/EmptyState";
 import { ListRowSkeletonList } from "@/components/Skeleton";
+import { PricePill } from "@/components/PricePill";
+import { cardShadow } from "@/theme/shadow";
 import { farmerService } from "./farmerService";
 import type { CropListingSummary } from "./types";
 import type { FarmerStackParamList } from "@/navigation/FarmerStackNavigator";
@@ -25,8 +27,9 @@ const ListingRow = ({ item, onPress }: { item: CropListingSummary; onPress: () =
         {item.name}
       </Text>
       <Text style={styles.meta}>
-        {item.categoryName ?? "Uncategorized"} · ₹{item.unitPrice} · {item.quantityAvailable} available
+        {item.categoryName ?? "Uncategorized"} · {item.quantityAvailable} available
       </Text>
+      <PricePill label={`₹${item.unitPrice}`} />
     </View>
     <Text style={[styles.statusBadge, item.isActive ? styles.statusActive : styles.statusInactive]}>
       {item.isActive ? "Active" : "Inactive"}
@@ -149,10 +152,9 @@ const styles = StyleSheet.create({
     gap: 12,
     backgroundColor: colors.surface,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.divider,
     padding: 10,
     marginBottom: 10,
+    ...cardShadow,
   },
   thumb: { width: 56, height: 56, borderRadius: 8, backgroundColor: colors.grey100 },
   name: { fontSize: 15, fontWeight: "600", color: colors.textPrimary },
