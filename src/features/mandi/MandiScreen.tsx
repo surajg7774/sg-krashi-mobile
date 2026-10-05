@@ -62,7 +62,9 @@ export const MandiScreen = () => {
     state,
   });
   // No chips (and no trend card) when the server says nothing has been synced.
-  const showChips = availability === "ready" || availability === "loading";
+  // Chips stay up in the error state: a failing list under a selected chip
+  // must still let the user deselect it (they only render once filters loaded).
+  const showChips = availability !== "awaiting";
   const retryFailed = () => {
     if (metaQuery.isError) void metaQuery.refetch();
     if (filtersQuery.isError) void filtersQuery.refetch();
