@@ -7,6 +7,7 @@ import { GuestStackNavigator } from "./GuestStackNavigator";
 import { MainStackNavigator } from "./MainStackNavigator";
 import { navigationRef, navigateToNotificationTarget } from "./navigationRef";
 import { parseNotificationDeepLink } from "@/notifications/pushNotifications";
+import { useOrderPushRefresh } from "@/notifications/useOrderPushRefresh";
 import { colors } from "@/theme/colors";
 import { OnboardingScreen } from "@/features/onboarding/OnboardingScreen";
 import { useOnboardingStatus } from "@/features/onboarding/useOnboardingStatus";
@@ -36,6 +37,7 @@ export const RootNavigator = () => {
   const { isAuthenticated, isLoading } = useAuth();
   const { hasSeenOnboarding, isLoading: onboardingLoading, markSeen } = useOnboardingStatus();
   useNotificationTapHandler();
+  useOrderPushRefresh();
 
   if (isLoading || onboardingLoading) {
     return (

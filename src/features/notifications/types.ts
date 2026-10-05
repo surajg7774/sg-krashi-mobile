@@ -1,6 +1,8 @@
 // Matches com.sgkrashi.notification's real entity/DTOs exactly.
 export type NotificationType =
+  | "ORDER_PLACED"
   | "ORDER_CONFIRMED"
+  | "ORDER_SHIPPED"
   | "ORDER_DELIVERED"
   | "PAYMENT_FAILED"
   | "BOOKING_CONFIRMED"

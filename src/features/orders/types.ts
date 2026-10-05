@@ -1,6 +1,6 @@
 // Ported from sg-krashi-client/src/features/orders/types.ts.
 
-export type OrderStatus = "PENDING_PAYMENT" | "CONFIRMED" | "DELIVERED" | "PAYMENT_FAILED" | "REFUNDED";
+export type OrderStatus = "PENDING_PAYMENT" | "CONFIRMED" | "SHIPPED" | "DELIVERED" | "PAYMENT_FAILED" | "REFUNDED";
 export type ItemType = "PRODUCT" | "CROP_LISTING";
 
 export interface OrderItem {

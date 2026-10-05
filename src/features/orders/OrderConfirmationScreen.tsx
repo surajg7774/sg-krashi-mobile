@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import * as Haptics from "expo-haptics";
 import { useNavigation, useRoute, type RouteProp } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -10,6 +10,9 @@ import { orderService } from "./orderService";
 import { paymentService } from "@/features/payment/paymentService";
 import { RazorpayWebView, type RazorpaySuccessPayload } from "@/features/payment/RazorpayWebView";
 import type { PaymentInitiation } from "@/features/payment/types";
+import { OrderTimeline } from "./OrderTimeline";
+import { isActiveOrderStatus } from "./orderTimelineSteps";
+import { orderStatusColor, orderStatusLabel, ORDER_STATUS_TITLE } from "./orderStatusDisplay";
 import type { MainStackParamList } from "@/navigation/MainStackNavigator";
 import { ErrorState } from "@/components/ErrorState";
 
@@ -19,6 +22,11 @@ type ConfirmationRoute = RouteProp<MainStackParamList, "OrderConfirmation">;
 // Same polling shape as sg-krashi-client's useOrderDetail.ts: keep polling
 // only while the order is still waiting on the async webhook to resolve it.
 const ACTIVE_POLL_INTERVAL_MS = 3000;
+
+// Once paid, an order keeps moving (shipped, delivered) without any push reaching
+// a screen that is already open in the background — re-check gently, and let a
+// foreground push refresh it immediately (see useOrderPushRefresh).
+const IN_PROGRESS_POLL_INTERVAL_MS = 30_000;
 
 // The web app polls forever with no fallback — fine there, since a page
 // reload is trivial. On mobile, a spinner with no end in sight reads as
@@ -41,7 +49,11 @@ export const OrderConfirmationScreen = () => {
   const orderQuery = useQuery({
     queryKey: ["order", params.orderId],
     queryFn: () => orderService.getOrderDetail(params.orderId),
-    refetchInterval: (query) => (query.state.data?.status === "PENDING_PAYMENT" ? ACTIVE_POLL_INTERVAL_MS : false),
+    refetchInterval: (query) => {
+      const current = query.state.data?.status;
+      if (current === "PENDING_PAYMENT") return ACTIVE_POLL_INTERVAL_MS;
+      return current && isActiveOrderStatus(current) ? IN_PROGRESS_POLL_INTERVAL_MS : false;
+    },
   });
 
   const status = orderQuery.data?.status;
@@ -107,11 +119,11 @@ export const OrderConfirmationScreen = () => {
   const order = orderQuery.data;
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.containerContent}>
       <View style={styles.card}>
-        <Text style={styles.title}>{order.status === "CONFIRMED" ? "Order Confirmed!" : "Order Placed"}</Text>
+        <Text style={styles.title}>{ORDER_STATUS_TITLE[order.status] ?? "Order"}</Text>
         <Text style={styles.orderNumber}>Order #{order.orderNumber}</Text>
-        <Text style={styles.statusBadge}>{order.status.replace("_", " ")}</Text>
+        <Text style={[styles.statusBadge, { color: orderStatusColor(order.status) }]}>{orderStatusLabel(order.status)}</Text>
         <Text style={styles.amount}>₹{order.totalAmount}</Text>
 
         {order.items.map((item) => (
@@ -166,6 +178,11 @@ export const OrderConfirmationScreen = () => {
           </Text>
         )}
 
+        <View style={styles.timelineSection}>
+          <Text style={styles.sectionTitle}>Order status</Text>
+          <OrderTimeline events={order.statusHistory} status={order.status} />
+        </View>
+
         <View style={styles.buttonRow}>
           <Pressable
             style={({ pressed }) => [styles.secondaryButton, pressed && { opacity: 0.6 }]}
@@ -193,12 +210,13 @@ export const OrderConfirmationScreen = () => {
           onError={handlePaymentError}
         />
       )}
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background, padding: 16 },
+  container: { flex: 1, backgroundColor: colors.background },
+  containerContent: { padding: 16, paddingBottom: 32 },
   centered: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: colors.background },
   card: {
     backgroundColor: colors.surface,
@@ -212,8 +230,7 @@ const styles = StyleSheet.create({
   orderNumber: { fontSize: 14, color: colors.textSecondary, marginTop: 4 },
   statusBadge: {
     fontSize: 12,
-    fontWeight: "600",
-    color: colors.primary,
+    fontWeight: "700",
     marginTop: 8,
     textTransform: "uppercase",
   },
@@ -252,6 +269,14 @@ const styles = StyleSheet.create({
   refreshButtonText: { color: colors.primary, fontWeight: "600" },
   failedText: { color: colors.textSecondary, textAlign: "center", marginTop: 16 },
   errorText: { color: colors.error, marginTop: 12, textAlign: "center" },
+  timelineSection: {
+    alignSelf: "stretch",
+    marginTop: 20,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: colors.divider,
+  },
+  sectionTitle: { fontSize: 14, fontWeight: "700", color: colors.textPrimary, marginBottom: 12 },
   buttonRow: { flexDirection: "row", gap: 12, marginTop: 24 },
   secondaryButton: {
     borderWidth: 1,

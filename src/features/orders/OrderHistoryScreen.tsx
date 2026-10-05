@@ -6,6 +6,7 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { colors } from "@/theme/colors";
 import { orderService } from "./orderService";
 import type { OrderSummary } from "./types";
+import { orderStatusColor, orderStatusLabel } from "./orderStatusDisplay";
 import type { MainStackParamList } from "@/navigation/MainStackNavigator";
 import { ErrorState } from "@/components/ErrorState";
 import { EmptyState } from "@/components/EmptyState";
@@ -24,7 +25,9 @@ const OrderRow = ({ order, onPress }: { order: OrderSummary; onPress: () => void
     </View>
     <View style={styles.rowRight}>
       <Text style={styles.amount}>₹{order.totalAmount}</Text>
-      <Text style={styles.status}>{order.status.replace("_", " ")}</Text>
+      <View style={[styles.statusChip, { borderColor: orderStatusColor(order.status), backgroundColor: `${orderStatusColor(order.status)}1A` }]}>
+        <Text style={[styles.statusChipText, { color: orderStatusColor(order.status) }]}>{orderStatusLabel(order.status)}</Text>
+      </View>
     </View>
   </Pressable>
 );
@@ -125,6 +128,7 @@ const styles = StyleSheet.create({
   itemCount: { fontSize: 12, color: colors.textSecondary, marginTop: 2 },
   rowRight: { alignItems: "flex-end" },
   amount: { fontSize: 14, fontWeight: "700", color: colors.primary },
-  status: { fontSize: 11, color: colors.textSecondary, marginTop: 2, textTransform: "uppercase" },
+  statusChip: { marginTop: 4, borderWidth: 1, borderRadius: 10, paddingHorizontal: 8, paddingVertical: 2 },
+  statusChipText: { fontSize: 11, fontWeight: "700" },
   footerLoader: { marginVertical: 16 },
 });
