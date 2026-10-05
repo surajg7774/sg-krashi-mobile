@@ -6,6 +6,7 @@ import { ErrorState } from "@/components/ErrorState";
 import { EmptyState } from "@/components/EmptyState";
 import { ListRowSkeletonList } from "@/components/Skeleton";
 import { mandiService } from "./mandiService";
+import { resolveMandiAvailability } from "./mandiAvailability";
 import { MandiTrendCard } from "./MandiTrendCard";
 import type { MandiPrice } from "./types";
 
@@ -54,6 +55,20 @@ export const MandiScreen = () => {
 
   const prices = useMemo(() => pricesQuery.data?.pages.flatMap((page) => page.items) ?? [], [pricesQuery.data]);
 
+  const availability = resolveMandiAvailability({
+    meta: { isLoading: metaQuery.isLoading, isError: metaQuery.isError, data: metaQuery.data },
+    filters: { isLoading: filtersQuery.isLoading, isError: filtersQuery.isError, data: filtersQuery.data },
+    prices: { isError: pricesQuery.isError, itemCount: prices.length },
+    state,
+  });
+  // No chips (and no trend card) when the server says nothing has been synced.
+  const showChips = availability === "ready" || availability === "loading";
+  const retryFailed = () => {
+    if (metaQuery.isError) void metaQuery.refetch();
+    if (filtersQuery.isError) void filtersQuery.refetch();
+    if (pricesQuery.isError) void pricesQuery.refetch();
+  };
+
   return (
     <View style={styles.container}>
       {metaQuery.data && (
@@ -65,7 +80,7 @@ export const MandiScreen = () => {
         </Text>
       )}
 
-      {filtersQuery.data && filtersQuery.data.states.length > 0 && (
+      {showChips && filtersQuery.data && filtersQuery.data.states.length > 0 && (
         <FlatList
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -84,7 +99,7 @@ export const MandiScreen = () => {
         />
       )}
 
-      {filtersQuery.data && filtersQuery.data.commodities.length > 0 && (
+      {showChips && filtersQuery.data && filtersQuery.data.commodities.length > 0 && (
         <FlatList
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -103,15 +118,25 @@ export const MandiScreen = () => {
         />
       )}
 
-      {commodity && <MandiTrendCard commodity={commodity} state={state} />}
+      {availability === "ready" && commodity && <MandiTrendCard commodity={commodity} state={state} />}
 
-      {pricesQuery.isLoading && <ListRowSkeletonList count={6} lines={3} />}
-
-      {pricesQuery.isError && (
-        <ErrorState message="Could not load mandi prices." onRetry={() => void pricesQuery.refetch()} />
+      {(availability === "loading" || (availability === "ready" && pricesQuery.isLoading)) && (
+        <ListRowSkeletonList count={6} lines={3} />
       )}
 
-      {!pricesQuery.isLoading && !pricesQuery.isError && prices.length === 0 && (
+      {availability === "awaiting" && (
+        <EmptyState
+          icon="📈"
+          message="Awaiting Agmarknet data"
+          description="Mandi prices will appear here once the daily sync has data."
+        />
+      )}
+
+      {(availability === "error" || (availability === "ready" && pricesQuery.isError)) && (
+        <ErrorState message="Could not load mandi prices." onRetry={retryFailed} />
+      )}
+
+      {availability === "ready" && !pricesQuery.isLoading && !pricesQuery.isError && prices.length === 0 && (
         <EmptyState icon="📈" message="No mandi price records match these filters." />
       )}
 
