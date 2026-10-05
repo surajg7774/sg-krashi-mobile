@@ -2,6 +2,7 @@ import { useState } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
+  Linking,
   Platform,
   ScrollView,
   StyleSheet,
@@ -16,8 +17,13 @@ import { colors } from "@/theme/colors";
 import { PasswordField } from "@/components/PasswordField";
 import { GoogleSignInButton } from "@/components/GoogleSignInButton";
 import { authService } from "./authService";
+import { PRIVACY_POLICY_URL, TERMS_URL } from "@/config/legal";
 import type { ApiError } from "@/api/types";
 import type { GuestStackParamList } from "@/navigation/GuestStackNavigator";
+
+const openWebPage = (url: string) => {
+  void Linking.openURL(url).catch(() => undefined);
+};
 
 type Navigation = NativeStackNavigationProp<GuestStackParamList, "Register">;
 
@@ -118,6 +124,18 @@ export const RegisterScreen = () => {
           )}
         </TouchableOpacity>
 
+        <Text style={styles.consentText}>
+          By signing up you agree to the{" "}
+          <Text style={styles.consentLink} onPress={() => openWebPage(TERMS_URL)}>
+            Terms
+          </Text>{" "}
+          and{" "}
+          <Text style={styles.consentLink} onPress={() => openWebPage(PRIVACY_POLICY_URL)}>
+            Privacy Policy
+          </Text>
+          .
+        </Text>
+
         <GoogleSignInButton onError={setError} />
 
         <TouchableOpacity
@@ -179,6 +197,17 @@ const styles = StyleSheet.create({
   buttonText: {
     color: colors.primaryContrastText,
     fontSize: 16,
+    fontWeight: "600",
+  },
+  consentText: {
+    marginTop: 14,
+    fontSize: 12,
+    lineHeight: 18,
+    color: colors.textSecondary,
+    textAlign: "center",
+  },
+  consentLink: {
+    color: colors.primary,
     fontWeight: "600",
   },
   loginLink: {

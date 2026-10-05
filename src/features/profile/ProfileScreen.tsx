@@ -1,4 +1,5 @@
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useState } from "react";
+import { Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation, type CompositeNavigationProp } from "@react-navigation/native";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
@@ -7,6 +8,13 @@ import { useAuth } from "@/context/AuthContext";
 import { colors } from "@/theme/colors";
 import type { TabParamList } from "@/navigation/TabNavigator";
 import type { MainStackParamList } from "@/navigation/MainStackNavigator";
+import { PRIVACY_POLICY_URL, TERMS_URL } from "@/config/legal";
+import { DeleteAccountModal } from "./DeleteAccountModal";
+
+// The legal pages are the website's; open them in the browser rather than keeping a copy in the app.
+const openWebPage = (url: string) => {
+  void Linking.openURL(url).catch(() => undefined);
+};
 
 type Navigation = CompositeNavigationProp<
   BottomTabNavigationProp<TabParamList, "Profile">,
@@ -21,6 +29,8 @@ export const ProfileScreen = () => {
   const { user, logout } = useAuth();
   const navigation = useNavigation<Navigation>();
   const insets = useSafeAreaInsets();
+
+  const [showDeleteAccount, setShowDeleteAccount] = useState(false);
 
   const initial = user?.name?.trim().charAt(0).toUpperCase() || "?";
 
@@ -45,8 +55,22 @@ export const ProfileScreen = () => {
             <Text style={styles.menuItemText}>Notifications</Text>
             <Text style={styles.menuItemChevron}>›</Text>
           </TouchableOpacity>
+          <TouchableOpacity style={styles.menuItem} onPress={() => openWebPage(PRIVACY_POLICY_URL)}>
+            <Text style={styles.menuItemText}>Privacy Policy</Text>
+            <Text style={styles.menuItemChevron}>›</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.menuItem} onPress={() => openWebPage(TERMS_URL)}>
+            <Text style={styles.menuItemText}>Terms &amp; Conditions</Text>
+            <Text style={styles.menuItemChevron}>›</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.menuItem} onPress={() => setShowDeleteAccount(true)}>
+            <Text style={[styles.menuItemText, styles.menuItemDestructive]}>Delete account</Text>
+            <Text style={styles.menuItemChevron}>›</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
+
+      <DeleteAccountModal visible={showDeleteAccount} onClose={() => setShowDeleteAccount(false)} />
 
       <View style={[styles.footer, { paddingBottom: insets.bottom + 16 }]}>
         <TouchableOpacity style={styles.ordersButton} onPress={() => navigation.navigate("OrderHistory")}>
@@ -125,6 +149,9 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.textPrimary,
     fontWeight: "500",
+  },
+  menuItemDestructive: {
+    color: colors.error,
   },
   menuItemChevron: {
     fontSize: 20,
