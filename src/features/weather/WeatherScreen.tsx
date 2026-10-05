@@ -13,6 +13,8 @@ import {
 import { colors } from "@/theme/colors";
 import { useDebouncedValue } from "@/shared/useDebouncedValue";
 import { ErrorState } from "@/components/ErrorState";
+import { BlockSkeleton } from "@/components/Skeleton";
+import { WeatherForecastChart } from "./WeatherForecastChart";
 import { weatherService } from "./weatherService";
 import { useWeatherLocation } from "./useWeatherLocation";
 import { KHANDWA_SUGGESTION, type GeocodingResult } from "./types";
@@ -133,8 +135,11 @@ export const WeatherScreen = () => {
       )}
 
       {location && weatherQuery.isLoading && (
-        <View style={styles.centered}>
-          <ActivityIndicator color={colors.primary} />
+        <View>
+          <View style={styles.centered}>
+            <ActivityIndicator color={colors.primary} />
+          </View>
+          <BlockSkeleton height={230} />
         </View>
       )}
 
@@ -168,6 +173,17 @@ export const WeatherScreen = () => {
               <Text style={styles.statValue}>{weatherQuery.data.forecastPrecipitationNext24hMm.toFixed(1)} mm</Text>
             </View>
           </View>
+        </View>
+      )}
+
+      {location && weatherQuery.data && (
+        <View style={styles.trendCard}>
+          <Text style={styles.trendTitle}>NEXT 7 DAYS</Text>
+          {(weatherQuery.data.daily?.length ?? 0) >= 2 ? (
+            <WeatherForecastChart daily={weatherQuery.data.daily ?? []} />
+          ) : (
+            <Text style={styles.helperText}>The 7-day trend is unavailable right now.</Text>
+          )}
         </View>
       )}
     </ScrollView>
@@ -257,4 +273,13 @@ const styles = StyleSheet.create({
   },
   statLabel: { fontSize: 12, color: colors.textSecondary },
   statValue: { fontSize: 16, fontWeight: "700", color: colors.textPrimary, marginTop: 4 },
+  trendCard: {
+    backgroundColor: colors.surface,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.divider,
+    padding: 16,
+    marginTop: 16,
+  },
+  trendTitle: { fontSize: 12, fontWeight: "700", color: colors.primary, letterSpacing: 0.8, marginBottom: 12 },
 });

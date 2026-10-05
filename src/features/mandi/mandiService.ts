@@ -1,6 +1,6 @@
 import { apiClient } from "@/api/client";
 import type { Paginated } from "@/api/types";
-import type { MandiFilterOptions, MandiPrice, MandiSyncMeta } from "./types";
+import type { MandiFilterOptions, MandiPrice, MandiSyncMeta, MandiTrendPoint } from "./types";
 
 export interface MandiPriceSearchParams {
   commodity?: string;
@@ -19,6 +19,11 @@ export const mandiService = {
 
   getFilterOptions: async (state?: string): Promise<MandiFilterOptions> => {
     const response = await apiClient.get<MandiFilterOptions>("/mandi/prices/filters", { params: { state } });
+    return response.data;
+  },
+
+  getTrend: async (commodity: string, state?: string, market?: string): Promise<MandiTrendPoint[]> => {
+    const response = await apiClient.get<MandiTrendPoint[]>("/mandi/prices/trend", { params: { commodity, state, market } });
     return response.data;
   },
 

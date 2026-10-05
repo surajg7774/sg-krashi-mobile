@@ -1,5 +1,13 @@
 // Mirrors sg-krashi-client/src/features/weather/types.ts exactly — same
 // backend endpoint (public, unauthenticated /api/v1/weather/*).
+// One day of the 7-day forecast, in the location's own timezone ("YYYY-MM-DD").
+export interface DailyForecastPoint {
+  date: string;
+  tempMaxC: number;
+  tempMinC: number;
+  rainMm: number;
+}
+
 export interface CurrentWeather {
   temperatureCelsius: number;
   humidityPercent: number;
@@ -7,6 +15,9 @@ export interface CurrentWeather {
   forecastSummary: string;
   forecastMinTempCelsius: number;
   forecastPrecipitationNext24hMm: number;
+  // Empty when the server's separate daily-forecast call failed; absent on
+  // servers older than this field.
+  daily?: DailyForecastPoint[];
 }
 
 export interface GeocodingResult {

@@ -17,6 +17,13 @@ export interface MandiFilterOptions {
   markets: string[];
 }
 
+// One point per day: the server averages the modal price across the markets
+// matching the filters (GET /mandi/prices/trend).
+export interface MandiTrendPoint {
+  priceDate: string;
+  modalPrice: number;
+}
+
 export interface MandiSyncMeta {
   lastSyncedAt: string | null;
   totalRows: number;

@@ -25,6 +25,11 @@ const PulsingBox = ({ style }: { style: object }) => {
   return <Animated.View style={[style, { opacity, backgroundColor: colors.grey100 }]} />;
 };
 
+/** A single pulsing block the size of a chart/card — for content that isn't a list row or a grid card. */
+export const BlockSkeleton = ({ height }: { height: number }) => (
+  <PulsingBox style={{ width: "100%", height, borderRadius: 12 }} />
+);
+
 const CardSkeleton = () => (
   <View style={styles.card}>
     <PulsingBox style={styles.cardImage} />

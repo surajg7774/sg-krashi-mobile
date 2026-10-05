@@ -6,6 +6,7 @@ import { ErrorState } from "@/components/ErrorState";
 import { EmptyState } from "@/components/EmptyState";
 import { ListRowSkeletonList } from "@/components/Skeleton";
 import { mandiService } from "./mandiService";
+import { MandiTrendCard } from "./MandiTrendCard";
 import type { MandiPrice } from "./types";
 
 const PAGE_SIZE = 20;
@@ -101,6 +102,8 @@ export const MandiScreen = () => {
           )}
         />
       )}
+
+      {commodity && <MandiTrendCard commodity={commodity} state={state} />}
 
       {pricesQuery.isLoading && <ListRowSkeletonList count={6} lines={3} />}
 
