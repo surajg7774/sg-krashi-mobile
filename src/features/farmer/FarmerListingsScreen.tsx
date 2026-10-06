@@ -7,6 +7,8 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useDebouncedValue } from "@/shared/useDebouncedValue";
 import { colors } from "@/theme/colors";
 import { MEDIA_WIDTH, resizedMediaUrl } from "@/shared/media";
+import { fill, farmerListingStatus, formatRupees, trimName } from "@/features/crop-marketplace/cropLogic";
+import { cropStrings } from "@/features/crop-marketplace/strings";
 import { ErrorState } from "@/components/ErrorState";
 import { EmptyState } from "@/components/EmptyState";
 import { ListRowSkeletonList } from "@/components/Skeleton";
@@ -20,23 +22,38 @@ const PAGE_SIZE = 20;
 
 type Navigation = NativeStackNavigationProp<FarmerStackParamList, "FarmerListings">;
 
-const ListingRow = ({ item, onPress }: { item: CropListingSummary; onPress: () => void }) => (
-  <Pressable style={({ pressed }) => [styles.row, pressed && { opacity: 0.6 }]} onPress={onPress}>
-    <Image source={resizedMediaUrl(item.thumbnailUrl, MEDIA_WIDTH.row)} style={styles.thumb} contentFit="cover" />
-    <View style={{ flex: 1 }}>
-      <Text style={styles.name} numberOfLines={1}>
-        {item.name}
+const STATUS_LABEL = { active: cropStrings.farmer.active, inactive: cropStrings.farmer.inactive, soldOut: cropStrings.farmer.soldOut } as const;
+
+const ListingRow = ({ item, onPress }: { item: CropListingSummary; onPress: () => void }) => {
+  const status = farmerListingStatus(item);
+  return (
+    <Pressable
+      style={({ pressed }) => [styles.row, pressed && { opacity: 0.6 }]}
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={fill(cropStrings.farmer.listingRow, {
+        name: trimName(item.name),
+        category: item.categoryName ?? cropStrings.farmer.uncategorized,
+        status: STATUS_LABEL[status],
+        price: formatRupees(item.unitPrice),
+      })}
+    >
+      <Image source={resizedMediaUrl(item.thumbnailUrl, MEDIA_WIDTH.row)} style={styles.thumb} contentFit="cover" accessible={false} />
+      <View style={{ flex: 1 }}>
+        <Text style={styles.name} numberOfLines={1}>
+          {trimName(item.name)}
+        </Text>
+        <Text style={styles.meta}>
+          {item.categoryName ?? cropStrings.farmer.uncategorized} · {status === "soldOut" ? cropStrings.farmer.soldOut : fill(cropStrings.farmer.available, { count: item.quantityAvailable })}
+        </Text>
+        <PricePill label={formatRupees(item.unitPrice)} />
+      </View>
+      <Text style={[styles.statusBadge, status === "active" && styles.statusActive, status === "soldOut" && styles.statusSoldOut, status === "inactive" && styles.statusInactive]}>
+        {STATUS_LABEL[status]}
       </Text>
-      <Text style={styles.meta}>
-        {item.categoryName ?? "Uncategorized"} · {item.quantityAvailable} available
-      </Text>
-      <PricePill label={`₹${item.unitPrice}`} />
-    </View>
-    <Text style={[styles.statusBadge, item.isActive ? styles.statusActive : styles.statusInactive]}>
-      {item.isActive ? "Active" : "Inactive"}
-    </Text>
-  </Pressable>
-);
+    </Pressable>
+  );
+};
 
 export const FarmerListingsScreen = () => {
   const navigation = useNavigation<Navigation>();
@@ -162,6 +179,7 @@ const styles = StyleSheet.create({
   meta: { fontSize: 12, color: colors.textSecondary, marginTop: 2 },
   statusBadge: { fontSize: 11, fontWeight: "700", paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, overflow: "hidden" },
   statusActive: { color: colors.success, backgroundColor: colors.grey100 },
+  statusSoldOut: { color: colors.error, backgroundColor: colors.grey100 },
   statusInactive: { color: colors.textSecondary, backgroundColor: colors.grey100 },
   footerLoader: { marginVertical: 16 },
 });

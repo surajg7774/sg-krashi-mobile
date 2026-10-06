@@ -74,6 +74,18 @@ export const fromIsoDay = (value: string, fallback: Date = new Date()): Date => 
   return date.getMonth() === Number(match[2]) - 1 ? date : fallback;
 };
 
+// ---- the farmer's own listings -----------------------------------------------------------------------------
+
+export type FarmerListingStatus = "inactive" | "soldOut" | "active";
+
+/** What a farmer's own listing is doing: deactivated, active but out of stock, or on sale. */
+export const farmerListingStatus = (listing: { isActive: boolean; quantityAvailable: number }): FarmerListingStatus =>
+  !listing.isActive ? "inactive" : isSoldOut(listing.quantityAvailable) ? "soldOut" : "active";
+
+/** "Mark sold out" only makes sense for an active listing that still has stock. */
+export const canMarkSoldOut = (isActive: boolean, quantityAvailable: number | null): boolean =>
+  isActive && quantityAvailable !== null && quantityAvailable > 0;
+
 // ---- filters ---------------------------------------------------------------------------------------------
 
 export interface CropFilters {

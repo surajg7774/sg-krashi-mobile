@@ -19,6 +19,8 @@ import { useNavigation, useRoute, type RouteProp } from "@react-navigation/nativ
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { colors } from "@/theme/colors";
 import { MEDIA_WIDTH, resizedMediaUrl } from "@/shared/media";
+import { canMarkSoldOut, fill, trimName } from "@/features/crop-marketplace/cropLogic";
+import { cropStrings } from "@/features/crop-marketplace/strings";
 import { SelectField } from "@/components/SelectField";
 import { ErrorState } from "@/components/ErrorState";
 import { farmerService } from "./farmerService";
@@ -126,6 +128,19 @@ export const FarmerListingFormScreen = () => {
     },
   });
 
+  // Uses the existing update call with the quantity set to 0: no new server endpoint. Any other edits on screen are saved with it.
+  const soldOutMutation = useMutation({
+    mutationFn: () => farmerService.updateOwnListing(listingId!, { ...form, quantityAvailable: 0 }),
+    onSuccess: () => {
+      setFormError(null);
+      setForm((f) => ({ ...f, quantityAvailable: 0 }));
+      invalidateListingLists();
+      void queryClient.invalidateQueries({ queryKey: ["farmer-listing-detail", listingId] });
+      Alert.alert(cropStrings.farmer.markSoldOutDoneTitle, cropStrings.farmer.markSoldOutDoneBody);
+    },
+    onError: (err) => setFormError((err as { message?: string })?.message ?? cropStrings.farmer.markSoldOutError),
+  });
+
   const uploadMediaMutation = useMutation({
     mutationFn: (image: { uri: string; name: string; type: string }) => farmerService.uploadListingMedia(listingId!, image),
     onSuccess: (asset) => setMedia((prev) => [...prev, asset]),
@@ -148,10 +163,17 @@ export const FarmerListingFormScreen = () => {
     }
   };
 
+  const handleMarkSoldOut = () => {
+    Alert.alert(cropStrings.farmer.markSoldOutTitle, fill(cropStrings.farmer.markSoldOutBody, { name: trimName(form.name) }), [
+      { text: cropStrings.farmer.cancel, style: "cancel" },
+      { text: cropStrings.farmer.markSoldOut, onPress: () => soldOutMutation.mutate() },
+    ]);
+  };
+
   const handleDeactivate = () => {
     Alert.alert(
       "Deactivate listing",
-      `Are you sure you want to deactivate "${form.name}"? It will immediately disappear from the Crop Marketplace, on the website and in the app.`,
+      `Are you sure you want to deactivate "${trimName(form.name)}"? It will immediately disappear from the Crop Marketplace, on the website and in the app.`,
       [
         { text: "Cancel", style: "cancel" },
         { text: "Deactivate", style: "destructive", onPress: () => deactivateMutation.mutate() },
@@ -337,6 +359,18 @@ export const FarmerListingFormScreen = () => {
         {isSaving ? <ActivityIndicator color={colors.primaryContrastText} /> : <Text style={styles.primaryButtonText}>{isEditing ? "Save Changes" : "Create Listing"}</Text>}
       </Pressable>
 
+      {isEditing && canMarkSoldOut(detailQuery.data?.isActive ?? false, form.quantityAvailable) && (
+        <Pressable
+          style={({ pressed }) => [styles.soldOutButton, soldOutMutation.isPending && styles.disabledButton, pressed && { opacity: 0.6 }]}
+          disabled={soldOutMutation.isPending || isSaving}
+          onPress={handleMarkSoldOut}
+          accessibilityRole="button"
+          accessibilityLabel={cropStrings.farmer.markSoldOut}
+        >
+          {soldOutMutation.isPending ? <ActivityIndicator color={colors.primary} /> : <Text style={styles.soldOutButtonText}>{cropStrings.farmer.markSoldOut}</Text>}
+        </Pressable>
+      )}
+
       {isEditing && (
         <View style={styles.mediaSection}>
           <Text style={styles.sectionTitle}>Photos</Text>
@@ -442,6 +476,8 @@ const styles = StyleSheet.create({
   pickButtonRow: { flexDirection: "row", gap: 10, marginTop: 8 },
   pickButton: { flex: 1, borderWidth: 1, borderColor: colors.primary, borderRadius: 8, paddingVertical: 12, minHeight: 44, alignItems: "center", justifyContent: "center" },
   pickButtonText: { color: colors.primary, fontWeight: "600", fontSize: 13 },
+  soldOutButton: { borderWidth: 1, borderColor: colors.primary, borderRadius: 8, paddingVertical: 12, minHeight: 44, alignItems: "center", justifyContent: "center", marginTop: 12 },
+  soldOutButtonText: { color: colors.primary, fontWeight: "600" },
   deactivateButton: { borderWidth: 1, borderColor: colors.error, borderRadius: 8, paddingVertical: 12, minHeight: 44, alignItems: "center", justifyContent: "center", marginTop: 20 },
   deactivateButtonText: { color: colors.error, fontWeight: "600" },
 });

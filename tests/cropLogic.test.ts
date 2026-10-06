@@ -6,7 +6,9 @@ import {
   EMPTY_FILTERS,
   MAX_ORDER_QUANTITY,
   activeFilterCount,
+  canMarkSoldOut,
   clampQuantity,
+  farmerListingStatus,
   fill,
   filtersAreValid,
   formatDay,
@@ -185,4 +187,18 @@ test("the date picker's Date and the typed yyyy-mm-dd day convert both ways", ()
   assert.equal(fromIsoDay("", fallback), fallback);
   assert.equal(fromIsoDay("nonsense", fallback), fallback);
   assert.equal(fromIsoDay("2026-02-30", fallback), fallback); // not a real day
+});
+
+test("a farmer's listing is inactive, sold out or active", () => {
+  assert.equal(farmerListingStatus({ isActive: true, quantityAvailable: 120 }), "active");
+  assert.equal(farmerListingStatus({ isActive: true, quantityAvailable: 0 }), "soldOut");
+  assert.equal(farmerListingStatus({ isActive: false, quantityAvailable: 120 }), "inactive");
+  assert.equal(farmerListingStatus({ isActive: false, quantityAvailable: 0 }), "inactive"); // deactivated wins
+});
+
+test("Mark sold out is offered only for an active listing that still has stock", () => {
+  assert.equal(canMarkSoldOut(true, 5), true);
+  assert.equal(canMarkSoldOut(true, 0), false);
+  assert.equal(canMarkSoldOut(true, null), false);
+  assert.equal(canMarkSoldOut(false, 5), false);
 });

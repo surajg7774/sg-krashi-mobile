@@ -69,6 +69,22 @@ export const cropStrings = {
     showMore: "Show more reviews", // mobile
     summary: "{{rating}} out of 5, {{count}} reviews", // mobile (screen reader)
   },
+  // The farmer's own listings (mobile only: the website's farmer screens are not translated from this file).
+  farmer: {
+    active: "Active",
+    inactive: "Inactive",
+    soldOut: "Sold out",
+    available: "{{count}} available",
+    uncategorized: "Uncategorized",
+    markSoldOut: "Mark Sold Out",
+    markSoldOutTitle: "Mark as sold out",
+    markSoldOutBody: '"{{name}}" will show as Sold Out and buyers will not be able to add it to their cart. To sell it again, enter a new Quantity Available and save.',
+    markSoldOutDoneTitle: "Marked as sold out",
+    markSoldOutDoneBody: "This listing now shows as Sold Out.",
+    markSoldOutError: "Could not mark this listing as sold out.",
+    cancel: "Cancel",
+    listingRow: "{{name}}, {{category}}, {{status}}, {{price}}",
+  },
   a11y: {
     listing: "Open {{label}}", // mobile
     categoryChip: "Crop type {{name}}", // mobile
