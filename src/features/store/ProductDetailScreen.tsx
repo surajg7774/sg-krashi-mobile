@@ -16,6 +16,7 @@ import { useNavigation, useRoute, type RouteProp } from "@react-navigation/nativ
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { StoreStackParamList } from "@/navigation/StoreStackNavigator";
 import { colors } from "@/theme/colors";
+import { MEDIA_WIDTH, resizedMediaUrl } from "@/shared/media";
 import { productService } from "./productService";
 import { cartService, CART_QUERY_KEY } from "@/features/cart/cartService";
 import { recommendationService } from "@/features/recommendations/recommendationService";
@@ -92,7 +93,7 @@ export const ProductDetailScreen = () => {
             }}
             renderItem={({ item }) => (
               <Image
-                source={item.url}
+                source={resizedMediaUrl(item.url, MEDIA_WIDTH.detail)}
                 style={{ width: SCREEN_WIDTH, height: SCREEN_WIDTH }}
                 contentFit="cover"
                 transition={150}

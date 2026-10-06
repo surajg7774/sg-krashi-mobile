@@ -14,6 +14,7 @@ import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useDebouncedValue } from "@/shared/useDebouncedValue";
 import { colors } from "@/theme/colors";
+import { MEDIA_WIDTH, resizedMediaUrl } from "@/shared/media";
 import { cardShadow } from "@/theme/shadow";
 import { productService } from "./productService";
 import type { ProductSummary } from "./types";
@@ -35,7 +36,7 @@ const ProductCard = ({ item, onPress }: { item: ProductSummary; onPress: () => v
     <Pressable style={({ pressed }) => [styles.card, pressed && { opacity: 0.6 }]} onPress={onPress}>
       <View style={styles.imageWrap}>
         <Image
-          source={item.thumbnailUrl ?? undefined}
+          source={resizedMediaUrl(item.thumbnailUrl, MEDIA_WIDTH.card)}
           style={styles.cardImage}
           contentFit="cover"
           placeholder={require("../../../assets/icon.png")}

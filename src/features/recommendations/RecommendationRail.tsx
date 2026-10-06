@@ -1,6 +1,7 @@
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { Image } from "expo-image";
 import { colors } from "@/theme/colors";
+import { MEDIA_WIDTH, resizedMediaUrl } from "@/shared/media";
 import { cardShadow } from "@/theme/shadow";
 import { PricePill } from "@/components/PricePill";
 import { Rating } from "@/components/Rating";
@@ -31,7 +32,7 @@ export const RecommendationRail = ({ title, items, onPressItem }: Recommendation
         contentContainerStyle={styles.row}
         renderItem={({ item }) => (
           <Pressable style={({ pressed }) => [styles.card, pressed && { opacity: 0.6 }]} onPress={() => onPressItem(item)}>
-            <Image source={item.thumbnailUrl ?? undefined} style={styles.image} contentFit="cover" transition={150} />
+            <Image source={resizedMediaUrl(item.thumbnailUrl, MEDIA_WIDTH.rail)} style={styles.image} contentFit="cover" transition={150} />
             <Text style={styles.name} numberOfLines={2}>
               {item.name}
             </Text>

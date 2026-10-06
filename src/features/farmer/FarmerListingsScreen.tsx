@@ -6,6 +6,7 @@ import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useDebouncedValue } from "@/shared/useDebouncedValue";
 import { colors } from "@/theme/colors";
+import { MEDIA_WIDTH, resizedMediaUrl } from "@/shared/media";
 import { ErrorState } from "@/components/ErrorState";
 import { EmptyState } from "@/components/EmptyState";
 import { ListRowSkeletonList } from "@/components/Skeleton";
@@ -21,7 +22,7 @@ type Navigation = NativeStackNavigationProp<FarmerStackParamList, "FarmerListing
 
 const ListingRow = ({ item, onPress }: { item: CropListingSummary; onPress: () => void }) => (
   <Pressable style={({ pressed }) => [styles.row, pressed && { opacity: 0.6 }]} onPress={onPress}>
-    <Image source={item.thumbnailUrl ?? undefined} style={styles.thumb} contentFit="cover" />
+    <Image source={resizedMediaUrl(item.thumbnailUrl, MEDIA_WIDTH.row)} style={styles.thumb} contentFit="cover" />
     <View style={{ flex: 1 }}>
       <Text style={styles.name} numberOfLines={1}>
         {item.name}

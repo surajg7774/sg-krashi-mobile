@@ -4,6 +4,7 @@ import { Image } from "expo-image";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { colors } from "@/theme/colors";
+import { MEDIA_WIDTH, resizedMediaUrl } from "@/shared/media";
 import { cartService, CART_QUERY_KEY } from "./cartService";
 import type { CartItem } from "./types";
 import type { MainStackParamList } from "@/navigation/MainStackNavigator";
@@ -26,7 +27,7 @@ const CartItemRow = ({
   isMutating: boolean;
 }) => (
   <View style={styles.row}>
-    <Image source={item.thumbnailUrl ?? undefined} style={styles.thumb} contentFit="cover" />
+    <Image source={resizedMediaUrl(item.thumbnailUrl, MEDIA_WIDTH.row)} style={styles.thumb} contentFit="cover" />
     <View style={styles.rowMiddle}>
       <Text style={styles.itemName} numberOfLines={2}>
         {item.itemName}

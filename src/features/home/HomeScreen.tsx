@@ -16,6 +16,7 @@ import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useAuth } from "@/context/AuthContext";
 import { colors } from "@/theme/colors";
+import { MEDIA_WIDTH, resizedMediaUrl } from "@/shared/media";
 import { productService } from "@/features/store/productService";
 import { cartService, CART_QUERY_KEY } from "@/features/cart/cartService";
 import { recommendationService } from "@/features/recommendations/recommendationService";
@@ -65,7 +66,7 @@ const ProductCard = ({ item, onPress }: { item: ProductSummary; onPress: () => v
   <Pressable style={({ pressed }) => [styles.card, pressed && { opacity: 0.6 }]} onPress={onPress}>
     <View style={styles.imageWrap}>
       <Image
-        source={item.thumbnailUrl ?? undefined}
+        source={resizedMediaUrl(item.thumbnailUrl, MEDIA_WIDTH.card)}
         style={styles.cardImage}
         contentFit="cover"
         transition={150}

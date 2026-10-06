@@ -18,6 +18,7 @@ import DateTimePicker, { DateTimePickerAndroid } from "@react-native-community/d
 import { useNavigation, useRoute, type RouteProp } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { colors } from "@/theme/colors";
+import { MEDIA_WIDTH, resizedMediaUrl } from "@/shared/media";
 import { SelectField } from "@/components/SelectField";
 import { ErrorState } from "@/components/ErrorState";
 import { farmerService } from "./farmerService";
@@ -341,7 +342,7 @@ export const FarmerListingFormScreen = () => {
           <Text style={styles.sectionTitle}>Photos</Text>
           {media.map((item, index) => (
             <View key={item.id} style={styles.mediaRow}>
-              <Image source={item.url} style={styles.mediaThumb} contentFit="cover" />
+              <Image source={resizedMediaUrl(item.url, MEDIA_WIDTH.row)} style={styles.mediaThumb} contentFit="cover" />
               <View style={styles.mediaControls}>
                 <Pressable
                   style={({ pressed }) => pressed && { opacity: 0.6 }}
