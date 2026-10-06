@@ -5,6 +5,7 @@ import { MEDIA_WIDTH, resizedMediaUrl } from "@/shared/media";
 import { cardShadow } from "@/theme/shadow";
 import { PricePill } from "@/components/PricePill";
 import { Rating } from "@/components/Rating";
+import { formatRupees, trimName } from "@/features/crop-marketplace/cropLogic";
 import type { RecommendationItem } from "./types";
 
 interface RecommendationRailProps {
@@ -13,13 +14,10 @@ interface RecommendationRailProps {
   onPressItem: (item: RecommendationItem) => void;
 }
 
-// Shared by Home ("For You") and Product Detail ("Frequently bought with")
-// — same card shape, same navigable-only-if-PRODUCT filtering (Crop
-// Marketplace isn't built in the mobile app, so a CROP_LISTING
-// recommendation has nowhere to navigate to yet).
+// Shared by Home ("For You"), Product Detail ("Frequently bought with") and Crop Listing Detail — same card
+// shape for products and crops. The caller decides where a tap goes, from item.itemType (PRODUCT or CROP_LISTING).
 export const RecommendationRail = ({ title, items, onPressItem }: RecommendationRailProps) => {
-  const productItems = items.filter((item) => item.itemType === "PRODUCT");
-  if (productItems.length === 0) return null;
+  if (items.length === 0) return null;
 
   return (
     <View style={styles.container}>
@@ -27,16 +25,16 @@ export const RecommendationRail = ({ title, items, onPressItem }: Recommendation
       <FlatList
         horizontal
         showsHorizontalScrollIndicator={false}
-        data={productItems}
+        data={items}
         keyExtractor={(item) => `${item.itemType}-${item.id}`}
         contentContainerStyle={styles.row}
         renderItem={({ item }) => (
           <Pressable style={({ pressed }) => [styles.card, pressed && { opacity: 0.6 }]} onPress={() => onPressItem(item)}>
             <Image source={resizedMediaUrl(item.thumbnailUrl, MEDIA_WIDTH.rail)} style={styles.image} contentFit="cover" transition={150} />
             <Text style={styles.name} numberOfLines={2}>
-              {item.name}
+              {trimName(item.name)}
             </Text>
-            <PricePill label={`₹${item.price}`} />
+            <PricePill label={item.itemType === "CROP_LISTING" ? formatRupees(item.price) : `₹${item.price}`} />
             <Rating avgRating={item.avgRating} reviewCount={item.reviewCount} />
           </Pressable>
         )}

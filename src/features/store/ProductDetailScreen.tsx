@@ -152,7 +152,7 @@ export const ProductDetailScreen = () => {
         <RecommendationRail
           title="Frequently Bought Together"
           items={frequentlyBoughtQuery.data.items}
-          onPressItem={(item) => navigation.push("ProductDetail", { idOrSlug: item.slug })}
+          onPressItem={(item) => navigation.push(item.itemType === "CROP_LISTING" ? "CropDetail" : "ProductDetail", { idOrSlug: item.slug })}
         />
       )}
     </ScrollView>

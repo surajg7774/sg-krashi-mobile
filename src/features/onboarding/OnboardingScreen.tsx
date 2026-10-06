@@ -23,10 +23,9 @@ interface Slide {
 }
 
 // Describes the app's real, working features only — confirmed against
-// TabNavigator.tsx/HomeScreen.tsx's actual nav destinations. Crop
-// Marketplace is deliberately excluded: it's just a "Coming soon" alert
-// today (HomeScreen.tsx QUICK_LINKS), not a real feature to promise here.
-// Farmer tools (listings/payouts) aren't given their own slide since
+// TabNavigator.tsx/HomeScreen.tsx's actual nav destinations. The Crop
+// Marketplace is a real screen now (Home tile and the Store shortcut), so it
+// has its own slide. Farmer tools (listings/payouts) aren't given their own slide since
 // they're role-gated and only relevant post-registration, not to every
 // first-time opener.
 const SLIDES: Slide[] = [
@@ -41,6 +40,11 @@ const SLIDES: Slide[] = [
     title: "Shop the Store",
     description:
       "Browse fresh, organic produce and farm essentials sourced directly from local farms.",
+  },
+  {
+    emoji: "🌾",
+    title: "Crop Marketplace",
+    description: "Buy fresh grain, pulse and vegetable batches listed directly by farms, and see when each was harvested.",
   },
   {
     emoji: "🌿",

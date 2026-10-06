@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import {
-  Alert,
   FlatList,
   Pressable,
   RefreshControl,
@@ -55,11 +54,7 @@ const QUICK_LINKS: QuickLink[] = [
   { label: "Weather", emoji: "☀️", onPress: (nav) => nav.navigate("Weather") },
   { label: "Mandi Prices", emoji: "📈", onPress: (nav) => nav.navigate("Mandi") },
   { label: "AI Assistant", emoji: "🤖", onPress: (nav) => nav.navigate("Chat") },
-  {
-    label: "Crop Marketplace",
-    emoji: "🌾",
-    onPress: () => Alert.alert("Coming soon", "Crop Marketplace isn't built in the mobile app yet."),
-  },
+  { label: "Crop Marketplace", emoji: "🌾", onPress: (nav) => nav.navigate("Store", { screen: "CropList" }) },
 ];
 
 const ProductCard = ({ item, onPress }: { item: ProductSummary; onPress: () => void }) => (
@@ -205,7 +200,10 @@ export const HomeScreen = () => {
           title="For You"
           items={forYouQuery.data.items}
           onPressItem={(item) =>
-            navigation.navigate("Store", { screen: "ProductDetail", params: { idOrSlug: item.slug } })
+            navigation.navigate("Store", {
+              screen: item.itemType === "CROP_LISTING" ? "CropDetail" : "ProductDetail",
+              params: { idOrSlug: item.slug },
+            })
           }
         />
       )}

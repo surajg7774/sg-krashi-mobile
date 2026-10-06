@@ -25,6 +25,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { PricePill } from "@/components/PricePill";
 import { NewBadge } from "@/components/NewBadge";
 import { Rating } from "@/components/Rating";
+import { cropStrings } from "@/features/crop-marketplace/strings";
 
 const PAGE_SIZE = 12;
 
@@ -89,6 +90,22 @@ export const StoreScreen = () => {
 
   return (
     <View style={styles.container}>
+      <Pressable
+        style={({ pressed }) => [styles.cropBanner, pressed && { opacity: 0.6 }]}
+        onPress={() => navigation.navigate("CropList")}
+        accessibilityRole="button"
+        accessibilityLabel={`${cropStrings.browse.title}. ${cropStrings.browse.storeEntrySubtitle}`}
+      >
+        <Text style={styles.cropBannerEmoji}>🌾</Text>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.cropBannerTitle}>{cropStrings.browse.title}</Text>
+          <Text style={styles.cropBannerSubtitle} numberOfLines={1}>
+            {cropStrings.browse.storeEntrySubtitle}
+          </Text>
+        </View>
+        <Text style={styles.cropBannerArrow}>→</Text>
+      </Pressable>
+
       <TextInput
         style={styles.searchInput}
         placeholder="Search products…"
@@ -179,6 +196,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 12,
   },
+  cropBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    minHeight: 56,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    marginBottom: 10,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.divider,
+    backgroundColor: colors.surface,
+  },
+  cropBannerEmoji: { fontSize: 24 },
+  cropBannerTitle: { fontSize: 15, fontWeight: "700", color: colors.textPrimary },
+  cropBannerSubtitle: { fontSize: 12, color: colors.textSecondary, marginTop: 1 },
+  cropBannerArrow: { fontSize: 18, color: colors.primary },
   searchInput: {
     borderWidth: 1,
     borderColor: colors.divider,

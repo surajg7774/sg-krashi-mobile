@@ -1,0 +1,191 @@
+import { useMemo, useState } from "react";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useDebouncedValue } from "@/shared/useDebouncedValue";
+import { colors } from "@/theme/colors";
+import { CardSkeletonGrid } from "@/components/Skeleton";
+import { ErrorState } from "@/components/ErrorState";
+import { EmptyState } from "@/components/EmptyState";
+import type { StoreStackParamList } from "@/navigation/StoreStackNavigator";
+import { cropService } from "./cropService";
+import { CropListingCard } from "./CropListingCard";
+import { CropFilterSheet } from "./CropFilterSheet";
+import { EMPTY_FILTERS, activeFilterCount, fill, toListingQuery, type CropFilters } from "./cropLogic";
+import { cropStrings as S } from "./strings";
+
+const PAGE_SIZE = 12;
+
+type Navigation = NativeStackNavigationProp<StoreStackParamList, "CropList">;
+
+export const CropMarketplaceScreen = () => {
+  const navigation = useNavigation<Navigation>();
+  const [searchInput, setSearchInput] = useState("");
+  const search = useDebouncedValue(searchInput, 400);
+  const [filters, setFilters] = useState<CropFilters>(EMPTY_FILTERS);
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  const categoriesQuery = useQuery({ queryKey: ["crop-categories"], queryFn: cropService.getCategories });
+
+  const listingsQuery = useInfiniteQuery({
+    queryKey: ["crop-listings", "browse", search, filters],
+    queryFn: ({ pageParam }) => cropService.getListings(toListingQuery(search, filters, pageParam, PAGE_SIZE)),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => (lastPage.page + 1 < lastPage.totalPages ? lastPage.page + 1 : undefined),
+  });
+
+  const listings = useMemo(() => listingsQuery.data?.pages.flatMap((page) => page.items) ?? [], [listingsQuery.data]);
+  const filterCount = activeFilterCount(filters);
+  const hasConstraints = search.trim() !== "" || filterCount > 0;
+  const clearAll = () => {
+    setSearchInput("");
+    setFilters(EMPTY_FILTERS);
+  };
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.searchRow}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder={S.filters.searchPlaceholder}
+          placeholderTextColor={colors.textSecondary}
+          value={searchInput}
+          onChangeText={setSearchInput}
+          returnKeyType="search"
+          accessibilityLabel={S.a11y.searchField}
+        />
+        <Pressable
+          style={({ pressed }) => [styles.filterButton, filterCount > 0 && styles.filterButtonActive, pressed && { opacity: 0.6 }]}
+          onPress={() => setSheetOpen(true)}
+          accessibilityRole="button"
+          accessibilityLabel={filterCount > 0 ? fill(S.a11y.filtersButton, { count: filterCount }) : S.a11y.filtersButtonNone}
+        >
+          <Text style={[styles.filterButtonText, filterCount > 0 && styles.filterButtonTextActive]}>
+            {S.browse.filters}
+            {filterCount > 0 ? ` (${filterCount})` : ""}
+          </Text>
+        </Pressable>
+      </View>
+
+      {categoriesQuery.data && categoriesQuery.data.length > 0 && (
+        <View style={styles.chipBar}>
+          <FlatList
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            data={[{ id: 0, name: S.filters.all, slug: "" }, ...categoriesQuery.data]}
+            keyExtractor={(c) => String(c.id)}
+            contentContainerStyle={styles.chipRow}
+            renderItem={({ item }) => {
+              const selected = item.slug === "" ? !filters.cropType : filters.cropType === item.slug;
+              return (
+                <Pressable
+                  style={({ pressed }) => [styles.chip, selected && styles.chipActive, pressed && { opacity: 0.6 }]}
+                  onPress={() => setFilters((f) => ({ ...f, cropType: item.slug === "" || f.cropType === item.slug ? undefined : item.slug }))}
+                  hitSlop={{ top: 7, bottom: 7 }}
+                  accessibilityRole="button"
+                  accessibilityLabel={item.slug === "" ? S.filters.all : fill(S.a11y.categoryChip, { name: item.name })}
+                  accessibilityState={{ selected }}
+                >
+                  <Text style={[styles.chipText, selected && styles.chipTextActive]}>{item.name}</Text>
+                </Pressable>
+              );
+            }}
+          />
+        </View>
+      )}
+
+      {listingsQuery.isLoading && <CardSkeletonGrid count={6} />}
+
+      {listingsQuery.isError && <ErrorState message={S.browse.loadError} onRetry={() => void listingsQuery.refetch()} />}
+
+      {!listingsQuery.isLoading && !listingsQuery.isError && listings.length === 0 && (
+        <EmptyState
+          icon="🌾"
+          message={
+            search.trim() !== ""
+              ? fill(S.browse.emptySearch, { search: search.trim() })
+              : filterCount > 0
+                ? S.browse.empty
+                : S.browse.emptyNone
+          }
+          action={
+            hasConstraints ? (
+              <Pressable style={({ pressed }) => [styles.clearButton, pressed && { opacity: 0.6 }]} onPress={clearAll} accessibilityRole="button">
+                <Text style={styles.clearButtonText}>{filterCount > 0 ? S.browse.clearFilters : S.browse.clearSearch}</Text>
+              </Pressable>
+            ) : undefined
+          }
+        />
+      )}
+
+      {listings.length > 0 && (
+        <FlatList
+          data={listings}
+          keyExtractor={(item) => String(item.id)}
+          renderItem={({ item }) => <CropListingCard item={item} onPress={() => navigation.navigate("CropDetail", { idOrSlug: item.slug })} />}
+          numColumns={2}
+          columnWrapperStyle={styles.row}
+          contentContainerStyle={styles.list}
+          refreshing={listingsQuery.isRefetching && !listingsQuery.isFetchingNextPage}
+          onRefresh={() => void listingsQuery.refetch()}
+          onEndReachedThreshold={0.4}
+          onEndReached={() => {
+            if (listingsQuery.hasNextPage && !listingsQuery.isFetchingNextPage) {
+              void listingsQuery.fetchNextPage();
+            }
+          }}
+          ListFooterComponent={listingsQuery.isFetchingNextPage ? <ActivityIndicator style={styles.footerLoader} color={colors.primary} /> : null}
+        />
+      )}
+
+      <CropFilterSheet
+        visible={sheetOpen}
+        value={filters}
+        onApply={(next) => {
+          setFilters((f) => ({ ...next, cropType: f.cropType })); // the crop-type chips stay as they are
+          setSheetOpen(false);
+        }}
+        onClear={() => {
+          setFilters(EMPTY_FILTERS);
+          setSheetOpen(false);
+        }}
+        onClose={() => setSheetOpen(false)}
+      />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.background, paddingHorizontal: 16, paddingTop: 12 },
+  searchRow: { flexDirection: "row", gap: 8, marginBottom: 10 },
+  searchInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: colors.divider,
+    borderRadius: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    fontSize: 15,
+    color: colors.textPrimary,
+    backgroundColor: colors.surface,
+    minHeight: 44,
+  },
+  filterButton: { minHeight: 44, minWidth: 44, borderWidth: 1, borderColor: colors.primary, borderRadius: 8, paddingHorizontal: 14, alignItems: "center", justifyContent: "center", backgroundColor: colors.surface },
+  filterButtonActive: { backgroundColor: colors.primary },
+  filterButtonText: { color: colors.primary, fontWeight: "600" },
+  filterButtonTextActive: { color: colors.primaryContrastText },
+  // A fixed-height bar so the horizontal list can never be squeezed by the grid below it.
+  chipBar: { height: 48, marginBottom: 4 },
+  chipRow: { gap: 8, alignItems: "center", paddingVertical: 4 },
+  // The chip looks ~31pt tall; hitSlop at the call site brings the tap area to 44pt without changing how it looks.
+  chip: { borderWidth: 1, borderColor: colors.divider, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 6, backgroundColor: colors.surface },
+  chipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
+  chipText: { fontSize: 13, color: colors.textPrimary },
+  chipTextActive: { color: colors.primaryContrastText, fontWeight: "600" },
+  clearButton: { marginTop: 4, borderWidth: 1, borderColor: colors.primary, borderRadius: 8, paddingHorizontal: 20, paddingVertical: 10, minHeight: 44, justifyContent: "center" },
+  clearButtonText: { color: colors.primary, fontWeight: "600" },
+  list: { paddingBottom: 24 },
+  row: { justifyContent: "space-between" },
+  footerLoader: { marginVertical: 16 },
+});

@@ -151,7 +151,7 @@ export const FarmerListingFormScreen = () => {
   const handleDeactivate = () => {
     Alert.alert(
       "Deactivate listing",
-      `Are you sure you want to deactivate "${form.name}"? It will immediately disappear from the public Crop Marketplace.`,
+      `Are you sure you want to deactivate "${form.name}"? It will immediately disappear from the Crop Marketplace, on the website and in the app.`,
       [
         { text: "Cancel", style: "cancel" },
         { text: "Deactivate", style: "destructive", onPress: () => deactivateMutation.mutate() },
