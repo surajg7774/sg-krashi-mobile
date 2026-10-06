@@ -16,6 +16,9 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useAuth } from "@/context/AuthContext";
 import { colors } from "@/theme/colors";
 import { MEDIA_WIDTH, resizedMediaUrl } from "@/shared/media";
+import { cropService } from "@/features/crop-marketplace/cropService";
+import { asRailItem } from "@/features/crop-marketplace/railItem";
+import { cropStrings } from "@/features/crop-marketplace/strings";
 import { productService } from "@/features/store/productService";
 import { cartService, CART_QUERY_KEY } from "@/features/cart/cartService";
 import { recommendationService } from "@/features/recommendations/recommendationService";
@@ -24,7 +27,7 @@ import { notificationService } from "@/features/notifications/notificationServic
 import type { ProductSummary } from "@/features/store/types";
 import type { TabParamList } from "@/navigation/TabNavigator";
 import type { MainStackParamList } from "@/navigation/MainStackNavigator";
-import { CardSkeletonGrid } from "@/components/Skeleton";
+import { CardSkeletonGrid, BlockSkeleton } from "@/components/Skeleton";
 import { ErrorState } from "@/components/ErrorState";
 import { EmptyState } from "@/components/EmptyState";
 import { PricePill } from "@/components/PricePill";
@@ -93,6 +96,12 @@ export const HomeScreen = () => {
     queryFn: () => productService.getProducts({ page: 0, size: 8 }),
   });
 
+  // Latest crop listings (public, like /products): a short rail under the products, with its own loading, empty and error states.
+  const cropsQuery = useQuery({
+    queryKey: ["crop-listings", "home"],
+    queryFn: () => cropService.getListings({ page: 0, size: 8 }),
+  });
+
   // Genuinely requires auth (unlike /products above) — see the Milestone 2
   // verification report for why an endpoint that doesn't need auth can't
   // prove a refresh flow. Polling keeps a long-lived session's access token
@@ -115,10 +124,11 @@ export const HomeScreen = () => {
     refetchInterval: 60_000,
   });
 
-  const isRefreshing = productsQuery.isRefetching || cartQuery.isRefetching;
+  const isRefreshing = productsQuery.isRefetching || cartQuery.isRefetching || cropsQuery.isRefetching;
   const onRefresh = () => {
     void productsQuery.refetch();
     void cartQuery.refetch();
+    void cropsQuery.refetch();
   };
 
   return (
@@ -192,6 +202,27 @@ export const HomeScreen = () => {
           numColumns={2}
           columnWrapperStyle={styles.row}
           scrollEnabled={false}
+        />
+      )}
+
+      {/* the rail prints its own title when there are crops; the other states need one here */}
+      {!(cropsQuery.data && cropsQuery.data.items.length > 0) && <Text style={styles.sectionTitle}>{cropStrings.browse.homeSection}</Text>}
+
+      {cropsQuery.isLoading && (
+        <View style={styles.cropSkeleton}>
+          <BlockSkeleton height={180} />
+        </View>
+      )}
+
+      {cropsQuery.isError && <ErrorState message={cropStrings.browse.loadError} onRetry={() => void cropsQuery.refetch()} />}
+
+      {cropsQuery.data && cropsQuery.data.items.length === 0 && <EmptyState icon="🌾" message={cropStrings.browse.homeEmpty} />}
+
+      {cropsQuery.data && cropsQuery.data.items.length > 0 && (
+        <RecommendationRail
+          title={cropStrings.browse.homeSection}
+          items={cropsQuery.data.items.map(asRailItem)}
+          onPressItem={(item) => navigation.navigate("Store", { screen: "CropDetail", params: { idOrSlug: item.slug } })}
         />
       )}
 
@@ -296,6 +327,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
     textAlign: "center",
   },
+  cropSkeleton: { paddingHorizontal: 16 },
   sectionTitle: {
     fontSize: 17,
     fontWeight: "700",

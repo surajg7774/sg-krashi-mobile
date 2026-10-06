@@ -10,28 +10,35 @@ import type { CartItem } from "./types";
 import type { MainStackParamList } from "@/navigation/MainStackNavigator";
 import { ErrorState } from "@/components/ErrorState";
 import { EmptyState } from "@/components/EmptyState";
+import { trimName } from "@/features/crop-marketplace/cropLogic";
 
 type Navigation = NativeStackNavigationProp<MainStackParamList, "Cart">;
 
 const CartItemRow = ({
   item,
+  onOpen,
   onIncrement,
   onDecrement,
   onRemove,
   isMutating,
 }: {
   item: CartItem;
+  onOpen: () => void;
   onIncrement: () => void;
   onDecrement: () => void;
   onRemove: () => void;
   isMutating: boolean;
 }) => (
   <View style={styles.row}>
-    <Image source={resizedMediaUrl(item.thumbnailUrl, MEDIA_WIDTH.row)} style={styles.thumb} contentFit="cover" />
+    <Pressable onPress={onOpen} accessible={false} style={({ pressed }) => pressed && { opacity: 0.6 }}>
+      <Image source={resizedMediaUrl(item.thumbnailUrl, MEDIA_WIDTH.row)} style={styles.thumb} contentFit="cover" />
+    </Pressable>
     <View style={styles.rowMiddle}>
-      <Text style={styles.itemName} numberOfLines={2}>
-        {item.itemName}
-      </Text>
+      <Pressable onPress={onOpen} accessibilityRole="button" accessibilityLabel={`Open ${trimName(item.itemName)}`} style={({ pressed }) => pressed && { opacity: 0.6 }}>
+        <Text style={styles.itemName} numberOfLines={2}>
+          {trimName(item.itemName)}
+        </Text>
+      </Pressable>
       <Text style={styles.unitPrice}>₹{item.unitPrice} each</Text>
       <View style={styles.qtyRow}>
         <Pressable
@@ -109,14 +116,22 @@ export const CartScreen = () => {
       <View style={styles.centered}>
         <EmptyState
           icon="🛒"
-          message="Your cart is empty. Add products from the Store to see them here."
+          message="Your cart is empty. Add products from the Store or crops from the Crop Marketplace to see them here."
           action={
-            <Pressable
-              style={({ pressed }) => [styles.browseButton, pressed && { opacity: 0.6 }]}
-              onPress={() => navigation.navigate("MainTabs", { screen: "Store", params: { screen: "StoreList" } })}
-            >
-              <Text style={styles.browseButtonText}>Browse Store</Text>
-            </Pressable>
+            <View style={styles.browseButtons}>
+              <Pressable
+                style={({ pressed }) => [styles.browseButton, pressed && { opacity: 0.6 }]}
+                onPress={() => navigation.navigate("MainTabs", { screen: "Store", params: { screen: "StoreList" } })}
+              >
+                <Text style={styles.browseButtonText}>Browse Store</Text>
+              </Pressable>
+              <Pressable
+                style={({ pressed }) => [styles.browseButton, pressed && { opacity: 0.6 }]}
+                onPress={() => navigation.navigate("MainTabs", { screen: "Store", params: { screen: "CropList" } })}
+              >
+                <Text style={styles.browseButtonText}>Browse Crops</Text>
+              </Pressable>
+            </View>
           }
         />
       </View>
@@ -132,6 +147,12 @@ export const CartScreen = () => {
           <CartItemRow
             item={item}
             isMutating={isMutating}
+            onOpen={() =>
+              navigation.navigate("MainTabs", {
+                screen: "Store",
+                params: { screen: item.itemType === "CROP_LISTING" ? "CropDetail" : "ProductDetail", params: { idOrSlug: item.itemSlug } },
+              })
+            }
             onIncrement={() => updateMutation.mutate({ itemId: item.id, quantity: item.quantity + 1 })}
             onDecrement={() => updateMutation.mutate({ itemId: item.id, quantity: item.quantity - 1 })}
             onRemove={() => removeMutation.mutate(item.id)}
@@ -165,6 +186,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     paddingHorizontal: 32,
   },
+  browseButtons: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 12 },
   browseButton: {
     marginTop: 20,
     backgroundColor: colors.primary,

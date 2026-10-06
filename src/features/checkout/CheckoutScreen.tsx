@@ -9,6 +9,7 @@ import { addressService, ADDRESSES_QUERY_KEY } from "@/features/address/addressS
 import { orderService } from "@/features/orders/orderService";
 import type { MainStackParamList } from "@/navigation/MainStackNavigator";
 import { ErrorState } from "@/components/ErrorState";
+import { trimName } from "@/features/crop-marketplace/cropLogic";
 
 type Navigation = NativeStackNavigationProp<MainStackParamList, "Checkout">;
 type CheckoutRoute = RouteProp<MainStackParamList, "Checkout">;
@@ -70,7 +71,7 @@ export const CheckoutScreen = () => {
           {cart.items.map((item) => (
             <View key={item.id} style={styles.itemRow}>
               <Text style={styles.itemName}>
-                {item.itemName} × {item.quantity}
+                {trimName(item.itemName)} × {item.quantity}
               </Text>
               <Text style={styles.itemTotal}>₹{item.lineTotal}</Text>
             </View>

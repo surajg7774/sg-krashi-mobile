@@ -2,9 +2,12 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import * as Haptics from "expo-haptics";
+import { Image } from "expo-image";
 import { useNavigation, useRoute, type RouteProp } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { colors } from "@/theme/colors";
+import { MEDIA_WIDTH, resizedMediaUrl } from "@/shared/media";
+import { trimName } from "@/features/crop-marketplace/cropLogic";
 import { useAuth } from "@/context/AuthContext";
 import { orderService } from "./orderService";
 import { paymentService } from "@/features/payment/paymentService";
@@ -127,12 +130,25 @@ export const OrderConfirmationScreen = () => {
         <Text style={styles.amount}>₹{order.totalAmount}</Text>
 
         {order.items.map((item) => (
-          <View key={item.id} style={styles.itemRow}>
+          <Pressable
+            key={item.id}
+            style={({ pressed }) => [styles.itemRow, pressed && { opacity: 0.6 }]}
+            onPress={() =>
+              navigation.navigate("MainTabs", {
+                screen: "Store",
+                // the order keeps the item's id, not its slug; the server accepts either
+                params: { screen: item.itemType === "CROP_LISTING" ? "CropDetail" : "ProductDetail", params: { idOrSlug: String(item.itemId) } },
+              })
+            }
+            accessibilityRole="button"
+            accessibilityLabel={`Open ${trimName(item.itemName)}, quantity ${item.quantity}, ₹${item.lineTotal}`}
+          >
+            <Image source={resizedMediaUrl(item.thumbnailUrl, MEDIA_WIDTH.row)} style={styles.itemThumb} contentFit="cover" accessible={false} />
             <Text style={styles.itemName}>
-              {item.itemName} × {item.quantity}
+              {trimName(item.itemName)} × {item.quantity}
             </Text>
             <Text style={styles.itemTotal}>₹{item.lineTotal}</Text>
-          </View>
+          </Pressable>
         ))}
 
         {order.status === "PENDING_PAYMENT" && !paymentSubmitted && (
@@ -237,10 +253,13 @@ const styles = StyleSheet.create({
   amount: { fontSize: 22, fontWeight: "700", color: colors.primary, marginTop: 8, marginBottom: 12 },
   itemRow: {
     flexDirection: "row",
+    alignItems: "center",
     justifyContent: "space-between",
     width: "100%",
     paddingVertical: 4,
+    minHeight: 44,
   },
+  itemThumb: { width: 40, height: 40, borderRadius: 6, backgroundColor: colors.grey100, marginRight: 10 },
   itemName: { fontSize: 14, color: colors.textPrimary, flex: 1 },
   itemTotal: { fontSize: 14, fontWeight: "600", color: colors.textPrimary },
   payButton: {

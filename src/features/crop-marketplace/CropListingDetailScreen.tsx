@@ -12,29 +12,16 @@ import { Rating } from "@/components/Rating";
 import { cartService, CART_QUERY_KEY } from "@/features/cart/cartService";
 import { recommendationService } from "@/features/recommendations/recommendationService";
 import { RecommendationRail } from "@/features/recommendations/RecommendationRail";
-import type { RecommendationItem } from "@/features/recommendations/types";
 import { cropService } from "./cropService";
 import { CropImageGallery } from "./CropImageGallery";
 import { CropReviews } from "./CropReviews";
+import { asRailItem } from "./railItem";
 import { QuantityStepper } from "./QuantityStepper";
 import { clampQuantity, fill, formatRupees, harvestLabel, isSoldOut, maxQuantity, trimName } from "./cropLogic";
 import { cropStrings as S } from "./strings";
-import type { CropListingSummary } from "./types";
 
 type DetailRoute = RouteProp<StoreStackParamList, "CropDetail">;
 type Navigation = NativeStackNavigationProp<StoreStackParamList, "CropDetail">;
-
-/** A crop summary in the shape the shared recommendation rail takes. */
-const asRailItem = (listing: CropListingSummary): RecommendationItem => ({
-  id: listing.id,
-  itemType: "CROP_LISTING",
-  name: listing.name,
-  slug: listing.slug,
-  price: listing.unitPrice,
-  thumbnailUrl: listing.thumbnailUrl,
-  avgRating: listing.avgRating,
-  reviewCount: listing.reviewCount,
-});
 
 export const CropListingDetailScreen = () => {
   const { params } = useRoute<DetailRoute>();
