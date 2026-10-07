@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { clearLocalUserData, subscribeSessionCleared } from "../src/shared/sessionCleanup.ts";
-import { ONBOARDING_SEEN_KEY, WEATHER_LOCATION_KEY } from "../src/shared/storageKeys.ts";
+import { LANGUAGE_KEY, ONBOARDING_SEEN_KEY, WEATHER_LOCATION_KEY } from "../src/shared/storageKeys.ts";
 
 const fakeQueryClient = (cancelFails = false) => {
   const calls: string[] = [];
@@ -41,6 +41,15 @@ test("the saved weather location is removed and the onboarding flag is never tou
   assert.deepEqual(storage.removed, [WEATHER_LOCATION_KEY]);
   assert.ok(!storage.removed.includes(ONBOARDING_SEEN_KEY));
   assert.notEqual(WEATHER_LOCATION_KEY, ONBOARDING_SEEN_KEY);
+});
+
+test("the app language survives logout, account deletion and a forced logout (all go through this cleanup)", async () => {
+  const storage = fakeStorage();
+  await clearLocalUserData({ queryClient: fakeQueryClient(), storage, offlineCache: { clearPrivate: async () => {} } });
+  assert.ok(!storage.removed.includes(LANGUAGE_KEY));
+  assert.equal(LANGUAGE_KEY, "sgkrashi.language");
+  assert.notEqual(LANGUAGE_KEY, WEATHER_LOCATION_KEY);
+  assert.notEqual(LANGUAGE_KEY, ONBOARDING_SEEN_KEY);
 });
 
 test("the storage keys are the ones the hooks have always used (existing installs keep working)", () => {
