@@ -22,6 +22,11 @@ import { cartService, CART_QUERY_KEY } from "@/features/cart/cartService";
 import { recommendationService } from "@/features/recommendations/recommendationService";
 import { RecommendationRail } from "@/features/recommendations/RecommendationRail";
 import { ErrorState } from "@/components/ErrorState";
+import { LastUpdated } from "@/components/LastUpdated";
+import { OfflineBanner } from "@/components/OfflineBanner";
+import { useOfflineData } from "@/offline/useOfflineData";
+import { canAddToCart, shouldShowFullError, shouldShowOfflineBanner } from "@/offline/screenState";
+import { OFFLINE_STRINGS } from "@/offline/strings";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -35,10 +40,13 @@ export const ProductDetailScreen = () => {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [addedFeedback, setAddedFeedback] = useState(false);
 
-  const { data: product, isLoading, isError, refetch } = useQuery({
+  const productQuery = useQuery({
     queryKey: ["product-detail", params.idOrSlug],
     queryFn: () => productService.getProductDetail(params.idOrSlug),
   });
+  const { data: product, isLoading, refetch } = productQuery;
+  const offline = useOfflineData(productQuery);
+  const cartAllowed = canAddToCart(offline);
 
   const addToCartMutation = useMutation({
     mutationFn: () => cartService.addItem({ itemType: "PRODUCT", itemId: product!.id, quantity: 1 }),
@@ -67,7 +75,8 @@ export const ProductDetailScreen = () => {
     );
   }
 
-  if (isError || !product) {
+  // The error box only when there is no product to show; a saved copy stays on screen after a failed refresh.
+  if (shouldShowFullError(productQuery) || !product) {
     return (
       <View style={styles.centered}>
         <ErrorState message="Could not load this product." onRetry={() => void refetch()} />
@@ -115,6 +124,8 @@ export const ProductDetailScreen = () => {
       )}
 
       <View style={styles.content}>
+        <OfflineBanner visible={shouldShowOfflineBanner(offline)} onRetry={() => void productQuery.refetch()} />
+        <LastUpdated timestamp={offline.lastUpdatedAt} isShowingOfflineData={offline.isShowingOfflineData} />
         <Text style={styles.name}>{product.name}</Text>
         {product.category && <Text style={styles.category}>{product.category.name}</Text>}
         <Text style={styles.price}>₹{product.price}</Text>
@@ -132,8 +143,8 @@ export const ProductDetailScreen = () => {
         <Text style={styles.description}>{product.description}</Text>
 
         <Pressable
-          style={({ pressed }) => [styles.addButton, (product.stockQty === 0 || addToCartMutation.isPending) && styles.addButtonDisabled, pressed && { opacity: 0.6 }]}
-          disabled={product.stockQty === 0 || addToCartMutation.isPending}
+          style={({ pressed }) => [styles.addButton, (product.stockQty === 0 || addToCartMutation.isPending || !cartAllowed) && styles.addButtonDisabled, pressed && { opacity: 0.6 }]}
+          disabled={product.stockQty === 0 || addToCartMutation.isPending || !cartAllowed}
           onPress={() => addToCartMutation.mutate()}
         >
           {addToCartMutation.isPending ? (
@@ -142,6 +153,8 @@ export const ProductDetailScreen = () => {
             <Text style={styles.addButtonText}>{addedFeedback ? "Added ✓" : "Add to Cart"}</Text>
           )}
         </Pressable>
+
+        {!cartAllowed && <Text style={styles.errorText}>{OFFLINE_STRINGS.addToCartNeedsInternet}</Text>}
 
         {addToCartMutation.isError && (
           <Text style={styles.errorText}>Could not add to cart. Please try again.</Text>

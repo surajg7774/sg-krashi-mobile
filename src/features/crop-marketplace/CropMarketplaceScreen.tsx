@@ -14,6 +14,10 @@ import { CropListingCard } from "./CropListingCard";
 import { CropFilterSheet } from "./CropFilterSheet";
 import { EMPTY_FILTERS, activeFilterCount, fill, toListingQuery, type CropFilters } from "./cropLogic";
 import { cropStrings as S } from "./strings";
+import { LastUpdated } from "@/components/LastUpdated";
+import { OfflineBanner } from "@/components/OfflineBanner";
+import { useOfflineData } from "@/offline/useOfflineData";
+import { shouldShowFullError, shouldShowOfflineBanner } from "@/offline/screenState";
 
 const PAGE_SIZE = 12;
 
@@ -36,6 +40,7 @@ export const CropMarketplaceScreen = () => {
   });
 
   const listings = useMemo(() => listingsQuery.data?.pages.flatMap((page) => page.items) ?? [], [listingsQuery.data]);
+  const offline = useOfflineData(listingsQuery);
   const filterCount = activeFilterCount(filters);
   const hasConstraints = search.trim() !== "" || filterCount > 0;
   const clearAll = () => {
@@ -97,9 +102,10 @@ export const CropMarketplaceScreen = () => {
 
       {listingsQuery.isLoading && <CardSkeletonGrid count={6} />}
 
-      {listingsQuery.isError && <ErrorState message={S.browse.loadError} onRetry={() => void listingsQuery.refetch()} />}
+      {/* Full-screen error only when there is nothing to show; saved listings stay on screen after a failed refresh. */}
+      {shouldShowFullError(listingsQuery) && <ErrorState message={S.browse.loadError} onRetry={() => void listingsQuery.refetch()} />}
 
-      {!listingsQuery.isLoading && !listingsQuery.isError && listings.length === 0 && (
+      {!listingsQuery.isLoading && !shouldShowFullError(listingsQuery) && listings.length === 0 && (
         <EmptyState
           icon="🌾"
           message={
@@ -127,6 +133,12 @@ export const CropMarketplaceScreen = () => {
           numColumns={2}
           columnWrapperStyle={styles.row}
           contentContainerStyle={styles.list}
+          ListHeaderComponent={
+            <>
+              <OfflineBanner visible={shouldShowOfflineBanner(offline)} onRetry={() => void listingsQuery.refetch()} />
+              <LastUpdated timestamp={offline.lastUpdatedAt} isShowingOfflineData={offline.isShowingOfflineData} />
+            </>
+          }
           refreshing={listingsQuery.isRefetching && !listingsQuery.isFetchingNextPage}
           onRefresh={() => void listingsQuery.refetch()}
           onEndReachedThreshold={0.4}

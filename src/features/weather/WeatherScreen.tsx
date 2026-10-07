@@ -14,6 +14,11 @@ import { colors } from "@/theme/colors";
 import { useDebouncedValue } from "@/shared/useDebouncedValue";
 import { ErrorState } from "@/components/ErrorState";
 import { BlockSkeleton } from "@/components/Skeleton";
+import { LastUpdated } from "@/components/LastUpdated";
+import { OfflineBanner } from "@/components/OfflineBanner";
+import { useOfflineData } from "@/offline/useOfflineData";
+import { shouldShowFullError, shouldShowOfflineBanner } from "@/offline/screenState";
+import { roundCoordinate } from "./coordinates";
 import { WeatherForecastChart } from "./WeatherForecastChart";
 import { weatherService } from "./weatherService";
 import { useWeatherLocation } from "./useWeatherLocation";
@@ -40,11 +45,15 @@ export const WeatherScreen = () => {
     enabled: search.trim().length >= MIN_SEARCH_LENGTH,
   });
 
+  // Rounded to ~1 km so a fresh GPS fix finds the saved forecast (see coordinates.ts).
+  const latitude = location ? roundCoordinate(location.latitude) : undefined;
+  const longitude = location ? roundCoordinate(location.longitude) : undefined;
   const weatherQuery = useQuery({
-    queryKey: ["weather-current", location?.latitude, location?.longitude],
-    queryFn: () => weatherService.getCurrentWeather(location!.latitude, location!.longitude),
+    queryKey: ["weather-current", latitude, longitude],
+    queryFn: () => weatherService.getCurrentWeather(latitude!, longitude!),
     enabled: location !== null,
   });
+  const offline = useOfflineData(weatherQuery);
 
   const handleSelectLocation = (result: GeocodingResult) => {
     setManualLocation({ latitude: result.latitude, longitude: result.longitude, label: formatLabel(result) });
@@ -143,8 +152,16 @@ export const WeatherScreen = () => {
         </View>
       )}
 
-      {location && weatherQuery.isError && (
+      {/* The full-screen error only when there is nothing to show; with saved data a failed refresh keeps it on screen. */}
+      {location && shouldShowFullError(weatherQuery) && (
         <ErrorState message="Could not load weather for this location." onRetry={() => void weatherQuery.refetch()} />
+      )}
+
+      {location && weatherQuery.data && (
+        <>
+          <OfflineBanner visible={shouldShowOfflineBanner(offline)} onRetry={() => void weatherQuery.refetch()} />
+          <LastUpdated timestamp={offline.lastUpdatedAt} isShowingOfflineData={offline.isShowingOfflineData} always />
+        </>
       )}
 
       {location && weatherQuery.data && (

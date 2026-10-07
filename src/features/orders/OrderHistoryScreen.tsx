@@ -11,6 +11,11 @@ import type { MainStackParamList } from "@/navigation/MainStackNavigator";
 import { ErrorState } from "@/components/ErrorState";
 import { EmptyState } from "@/components/EmptyState";
 import { ListRowSkeletonList } from "@/components/Skeleton";
+import { LastUpdated } from "@/components/LastUpdated";
+import { OfflineBanner } from "@/components/OfflineBanner";
+import { useOfflineData } from "@/offline/useOfflineData";
+import { shouldShowFullError, shouldShowOfflineBanner } from "@/offline/screenState";
+import { OFFLINE_STRINGS } from "@/offline/strings";
 
 type Navigation = NativeStackNavigationProp<MainStackParamList, "OrderHistory">;
 const PAGE_SIZE = 10;
@@ -43,6 +48,7 @@ export const OrderHistoryScreen = () => {
   });
 
   const orders = useMemo(() => ordersQuery.data?.pages.flatMap((p) => p.items) ?? [], [ordersQuery.data]);
+  const offline = useOfflineData(ordersQuery);
 
   if (ordersQuery.isLoading) {
     return (
@@ -52,7 +58,8 @@ export const OrderHistoryScreen = () => {
     );
   }
 
-  if (ordersQuery.isError) {
+  // Full-screen error only when there is nothing to show; with saved orders a failed refresh keeps the list.
+  if (shouldShowFullError(ordersQuery)) {
     return (
       <View style={styles.centered}>
         <ErrorState message="Could not load your orders." onRetry={() => void ordersQuery.refetch()} />
@@ -87,6 +94,16 @@ export const OrderHistoryScreen = () => {
         <OrderRow order={item} onPress={() => navigation.navigate("OrderConfirmation", { orderId: item.id })} />
       )}
       contentContainerStyle={styles.list}
+      ListHeaderComponent={
+        <>
+          <OfflineBanner visible={shouldShowOfflineBanner(offline)} onRetry={() => void ordersQuery.refetch()} />
+          <LastUpdated
+            timestamp={offline.lastUpdatedAt}
+            isShowingOfflineData={offline.isShowingOfflineData}
+            offlineNote={OFFLINE_STRINGS.orderMayBeOutOfDate}
+          />
+        </>
+      }
       onEndReachedThreshold={0.4}
       onEndReached={() => {
         if (ordersQuery.hasNextPage && !ordersQuery.isFetchingNextPage) {

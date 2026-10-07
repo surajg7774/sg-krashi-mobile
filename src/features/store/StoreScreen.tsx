@@ -26,6 +26,10 @@ import { PricePill } from "@/components/PricePill";
 import { NewBadge } from "@/components/NewBadge";
 import { Rating } from "@/components/Rating";
 import { cropStrings } from "@/features/crop-marketplace/strings";
+import { LastUpdated } from "@/components/LastUpdated";
+import { OfflineBanner } from "@/components/OfflineBanner";
+import { useOfflineData } from "@/offline/useOfflineData";
+import { shouldShowFullError, shouldShowOfflineBanner } from "@/offline/screenState";
 
 const PAGE_SIZE = 12;
 
@@ -87,6 +91,7 @@ export const StoreScreen = () => {
     () => productsQuery.data?.pages.flatMap((page) => page.items) ?? [],
     [productsQuery.data]
   );
+  const offline = useOfflineData(productsQuery);
 
   return (
     <View style={styles.container}>
@@ -136,14 +141,14 @@ export const StoreScreen = () => {
 
       {productsQuery.isLoading && <CardSkeletonGrid count={6} />}
 
-      {productsQuery.isError && (
+      {shouldShowFullError(productsQuery) && (
         <ErrorState
           message="Could not load products."
           onRetry={() => void productsQuery.refetch()}
         />
       )}
 
-      {!productsQuery.isLoading && !productsQuery.isError && products.length === 0 && (
+      {!productsQuery.isLoading && !shouldShowFullError(productsQuery) && products.length === 0 && (
         <EmptyState
           icon="📦"
           message={`No products found${search ? ` for "${search}"` : ""}.`}
@@ -170,6 +175,12 @@ export const StoreScreen = () => {
           numColumns={2}
           columnWrapperStyle={styles.row}
           contentContainerStyle={styles.list}
+          ListHeaderComponent={
+            <>
+              <OfflineBanner visible={shouldShowOfflineBanner(offline)} onRetry={() => void productsQuery.refetch()} />
+              <LastUpdated timestamp={offline.lastUpdatedAt} isShowingOfflineData={offline.isShowingOfflineData} />
+            </>
+          }
           refreshing={productsQuery.isRefetching && !productsQuery.isFetchingNextPage}
           onRefresh={() => void productsQuery.refetch()}
           onEndReachedThreshold={0.4}

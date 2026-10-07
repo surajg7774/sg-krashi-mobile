@@ -7,6 +7,11 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { StoreStackParamList } from "@/navigation/StoreStackNavigator";
 import { colors } from "@/theme/colors";
 import { ErrorState } from "@/components/ErrorState";
+import { LastUpdated } from "@/components/LastUpdated";
+import { OfflineBanner } from "@/components/OfflineBanner";
+import { useOfflineData } from "@/offline/useOfflineData";
+import { canAddToCart, shouldShowFullError, shouldShowOfflineBanner } from "@/offline/screenState";
+import { OFFLINE_STRINGS } from "@/offline/strings";
 import { EmptyState } from "@/components/EmptyState";
 import { Rating } from "@/components/Rating";
 import { cartService, CART_QUERY_KEY } from "@/features/cart/cartService";
@@ -38,10 +43,12 @@ export const CropListingDetailScreen = () => {
   const detailQuery = useQuery({
     queryKey: ["crop-listing-detail", params.idOrSlug],
     queryFn: () => cropService.getDetail(params.idOrSlug),
-    // A listing that is gone (or never existed) answers 404: that is an answer, not a failure to retry.
-    retry: (count, error) => (error as { status?: number })?.status !== 404 && count < 2,
+    // Retries come from the shared cached-query policy (src/offline/queryPolicy.ts): none for a 404 (a listing that is
+    // gone answers 404 - an answer, not a failure) or when offline, one for other failures.
   });
   const listing = detailQuery.data;
+  const offline = useOfflineData(detailQuery);
+  const cartAllowed = canAddToCart(offline);
 
   const similarQuery = useQuery({
     queryKey: ["recommendations", "similar", "CROP_LISTING", listing?.id],
@@ -73,7 +80,8 @@ export const CropListingDetailScreen = () => {
     );
   }
 
-  if (detailQuery.isError) {
+  // The error box only when there is no listing to show; a saved copy stays on screen after a failed refresh.
+  if (shouldShowFullError(detailQuery)) {
     const notFound = (detailQuery.error as { status?: number } | null)?.status === 404;
     return (
       <View style={styles.centered}>
@@ -98,6 +106,8 @@ export const CropListingDetailScreen = () => {
       <CropImageGallery media={listing.media} listingName={listing.name} />
 
       <View style={styles.content}>
+        <OfflineBanner visible={shouldShowOfflineBanner(offline)} onRetry={() => void detailQuery.refetch()} />
+        <LastUpdated timestamp={offline.lastUpdatedAt} isShowingOfflineData={offline.isShowingOfflineData} />
         {listing.category && <Text style={styles.category}>{listing.category.name}</Text>}
         <Text style={styles.name} accessibilityRole="header">
           {trimName(listing.name)}
@@ -129,8 +139,8 @@ export const CropListingDetailScreen = () => {
           <View style={styles.buyRow}>
             <QuantityStepper value={shownQuantity} max={cap} onChange={setQuantity} />
             <Pressable
-              style={({ pressed }) => [styles.addButton, addMutation.isPending && styles.addButtonDisabled, pressed && { opacity: 0.6 }]}
-              disabled={addMutation.isPending}
+              style={({ pressed }) => [styles.addButton, (addMutation.isPending || !cartAllowed) && styles.addButtonDisabled, pressed && { opacity: 0.6 }]}
+              disabled={addMutation.isPending || !cartAllowed}
               onPress={() => addMutation.mutate()}
               accessibilityRole="button"
               accessibilityLabel={added ? S.detail.addedToCart : S.detail.addToCart}
@@ -143,6 +153,12 @@ export const CropListingDetailScreen = () => {
               )}
             </Pressable>
           </View>
+        )}
+
+        {!soldOut && !cartAllowed && (
+          <Text style={styles.errorText} accessibilityLiveRegion="polite">
+            {OFFLINE_STRINGS.addToCartNeedsInternet}
+          </Text>
         )}
 
         {addMutation.isError && (

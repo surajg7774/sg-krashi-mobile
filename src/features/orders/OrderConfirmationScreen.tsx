@@ -18,6 +18,11 @@ import { isActiveOrderStatus } from "./orderTimelineSteps";
 import { orderStatusColor, orderStatusLabel, ORDER_STATUS_TITLE } from "./orderStatusDisplay";
 import type { MainStackParamList } from "@/navigation/MainStackNavigator";
 import { ErrorState } from "@/components/ErrorState";
+import { LastUpdated } from "@/components/LastUpdated";
+import { OfflineBanner } from "@/components/OfflineBanner";
+import { useOfflineData } from "@/offline/useOfflineData";
+import { canOfferPayment, orderAddressView, shouldShowFullError, shouldShowOfflineBanner } from "@/offline/screenState";
+import { OFFLINE_STRINGS } from "@/offline/strings";
 
 type Navigation = NativeStackNavigationProp<MainStackParamList, "OrderConfirmation">;
 type ConfirmationRoute = RouteProp<MainStackParamList, "OrderConfirmation">;
@@ -60,6 +65,7 @@ export const OrderConfirmationScreen = () => {
   });
 
   const status = orderQuery.data?.status;
+  const offline = useOfflineData(orderQuery);
 
   // Covers both "just paid, waiting on the webhook" and "came back later to
   // an order that's still pending" — starts counting whenever this screen
@@ -111,7 +117,8 @@ export const OrderConfirmationScreen = () => {
     );
   }
 
-  if (orderQuery.isError || !orderQuery.data) {
+  // "Couldn't find that order" only when there is no order to show; with a saved copy a failed refresh keeps it.
+  if (shouldShowFullError(orderQuery) || !orderQuery.data) {
     return (
       <View style={styles.centered}>
         <ErrorState message="We couldn't find that order." onRetry={() => void orderQuery.refetch()} />
@@ -120,6 +127,8 @@ export const OrderConfirmationScreen = () => {
   }
 
   const order = orderQuery.data;
+  const addressView = orderAddressView(order);
+  const offerPayment = canOfferPayment({ status: order.status, isShowingOfflineData: offline.isShowingOfflineData });
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.containerContent}>
@@ -128,6 +137,12 @@ export const OrderConfirmationScreen = () => {
         <Text style={styles.orderNumber}>Order #{order.orderNumber}</Text>
         <Text style={[styles.statusBadge, { color: orderStatusColor(order.status) }]}>{orderStatusLabel(order.status)}</Text>
         <Text style={styles.amount}>₹{order.totalAmount}</Text>
+        <OfflineBanner visible={shouldShowOfflineBanner(offline)} onRetry={() => void orderQuery.refetch()} />
+        <LastUpdated
+          timestamp={offline.lastUpdatedAt}
+          isShowingOfflineData={offline.isShowingOfflineData}
+          offlineNote={OFFLINE_STRINGS.orderMayBeOutOfDate}
+        />
 
         {order.items.map((item) => (
           <Pressable
@@ -151,7 +166,11 @@ export const OrderConfirmationScreen = () => {
           </Pressable>
         ))}
 
-        {order.status === "PENDING_PAYMENT" && !paymentSubmitted && (
+        {order.status === "PENDING_PAYMENT" && !paymentSubmitted && !offerPayment && offline.isShowingOfflineData && (
+          <Text style={styles.waitingText}>{OFFLINE_STRINGS.payNeedsInternet}</Text>
+        )}
+
+        {offerPayment && !paymentSubmitted && (
           <>
             {paymentError && <Text style={styles.errorText}>{paymentError}</Text>}
             <Pressable
@@ -193,6 +212,8 @@ export const OrderConfirmationScreen = () => {
             try again.
           </Text>
         )}
+
+        {addressView.kind === "online-only" && <Text style={styles.waitingText}>{addressView.note}</Text>}
 
         <View style={styles.timelineSection}>
           <Text style={styles.sectionTitle}>Order status</Text>
