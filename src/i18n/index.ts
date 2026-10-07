@@ -69,6 +69,25 @@ export const translate = (lang: Lang, key: MessageKey, params?: MessageParams): 
 /** A t() bound to one language. */
 export const makeT = (lang: Lang): TFunction => (key, params) => translate(lang, key, params);
 
+export type TemplatePart = string | { name: string };
+
+/**
+ * Splits a template into text and {placeholder} parts, so a screen can put a link or styled text exactly where each
+ * language's word order wants it: "By signing up you agree to the {terms} and {privacy}." ->
+ * ["By signing up you agree to the ", { name: "terms" }, " and ", { name: "privacy" }, "."]. Empty text is dropped.
+ */
+export const splitTemplate = (template: string): TemplatePart[] => {
+  const parts: TemplatePart[] = [];
+  let last = 0;
+  for (const match of template.matchAll(/\{(\w+)\}/g)) {
+    if (match.index > last) parts.push(template.slice(last, match.index));
+    parts.push({ name: match[1] });
+    last = match.index + match[0].length;
+  }
+  if (last < template.length) parts.push(template.slice(last));
+  return parts;
+};
+
 // ---- language state ------------------------------------------------------------------------------------------
 
 export const parseStoredLanguage = (value: unknown): Lang | null => (value === "en" || value === "hi" ? value : null);

@@ -16,7 +16,8 @@ import type { RouteProp } from "@react-navigation/native";
 import { colors } from "@/theme/colors";
 import { useAuth } from "@/context/AuthContext";
 import { authService } from "./authService";
-import type { ApiError } from "@/api/types";
+import { splitTemplate } from "@/i18n";
+import { useT } from "@/i18n/useT";
 import type { GuestStackParamList } from "@/navigation/GuestStackNavigator";
 
 type Navigation = NativeStackNavigationProp<GuestStackParamList, "VerifyOtp">;
@@ -32,6 +33,7 @@ export const VerifyOtpScreen = () => {
   const route = useRoute<Route>();
   const { email } = route.params;
   const { verifyOtp } = useAuth();
+  const { t, errorText } = useT();
 
   const [otp, setOtp] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
@@ -55,9 +57,7 @@ export const VerifyOtpScreen = () => {
       // isAuthenticated, and RootNavigator (not this screen) reacts to that
       // by swapping the whole guest stack out, same as after a normal login.
     } catch (err) {
-      const apiError = err as ApiError;
-      const detail = apiError.details?.length ? apiError.details.join("\n") : null;
-      setError(detail || apiError.message || "Could not verify this code. Please try again.");
+      setError(errorText(err, t("auth.otp.verifyFailed")));
     } finally {
       setIsVerifying(false);
     }
@@ -70,8 +70,7 @@ export const VerifyOtpScreen = () => {
       await authService.resendOtp({ email });
       setCooldown(RESEND_COOLDOWN_SECONDS);
     } catch (err) {
-      const apiError = err as ApiError;
-      setError(apiError.message || "Could not resend the code. Please try again.");
+      setError(errorText(err, t("auth.otp.resendFailed"), { details: false }));
     } finally {
       setIsResending(false);
     }
@@ -80,10 +79,17 @@ export const VerifyOtpScreen = () => {
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : undefined}>
       <View style={styles.content}>
-        <Text style={styles.title}>Verify your email</Text>
+        <Text style={styles.title}>{t("auth.otp.title")}</Text>
         <Text style={styles.subtitle}>
-          We&apos;ve sent a 6-digit code to{"\n"}
-          <Text style={styles.emailText}>{email}</Text>
+          {splitTemplate(t("auth.otp.sentTo")).map((part, index) =>
+            typeof part === "string" ? (
+              part
+            ) : (
+              <Text key={index} style={styles.emailText}>
+                {email}
+              </Text>
+            )
+          )}
         </Text>
 
         {error && <Text style={styles.errorText}>{error}</Text>}
@@ -108,17 +114,17 @@ export const VerifyOtpScreen = () => {
           {isVerifying ? (
             <ActivityIndicator color={colors.primaryContrastText} />
           ) : (
-            <Text style={styles.buttonText}>Verify</Text>
+            <Text style={styles.buttonText}>{t("auth.otp.verify")}</Text>
           )}
         </TouchableOpacity>
 
         <View style={styles.resendRow}>
-          <Text style={styles.resendText}>Didn&apos;t get a code?</Text>
+          <Text style={styles.resendText}>{t("auth.otp.didntGetCode")}</Text>
           {cooldown > 0 ? (
-            <Text style={styles.resendCooldown}>Resend in {cooldown}s</Text>
+            <Text style={styles.resendCooldown}>{t("auth.otp.resendIn", { seconds: cooldown })}</Text>
           ) : (
             <TouchableOpacity onPress={handleResend} disabled={isResending} hitSlop={{ top: 12, bottom: 12, left: 8, right: 8 }}>
-              <Text style={styles.resendLink}>{isResending ? "Sending..." : "Resend code"}</Text>
+              <Text style={styles.resendLink}>{isResending ? t("auth.otp.sending") : t("auth.otp.resend")}</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -128,7 +134,7 @@ export const VerifyOtpScreen = () => {
           onPress={() => navigation.navigate("Login")}
           hitSlop={{ top: 12, bottom: 12 }}
         >
-          <Text style={styles.backLinkText}>Back to Log In</Text>
+          <Text style={styles.backLinkText}>{t("auth.otp.backToLogin")}</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>

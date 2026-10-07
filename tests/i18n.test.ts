@@ -10,12 +10,14 @@ import {
   parseStoredLanguage,
   pluralCategory,
   readDeviceLocale,
+  splitTemplate,
   translate,
   translateWith,
   type Dictionary,
   type LanguageStorage,
 } from "../src/i18n/index.ts";
 import { formatClock, formatDayMonth, monthName, weekdayShort } from "../src/i18n/format.ts";
+import { errorText } from "../src/i18n/errorText.ts";
 import { LANGUAGE_KEY } from "../src/shared/storageKeys.ts";
 import { isPrivateCacheKey, PUBLIC_CACHE_KEY } from "../src/offline/scoping.ts";
 
@@ -250,4 +252,44 @@ test("clock time is 12-hour with AM/PM", () => {
   assert.equal(formatClock(new Date(2026, 9, 5, 15, 42)), "3:42 PM");
   assert.equal(formatClock(new Date(2026, 9, 5, 0, 5)), "12:05 AM");
   assert.equal(formatClock(new Date(2026, 9, 5, 12, 0)), "12:00 PM");
+});
+
+// ---- rich templates and request errors --------------------------------------------------------------------------
+
+test("a template splits into text and placeholder parts, in the language's own order", () => {
+  assert.deepEqual(splitTemplate("By signing up you agree to the {terms} and {privacy}."), [
+    "By signing up you agree to the ",
+    { name: "terms" },
+    " and ",
+    { name: "privacy" },
+    ".",
+  ]);
+  assert.deepEqual(splitTemplate("{a}{b}"), [{ name: "a" }, { name: "b" }]);
+  assert.deepEqual(splitTemplate("plain"), ["plain"]);
+  assert.deepEqual(splitTemplate(""), []);
+  // The English consent sentence reads exactly as before once the links are put back.
+  const english = splitTemplate(translate("en", "auth.register.consent"))
+    .map((part) => (typeof part === "string" ? part : part.name === "terms" ? "Terms" : "Privacy Policy"))
+    .join("");
+  assert.equal(english, "By signing up you agree to the Terms and Privacy Policy.");
+  const hindi = splitTemplate(translate("hi", "auth.register.consent"));
+  assert.ok(hindi.some((p) => typeof p !== "string" && p.name === "terms"));
+  assert.ok(hindi.some((p) => typeof p !== "string" && p.name === "privacy"));
+});
+
+test("request errors: server details, then server message, then the fallback - unchanged in English", () => {
+  const en = { lang: "en" as const, networkText: "NET" };
+  const hiCtx = { lang: "hi" as const, networkText: "नेट" };
+  const withDetails = { code: "VALIDATION", message: "Request validation failed", details: ["email: bad", "name: blank"] };
+  assert.equal(errorText(withDetails, "fallback", en), "email: bad\nname: blank");
+  assert.equal(errorText(withDetails, "fallback", en, { details: false }), "Request validation failed");
+  assert.equal(errorText({ code: "X", message: "", details: [] }, "fallback", en), "fallback");
+  assert.equal(errorText(null, "fallback", en), "fallback");
+  assert.equal(errorText("boom", "fallback", en), "fallback");
+  // Server text is server data: shown as sent in Hindi too.
+  assert.equal(errorText(withDetails, "fallback", hiCtx), "email: bad\nname: blank");
+  // A network failure: English keeps the library text exactly as before; Hindi gets the Hindi sentence.
+  const network = { code: "NETWORK_ERROR", message: "Network Error", details: [] };
+  assert.equal(errorText(network, "fallback", en), "Network Error");
+  assert.equal(errorText(network, "fallback", hiCtx), "नेट");
 });

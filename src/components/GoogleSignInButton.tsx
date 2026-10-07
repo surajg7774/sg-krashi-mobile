@@ -10,7 +10,7 @@ import {
 } from "react-native-nitro-google-signin";
 import { useAuth } from "@/context/AuthContext";
 import { ensureGoogleSignInConfigured, isGoogleSignInConfigured } from "@/features/auth/googleAuth";
-import type { ApiError } from "@/api/types";
+import { useT } from "@/i18n/useT";
 
 interface GoogleSignInButtonProps {
   onError: (message: string) => void;
@@ -33,12 +33,13 @@ const withTimeout = <T,>(label: string, promise: Promise<T>): Promise<T> =>
   Promise.race([
     promise,
     new Promise<T>((_, reject) =>
-      setTimeout(() => reject(new Error(`${label} did not resolve within ${CALL_TIMEOUT_MS}ms`)), CALL_TIMEOUT_MS)
+      setTimeout(() => reject(new Error(`${label} did not resolve within ${CALL_TIMEOUT_MS}ms`)), CALL_TIMEOUT_MS) // i18n-ignore
     ),
   ]);
 
 export const GoogleSignInButton = ({ onError }: GoogleSignInButtonProps) => {
   const { loginWithGoogle } = useAuth();
+  const { t, errorText } = useT();
   const [isReady, setIsReady] = useState(false);
   const [isSigningIn, setIsSigningIn] = useState(false);
 
@@ -76,13 +77,14 @@ export const GoogleSignInButton = ({ onError }: GoogleSignInButtonProps) => {
         console.log("[GoogleSignInButton] loginWithGoogle() completed — should be authenticated now");
       } else if (isCancelledResponse(response)) {
         console.warn("[GoogleSignInButton] response type = 'cancelled' (no thrown error)");
+        // The second sentence is a setup hint for whoever configures the app, so it stays in English (D5).
         onError(
-          "Google sign-in was cancelled or rejected. If you selected an account, check whether that account is " +
-            "added under Google Cloud Console → OAuth consent screen → Test users."
+          `${t("auth.google.cancelled")} ` +
+            "If you selected an account, check whether that account is added under Google Cloud Console → OAuth consent screen → Test users." // i18n-ignore
         );
       } else {
         console.warn("[GoogleSignInButton] unexpected response type:", response.type);
-        onError("Google sign-in did not complete (unexpected response). Please try again.");
+        onError(t("auth.google.unexpected"));
       }
     } catch (err) {
       if (isErrorWithCode(err)) {
@@ -91,21 +93,19 @@ export const GoogleSignInButton = ({ onError }: GoogleSignInButtonProps) => {
           return; // Real, unambiguous user cancellation — nothing to show.
         }
         if (err.code === statusCodes.DEVELOPER_ERROR) {
-          onError("Google sign-in configuration error (DEVELOPER_ERROR) — package name, SHA-1, or client ID mismatch. See Metro console for details.");
+          onError("Google sign-in configuration error (DEVELOPER_ERROR) — package name, SHA-1, or client ID mismatch. See Metro console for details."); // i18n-ignore
           return;
         }
-        onError(`Google sign-in failed (${err.code}): ${err.message}`);
+        onError(t("auth.google.failedWithCode", { code: err.code, message: err.message }));
         return;
       }
       if (err instanceof Error && /did not resolve within/.test(err.message)) {
         console.error("[GoogleSignInButton]", err.message);
-        onError(`Google sign-in hung on ${err.message.split(" did not")[0]} — see Metro console. This is a real, reported issue in this library's version.`);
+        onError(`Google sign-in hung on ${err.message.split(" did not")[0]} — see Metro console. This is a real, reported issue in this library's version.`); // i18n-ignore
         return;
       }
       console.error("[GoogleSignInButton] non-library error during sign-in:", err);
-      const apiError = err as ApiError;
-      const detail = apiError.details?.length ? apiError.details.join("\n") : null;
-      onError(detail || apiError.message || "Could not sign in with Google. Please try again.");
+      onError(errorText(err, t("auth.google.failed")));
     } finally {
       setIsSigningIn(false);
     }

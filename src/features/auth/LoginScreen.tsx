@@ -17,13 +17,14 @@ import { colors } from "@/theme/colors";
 import { PasswordField } from "@/components/PasswordField";
 import { GoogleSignInButton } from "@/components/GoogleSignInButton";
 import { LanguageToggle } from "@/components/LanguageToggle";
-import type { ApiError } from "@/api/types";
+import { useT } from "@/i18n/useT";
 import type { GuestStackParamList } from "@/navigation/GuestStackNavigator";
 
 type Navigation = NativeStackNavigationProp<GuestStackParamList, "Login">;
 
 export const LoginScreen = () => {
   const { login } = useAuth();
+  const { t, errorText } = useT();
   const navigation = useNavigation<Navigation>();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -36,11 +37,9 @@ export const LoginScreen = () => {
     try {
       await login({ email: email.trim(), password });
     } catch (err) {
-      const apiError = err as ApiError;
       // See RegisterScreen's identical fix — the backend's per-field reason
       // lives in `details`, not just the generic top-level `message`.
-      const detail = apiError.details?.length ? apiError.details.join("\n") : null;
-      setError(detail || apiError.message || "Login failed. Please try again.");
+      setError(errorText(err, t("auth.login.failed")));
     } finally {
       setIsSubmitting(false);
     }
@@ -55,13 +54,13 @@ export const LoginScreen = () => {
         <LanguageToggle compact />
       </View>
       <Image source={require("../../../assets/logo.png")} style={styles.logo} resizeMode="contain" />
-      <Text style={styles.title}>Log in</Text>
+      <Text style={styles.title}>{t("auth.login.title")}</Text>
 
       {error && <Text style={styles.errorText}>{error}</Text>}
 
       <TextInput
         style={styles.input}
-        placeholder="Email"
+        placeholder={t("auth.login.email")}
         placeholderTextColor={colors.textSecondary}
         autoCapitalize="none"
         keyboardType="email-address"
@@ -70,7 +69,7 @@ export const LoginScreen = () => {
         editable={!isSubmitting}
       />
       <PasswordField
-        placeholder="Password"
+        placeholder={t("auth.login.password")}
         value={password}
         onChangeText={setPassword}
         editable={!isSubmitting}
@@ -84,7 +83,7 @@ export const LoginScreen = () => {
         {isSubmitting ? (
           <ActivityIndicator color={colors.primaryContrastText} />
         ) : (
-          <Text style={styles.buttonText}>Log in</Text>
+          <Text style={styles.buttonText}>{t("auth.login.submit")}</Text>
         )}
       </TouchableOpacity>
 
@@ -95,7 +94,7 @@ export const LoginScreen = () => {
         onPress={() => navigation.navigate("Register")}
         hitSlop={{ top: 12, bottom: 12 }}
       >
-        <Text style={styles.signupLinkText}>Don't have an account? Sign up</Text>
+        <Text style={styles.signupLinkText}>{t("auth.login.signUpLink")}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -103,7 +102,7 @@ export const LoginScreen = () => {
         onPress={() => navigation.navigate("CropDoctorGuest")}
         hitSlop={{ top: 12, bottom: 12 }}
       >
-        <Text style={styles.guestLinkText}>Try AI Crop Doctor without an account →</Text>
+        <Text style={styles.guestLinkText}>{t("auth.login.guestCropDoctor")}</Text>
       </TouchableOpacity>
     </KeyboardAvoidingView>
   );

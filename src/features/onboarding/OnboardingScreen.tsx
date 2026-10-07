@@ -11,15 +11,18 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "@/theme/colors";
+import type { MessageKey } from "@/i18n";
+import { useT } from "@/i18n/useT";
 
 export interface OnboardingScreenProps {
   onDone: () => void;
 }
 
 interface Slide {
+  id: string;
   emoji: string;
-  title: string;
-  description: string;
+  title: MessageKey;
+  description: MessageKey;
 }
 
 // Describes the app's real, working features only — confirmed against
@@ -29,35 +32,11 @@ interface Slide {
 // they're role-gated and only relevant post-registration, not to every
 // first-time opener.
 const SLIDES: Slide[] = [
-  {
-    emoji: "🌱",
-    title: "Welcome to SG Krashi",
-    description:
-      "One platform connecting farmers and buyers — shop fresh produce, manage your farm, and get smart farming help, all in one app.",
-  },
-  {
-    emoji: "🏪",
-    title: "Shop the Store",
-    description:
-      "Browse fresh, organic produce and farm essentials sourced directly from local farms.",
-  },
-  {
-    emoji: "🌾",
-    title: "Crop Marketplace",
-    description: "Buy fresh grain, pulse and vegetable batches listed directly by farms, and see when each was harvested.",
-  },
-  {
-    emoji: "🌿",
-    title: "AI Crop Doctor & Assistant",
-    description:
-      "Snap a photo of your crop to instantly diagnose issues, or chat with our AI Assistant for farming advice anytime.",
-  },
-  {
-    emoji: "☀️",
-    title: "Weather & Mandi Prices",
-    description:
-      "Check live weather forecasts for your farm and track daily mandi (market) prices before you sell.",
-  },
+  { id: "welcome", emoji: "🌱", title: "onboarding.welcomeTitle", description: "onboarding.welcomeBody" },
+  { id: "store", emoji: "🏪", title: "onboarding.storeTitle", description: "onboarding.storeBody" },
+  { id: "crops", emoji: "🌾", title: "onboarding.cropsTitle", description: "onboarding.cropsBody" },
+  { id: "doctor", emoji: "🌿", title: "onboarding.doctorTitle", description: "onboarding.doctorBody" },
+  { id: "weather", emoji: "☀️", title: "onboarding.weatherTitle", description: "onboarding.weatherBody" },
 ];
 
 const { width } = Dimensions.get("window");
@@ -70,6 +49,7 @@ const { width } = Dimensions.get("window");
  */
 export const OnboardingScreen = ({ onDone }: OnboardingScreenProps) => {
   const insets = useSafeAreaInsets();
+  const { t } = useT();
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollRef = useRef<ScrollView>(null);
   const isLastSlide = activeIndex === SLIDES.length - 1;
@@ -94,7 +74,7 @@ export const OnboardingScreen = ({ onDone }: OnboardingScreenProps) => {
           onPress={onDone}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <Text style={styles.skipText}>Skip</Text>
+          <Text style={styles.skipText}>{t("onboarding.skip")}</Text>
         </TouchableOpacity>
       )}
 
@@ -106,10 +86,10 @@ export const OnboardingScreen = ({ onDone }: OnboardingScreenProps) => {
         onMomentumScrollEnd={handleScrollEnd}
       >
         {SLIDES.map((slide) => (
-          <View key={slide.title} style={[styles.slide, { width }]}>
+          <View key={slide.id} style={[styles.slide, { width }]}>
             <Text style={styles.emoji}>{slide.emoji}</Text>
-            <Text style={styles.title}>{slide.title}</Text>
-            <Text style={styles.description}>{slide.description}</Text>
+            <Text style={styles.title}>{t(slide.title)}</Text>
+            <Text style={styles.description}>{t(slide.description)}</Text>
           </View>
         ))}
       </ScrollView>
@@ -117,12 +97,12 @@ export const OnboardingScreen = ({ onDone }: OnboardingScreenProps) => {
       <View style={[styles.footer, { paddingBottom: insets.bottom + 24 }]}>
         <View style={styles.dotsRow}>
           {SLIDES.map((slide, index) => (
-            <View key={slide.title} style={[styles.dot, index === activeIndex && styles.dotActive]} />
+            <View key={slide.id} style={[styles.dot, index === activeIndex && styles.dotActive]} />
           ))}
         </View>
 
         <TouchableOpacity style={styles.nextButton} onPress={goToNext}>
-          <Text style={styles.nextButtonText}>{isLastSlide ? "Get Started" : "Next"}</Text>
+          <Text style={styles.nextButtonText}>{isLastSlide ? t("onboarding.getStarted") : t("common.next")}</Text>
         </TouchableOpacity>
       </View>
     </View>

@@ -121,6 +121,8 @@ const scanFile = (file) => {
       const text = textOf(node, sf);
       const parent = node.parent;
       if (NON_UI_TEXTS.some((re) => re.test(text.trim())) || insideNonUiCall(node, sf)) return;
+      // A message key ("auth.login.title") is a reference to translated text, not text.
+      if (/^[a-z][A-Za-z0-9]*(\.[A-Za-z0-9]+)+$/.test(text)) return;
       // Already reported by the Alert.alert branch.
       if (ts.isCallExpression(parent) && parent.expression.getText(sf) === "Alert.alert" && parent.arguments.indexOf(node) < 2) return;
       // Comparisons, switch cases, object keys, element access: values, not text.

@@ -17,8 +17,9 @@ import { colors } from "@/theme/colors";
 import { PasswordField } from "@/components/PasswordField";
 import { GoogleSignInButton } from "@/components/GoogleSignInButton";
 import { authService } from "./authService";
+import { splitTemplate } from "@/i18n";
+import { useT } from "@/i18n/useT";
 import { PRIVACY_POLICY_URL, TERMS_URL } from "@/config/legal";
-import type { ApiError } from "@/api/types";
 import type { GuestStackParamList } from "@/navigation/GuestStackNavigator";
 
 const openWebPage = (url: string) => {
@@ -35,6 +36,7 @@ const isPlausibleEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(va
 
 export const RegisterScreen = () => {
   const navigation = useNavigation<Navigation>();
+  const { t, errorText } = useT();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -58,14 +60,12 @@ export const RegisterScreen = () => {
       await authService.register({ name: trimmedName, email: trimmedEmail, password, phone: phone.trim() || undefined });
       navigation.navigate("VerifyOtp", { email: trimmedEmail });
     } catch (err) {
-      const apiError = err as ApiError;
       // The backend's per-field reason (e.g. "email: Email must be a valid
       // address") lives in `details`, not the generic top-level `message`
       // ("Request validation failed") — showing only the latter was the
       // actual bug: every validation failure looked identical and gave no
       // clue which field or why.
-      const detail = apiError.details?.length ? apiError.details.join("\n") : null;
-      setError(detail || apiError.message || "Could not create your account. Please try again.");
+      setError(errorText(err, t("auth.register.failed")));
     } finally {
       setIsSubmitting(false);
     }
@@ -74,13 +74,13 @@ export const RegisterScreen = () => {
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : undefined}>
       <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-        <Text style={styles.title}>Create Account</Text>
+        <Text style={styles.title}>{t("auth.register.title")}</Text>
 
         {error && <Text style={styles.errorText}>{error}</Text>}
 
         <TextInput
           style={styles.input}
-          placeholder="Full name"
+          placeholder={t("auth.register.fullName")}
           placeholderTextColor={colors.textSecondary}
           value={name}
           onChangeText={setName}
@@ -88,7 +88,7 @@ export const RegisterScreen = () => {
         />
         <TextInput
           style={styles.input}
-          placeholder="Email"
+          placeholder={t("auth.register.email")}
           placeholderTextColor={colors.textSecondary}
           autoCapitalize="none"
           keyboardType="email-address"
@@ -98,7 +98,7 @@ export const RegisterScreen = () => {
         />
         <TextInput
           style={styles.input}
-          placeholder="Phone (optional)"
+          placeholder={t("auth.register.phone")}
           placeholderTextColor={colors.textSecondary}
           keyboardType="phone-pad"
           value={phone}
@@ -106,7 +106,7 @@ export const RegisterScreen = () => {
           editable={!isSubmitting}
         />
         <PasswordField
-          placeholder="Password (min. 8 characters)"
+          placeholder={t("auth.register.password")}
           value={password}
           onChangeText={setPassword}
           editable={!isSubmitting}
@@ -120,20 +120,25 @@ export const RegisterScreen = () => {
           {isSubmitting ? (
             <ActivityIndicator color={colors.primaryContrastText} />
           ) : (
-            <Text style={styles.buttonText}>Create Account</Text>
+            <Text style={styles.buttonText}>{t("auth.register.submit")}</Text>
           )}
         </TouchableOpacity>
 
+        {/* The links sit wherever the language's word order puts them ({terms}, {privacy} in the text). */}
         <Text style={styles.consentText}>
-          By signing up you agree to the{" "}
-          <Text style={styles.consentLink} onPress={() => openWebPage(TERMS_URL)}>
-            Terms
-          </Text>{" "}
-          and{" "}
-          <Text style={styles.consentLink} onPress={() => openWebPage(PRIVACY_POLICY_URL)}>
-            Privacy Policy
-          </Text>
-          .
+          {splitTemplate(t("auth.register.consent")).map((part, index) =>
+            typeof part === "string" ? (
+              part
+            ) : part.name === "terms" ? (
+              <Text key={index} style={styles.consentLink} onPress={() => openWebPage(TERMS_URL)}>
+                {t("auth.register.terms")}
+              </Text>
+            ) : (
+              <Text key={index} style={styles.consentLink} onPress={() => openWebPage(PRIVACY_POLICY_URL)}>
+                {t("auth.register.privacy")}
+              </Text>
+            )
+          )}
         </Text>
 
         <GoogleSignInButton onError={setError} />
@@ -143,7 +148,7 @@ export const RegisterScreen = () => {
           onPress={() => navigation.navigate("Login")}
           hitSlop={{ top: 12, bottom: 12 }}
         >
-          <Text style={styles.loginLinkText}>Already have an account? Log in</Text>
+          <Text style={styles.loginLinkText}>{t("auth.register.loginLink")}</Text>
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
