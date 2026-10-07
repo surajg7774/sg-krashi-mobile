@@ -96,14 +96,21 @@ apiClient.interceptors.response.use(
     // request 401s again.
     if (error.response?.status === 401 && originalRequest && !originalRequest._retry && !isRefreshCall) {
       originalRequest._retry = true;
-      const newAccessToken = await getOrStartRefresh();
+      // null = the server rejected the refresh token (session over); a throw = the refresh could not be
+      // completed (offline, timeout, 429, 5xx), which must never log anyone out.
+      let newAccessToken: string | null | undefined;
+      try {
+        newAccessToken = await getOrStartRefresh();
+      } catch {
+        newAccessToken = undefined;
+      }
 
       if (newAccessToken) {
         originalRequest.headers.set("Authorization", `Bearer ${newAccessToken}`);
         return apiClient(originalRequest);
       }
 
-      if (!isNonCritical) {
+      if (newAccessToken === null && !isNonCritical) {
         onAuthFailure();
       }
     }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const STORAGE_KEY = "sgkrashi.hasSeenOnboarding";
+import { ONBOARDING_SEEN_KEY as STORAGE_KEY } from "@/shared/storageKeys";
 
 /**
  * Same AsyncStorage try/catch/finally shape as useWeatherLocation.ts's

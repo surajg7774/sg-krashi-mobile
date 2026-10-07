@@ -1,8 +1,12 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { authService } from "@/features/auth/authService";
 import { tokenStorage } from "@/api/tokenStorage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { registerAuthHandlers } from "@/api/client";
+import { shouldEndSession, type RefreshFailure } from "@/api/sessionPolicy";
 import { ensurePushPermissionAndRegister, unregisterPushToken } from "@/notifications/pushNotifications";
+import { queryClient } from "@/shared/queryClient";
+import { clearLocalUserData } from "@/shared/sessionCleanup";
 import type {
   AuthUser,
   LoginPayload,
@@ -10,6 +14,8 @@ import type {
   ResendOtpPayload,
   VerifyOtpPayload,
 } from "@/features/auth/types";
+
+const PUSH_UNREGISTER_WAIT_MS = 4000;
 
 interface AuthContextValue {
   user: AuthUser | null;
@@ -88,12 +94,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     // logout endpoint yet — the refresh token this app holds stays valid
     // server-side until it expires or is rotated again. Fine for this
     // milestone; worth a real "revoke on mobile logout" endpoint later.
-    await unregisterPushToken();
+    // Best-effort and bounded: with no connection this call could otherwise wait forever and the person
+    // would be unable to log out (the local session below must always be cleared).
+    await Promise.race([unregisterPushToken(), new Promise<void>((resolve) => setTimeout(resolve, PUSH_UNREGISTER_WAIT_MS))]);
     await Promise.all([
       tokenStorage.clearAccessToken(),
       tokenStorage.clearRefreshToken(),
       tokenStorage.clearStoredUser(),
     ]);
+    // Every session-ending path (menu "Log out", account deletion, forced logout after a refresh
+    // rejection) ends here: cancel and drop every cached server response and the saved weather location,
+    // so the next person on this phone never sees this person's data. The onboarding flag is kept.
+    await clearLocalUserData({ queryClient, storage: AsyncStorage });
     setUser(null);
   }, []);
 
@@ -114,8 +126,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         tokenStorage.setRefreshToken(response.refreshToken),
       ]);
       return response.accessToken;
-    } catch {
-      return null;
+    } catch (error) {
+      // Only a refresh the server REJECTED ends the session (null -> forced logout). Offline, timeouts,
+      // rate limits and server errors rethrow, so the caller keeps the session and the original request just fails.
+      if (shouldEndSession(error as RefreshFailure)) {
+        return null;
+      }
+      throw error;
     }
   }, []);
 

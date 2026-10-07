@@ -1,10 +1,9 @@
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "@/context/AuthContext";
 import { RootNavigator } from "@/navigation/RootNavigator";
-
-const queryClient = new QueryClient();
+import { queryClient } from "@/shared/queryClient";
 
 export default function App() {
   return (

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { WEATHER_LOCATION_KEY as STORAGE_KEY } from "@/shared/storageKeys";
+import { subscribeSessionCleared } from "@/shared/sessionCleanup";
 import { useGeolocation } from "./useGeolocation";
 import type { WeatherLocation } from "./types";
-
-const STORAGE_KEY = "sgkrashi.weatherLocation";
 
 interface StoredManualLocation {
   latitude: number;
@@ -39,6 +39,10 @@ export const useWeatherLocation = () => {
       }
     })();
   }, []);
+
+  // When a session ends (logout, account deletion, forced logout) the saved pick is removed from storage by
+  // clearLocalUserData; this resets the copy held in memory too, so a mounted screen cannot show it afterwards.
+  useEffect(() => subscribeSessionCleared(() => setManualLocationState(null)), []);
 
   useEffect(() => {
     if (hasLoadedStorage && !manualLocation) {
