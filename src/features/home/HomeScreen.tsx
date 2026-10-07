@@ -34,6 +34,8 @@ import { PricePill } from "@/components/PricePill";
 import { NewBadge } from "@/components/NewBadge";
 import { Rating } from "@/components/Rating";
 import { cardShadow } from "@/theme/shadow";
+import type { MessageKey } from "@/i18n";
+import { useT } from "@/i18n/useT";
 
 // Composite because Home needs to navigate both within its own tab
 // navigator (Store, Weather) AND up to the parent stack (Cart, which lives
@@ -44,7 +46,8 @@ type Navigation = CompositeNavigationProp<
 >;
 
 interface QuickLink {
-  label: string;
+  id: string;
+  label: MessageKey;
   emoji: string;
   onPress: (navigation: Navigation) => void;
 }
@@ -52,12 +55,12 @@ interface QuickLink {
 const QUICK_LINKS: QuickLink[] = [
   // 🏪 (storefront), not 🛒 — the cart look now belongs to the header's
   // dedicated Cart button, so Store needs a visually distinct icon.
-  { label: "Store", emoji: "🏪", onPress: (nav) => nav.navigate("Store", { screen: "StoreList" }) },
-  { label: "Crop Doctor", emoji: "🌿", onPress: (nav) => nav.navigate("CropDoctor", { screen: "CropDoctorHome" }) },
-  { label: "Weather", emoji: "☀️", onPress: (nav) => nav.navigate("Weather") },
-  { label: "Mandi Prices", emoji: "📈", onPress: (nav) => nav.navigate("Mandi") },
-  { label: "AI Assistant", emoji: "🤖", onPress: (nav) => nav.navigate("Chat") },
-  { label: "Crop Marketplace", emoji: "🌾", onPress: (nav) => nav.navigate("Store", { screen: "CropList" }) },
+  { id: "store", label: "home.links.store", emoji: "🏪", onPress: (nav) => nav.navigate("Store", { screen: "StoreList" }) },
+  { id: "cropDoctor", label: "home.links.cropDoctor", emoji: "🌿", onPress: (nav) => nav.navigate("CropDoctor", { screen: "CropDoctorHome" }) },
+  { id: "weather", label: "home.links.weather", emoji: "☀️", onPress: (nav) => nav.navigate("Weather") },
+  { id: "mandi", label: "home.links.mandi", emoji: "📈", onPress: (nav) => nav.navigate("Mandi") },
+  { id: "assistant", label: "home.links.assistant", emoji: "🤖", onPress: (nav) => nav.navigate("Chat") },
+  { id: "crops", label: "home.links.cropMarketplace", emoji: "🌾", onPress: (nav) => nav.navigate("Store", { screen: "CropList" }) },
 ];
 
 const ProductCard = ({ item, onPress }: { item: ProductSummary; onPress: () => void }) => (
@@ -85,6 +88,7 @@ export const HomeScreen = () => {
   const { user, isAuthenticated } = useAuth();
   const navigation = useNavigation<Navigation>();
   const insets = useSafeAreaInsets();
+  const { t } = useT();
 
   // "Latest products" — the recommendation endpoints ("for you"/similar)
   // need real order history to return anything meaningful, and this test
@@ -139,7 +143,7 @@ export const HomeScreen = () => {
       <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
         <View style={styles.headerTopRow}>
           <Text style={styles.greeting} numberOfLines={1}>
-            Welcome{user ? `, ${user.name}` : ""}
+            {user ? t("home.welcomeName", { name: user.name }) : t("home.welcome")}
           </Text>
           <View style={styles.headerIcons}>
             <Pressable style={({ pressed }) => [styles.iconButton, pressed && { opacity: 0.6 }]} onPress={() => navigation.navigate("Cart")}>
@@ -168,23 +172,23 @@ export const HomeScreen = () => {
 
       <View style={styles.quickLinksRow}>
         {QUICK_LINKS.map((link) => (
-          <Pressable key={link.label} style={({ pressed }) => [styles.quickLink, pressed && { opacity: 0.6 }]} onPress={() => link.onPress(navigation)}>
+          <Pressable key={link.id} style={({ pressed }) => [styles.quickLink, pressed && { opacity: 0.6 }]} onPress={() => link.onPress(navigation)}>
             <Text style={styles.quickLinkEmoji}>{link.emoji}</Text>
-            <Text style={styles.quickLinkLabel}>{link.label}</Text>
+            <Text style={styles.quickLinkLabel}>{t(link.label)}</Text>
           </Pressable>
         ))}
       </View>
 
-      <Text style={styles.sectionTitle}>Featured Products</Text>
+      <Text style={styles.sectionTitle}>{t("home.featuredProducts")}</Text>
 
       {productsQuery.isLoading && <CardSkeletonGrid count={4} />}
 
       {productsQuery.isError && (
-        <ErrorState message="Could not load products." onRetry={() => void productsQuery.refetch()} />
+        <ErrorState message={t("home.productsLoadError")} onRetry={() => void productsQuery.refetch()} />
       )}
 
       {productsQuery.data && productsQuery.data.items.length === 0 && (
-        <EmptyState icon="📦" message="No featured products right now — check back soon." />
+        <EmptyState icon="📦" message={t("home.productsEmpty")} />
       )}
 
       {productsQuery.data && productsQuery.data.items.length > 0 && (
@@ -228,7 +232,7 @@ export const HomeScreen = () => {
 
       {forYouQuery.data && forYouQuery.data.items.length > 0 && (
         <RecommendationRail
-          title="For You"
+          title={t("home.forYou")}
           items={forYouQuery.data.items}
           onPressItem={(item) =>
             navigation.navigate("Store", {

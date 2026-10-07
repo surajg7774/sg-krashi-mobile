@@ -91,6 +91,22 @@ export const en = {
     weatherTitle: "Weather & Mandi Prices",
     weatherBody: "Check live weather forecasts for your farm and track daily mandi (market) prices before you sell.",
   },
+  home: {
+    welcome: "Welcome",
+    welcomeName: "Welcome, {name}",
+    links: {
+      store: "Store",
+      cropDoctor: "Crop Doctor",
+      weather: "Weather",
+      mandi: "Mandi Prices",
+      assistant: "AI Assistant",
+      cropMarketplace: "Crop Marketplace",
+    },
+    featuredProducts: "Featured Products",
+    productsLoadError: "Could not load products.",
+    productsEmpty: "No featured products right now — check back soon.",
+    forYou: "For You",
+  },
 } as const;
 
 type Widen<T> = T extends string ? string : T extends PluralForms ? PluralForms : { readonly [K in keyof T]: Widen<T[K]> };

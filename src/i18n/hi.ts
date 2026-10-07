@@ -83,4 +83,20 @@ export const hi: Messages = {
     weatherTitle: "मौसम और मंडी भाव",
     weatherBody: "अपने खेत के लिए मौसम का ताज़ा पूर्वानुमान देखें और बेचने से पहले रोज़ के मंडी भाव जानें।",
   },
+  home: {
+    welcome: "नमस्ते",
+    welcomeName: "नमस्ते, {name}",
+    links: {
+      store: "स्टोर",
+      cropDoctor: "फसल डॉक्टर",
+      weather: "मौसम",
+      mandi: "मंडी भाव",
+      assistant: "AI सहायक",
+      cropMarketplace: "फसल बाज़ार",
+    },
+    featuredProducts: "चुनिंदा उत्पाद",
+    productsLoadError: "उत्पाद लोड नहीं हो सके।",
+    productsEmpty: "अभी कोई चुनिंदा उत्पाद नहीं है — थोड़ी देर बाद फिर देखें।",
+    forYou: "आपके लिए",
+  },
 };
