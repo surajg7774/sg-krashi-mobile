@@ -40,3 +40,18 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Secrets (safety net, repos may be public)
+.env
+.env.*
+!.env.example
+!.env.production.example
+*.keystore
+*.age
+id_rsa*
+*service-account*.json
+*firebase-adminsdk*.json
+*credentials*.json
+secrets/
+SG-Krashi-Secrets/
+.vercel/
