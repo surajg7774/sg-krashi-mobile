@@ -9,6 +9,8 @@ import { colors } from "@/theme/colors";
 import type { TabParamList } from "@/navigation/TabNavigator";
 import type { MainStackParamList } from "@/navigation/MainStackNavigator";
 import { PRIVACY_POLICY_URL, TERMS_URL } from "@/config/legal";
+import { LanguageToggle } from "@/components/LanguageToggle";
+import { useT } from "@/i18n/useT";
 import { DeleteAccountModal } from "./DeleteAccountModal";
 
 // The legal pages are the website's; open them in the browser rather than keeping a copy in the app.
@@ -27,6 +29,7 @@ type Navigation = CompositeNavigationProp<
 // of reach the way a long menu list eventually would.
 export const ProfileScreen = () => {
   const { user, logout } = useAuth();
+  const { t } = useT();
   const navigation = useNavigation<Navigation>();
   const insets = useSafeAreaInsets();
 
@@ -46,6 +49,11 @@ export const ProfileScreen = () => {
         <Text style={styles.name}>{user?.name}</Text>
         <Text style={styles.email}>{user?.email}</Text>
         {!!user?.roles?.length && <Text style={styles.roles}>{user.roles.join(", ")}</Text>}
+
+        <View style={styles.languageSection}>
+          <Text style={styles.sectionLabel}>{t("language.title")}</Text>
+          <LanguageToggle />
+        </View>
 
         <View style={styles.menuCard}>
           <TouchableOpacity
@@ -129,9 +137,19 @@ const styles = StyleSheet.create({
     textAlign: "center",
     textTransform: "capitalize",
   },
-  menuCard: {
+  languageSection: {
     width: "100%",
     marginTop: 32,
+  },
+  sectionLabel: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: colors.textSecondary,
+    marginBottom: 8,
+  },
+  menuCard: {
+    width: "100%",
+    marginTop: 20,
     backgroundColor: colors.surface,
     borderRadius: 12,
     borderWidth: 1,

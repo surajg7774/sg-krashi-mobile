@@ -16,6 +16,7 @@ import { useAuth } from "@/context/AuthContext";
 import { colors } from "@/theme/colors";
 import { PasswordField } from "@/components/PasswordField";
 import { GoogleSignInButton } from "@/components/GoogleSignInButton";
+import { LanguageToggle } from "@/components/LanguageToggle";
 import type { ApiError } from "@/api/types";
 import type { GuestStackParamList } from "@/navigation/GuestStackNavigator";
 
@@ -50,6 +51,9 @@ export const LoginScreen = () => {
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
+      <View style={styles.languageRow}>
+        <LanguageToggle compact />
+      </View>
       <Image source={require("../../../assets/logo.png")} style={styles.logo} resizeMode="contain" />
       <Text style={styles.title}>Log in</Text>
 
@@ -111,6 +115,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     justifyContent: "center",
     paddingHorizontal: 24,
+  },
+  languageRow: {
+    marginBottom: 12,
   },
   logo: {
     width: 160,
