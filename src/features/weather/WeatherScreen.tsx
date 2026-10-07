@@ -23,6 +23,7 @@ import { WeatherForecastChart } from "./WeatherForecastChart";
 import { weatherService } from "./weatherService";
 import { useWeatherLocation } from "./useWeatherLocation";
 import { KHANDWA_SUGGESTION, type GeocodingResult } from "./types";
+import { useT } from "@/i18n/useT";
 
 const MIN_SEARCH_LENGTH = 2;
 
@@ -35,6 +36,7 @@ export const WeatherScreen = () => {
     useCurrentLocation,
     retryGeolocation,
   } = useWeatherLocation();
+  const { t } = useT();
   const [searchInput, setSearchInput] = useState("");
   const [hasSearchedOnce, setHasSearchedOnce] = useState(false);
   const search = useDebouncedValue(searchInput, 300);
@@ -66,12 +68,12 @@ export const WeatherScreen = () => {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.screenTitle}>Weather</Text>
-      <Text style={styles.sectionTitle}>Location</Text>
+      <Text style={styles.screenTitle}>{t("weather.title")}</Text>
+      <Text style={styles.sectionTitle}>{t("weather.location")}</Text>
       <View style={styles.searchRow}>
         <TextInput
           style={styles.searchInput}
-          placeholder="Search a city or place…"
+          placeholder={t("weather.searchPlaceholder")}
           placeholderTextColor={colors.textSecondary}
           value={searchInput}
           onChangeText={(text) => {
@@ -101,7 +103,7 @@ export const WeatherScreen = () => {
       )}
 
       {showResults && searchQuery.data && searchQuery.data.length === 0 && !searchQuery.isLoading && (
-        <Text style={styles.emptyResultsText}>No places found.</Text>
+        <Text style={styles.emptyResultsText}>{t("weather.noPlaces")}</Text>
       )}
 
       {showKhandwaSuggestion && (
@@ -110,7 +112,9 @@ export const WeatherScreen = () => {
           onPress={() => handleSelectLocation(KHANDWA_SUGGESTION)}
           hitSlop={{ top: 7, bottom: 7 }}
         >
-          <Text style={styles.suggestionChipText}>Try Khandwa, Madhya Pradesh</Text>
+          <Text style={styles.suggestionChipText}>
+            {t("weather.trySuggestion", { place: `${KHANDWA_SUGGESTION.name}, ${KHANDWA_SUGGESTION.admin1}` })}
+          </Text>
         </Pressable>
       )}
 
@@ -122,8 +126,9 @@ export const WeatherScreen = () => {
         >
           <Text style={styles.locationLabel}>
             {location.source === "geolocation" ? "📍 " : "📌 "}
-            {location.label}
-            {location.source === "manual" ? " · Use current location" : ""}
+            {/* A picked place keeps the name it was saved with (place names are data); "current location" is app text. */}
+            {location.source === "geolocation" ? t("weather.currentLocation") : location.label}
+            {location.source === "manual" ? ` · ${t("weather.useCurrentLocation")}` : ""}
           </Text>
         </Pressable>
       )}
@@ -133,14 +138,12 @@ export const WeatherScreen = () => {
       {isResolving && !location && (
         <View style={styles.centered}>
           <ActivityIndicator color={colors.primary} />
-          <Text style={styles.helperText}>Finding your location…</Text>
+          <Text style={styles.helperText}>{t("weather.finding")}</Text>
         </View>
       )}
 
       {needsManualPrompt && !location && (
-        <Text style={styles.helperText}>
-          Couldn't access your location. Search for a city above to see its weather.
-        </Text>
+        <Text style={styles.helperText}>{t("weather.locationUnavailable")}</Text>
       )}
 
       {location && weatherQuery.isLoading && (
@@ -154,7 +157,7 @@ export const WeatherScreen = () => {
 
       {/* The full-screen error only when there is nothing to show; with saved data a failed refresh keeps it on screen. */}
       {location && shouldShowFullError(weatherQuery) && (
-        <ErrorState message="Could not load weather for this location." onRetry={() => void weatherQuery.refetch()} />
+        <ErrorState message={t("weather.loadError")} onRetry={() => void weatherQuery.refetch()} />
       )}
 
       {location && weatherQuery.data && (
@@ -171,22 +174,22 @@ export const WeatherScreen = () => {
 
           <View style={styles.statsRow}>
             <View style={styles.statBox}>
-              <Text style={styles.statLabel}>Humidity</Text>
+              <Text style={styles.statLabel}>{t("weather.humidity")}</Text>
               <Text style={styles.statValue}>{Math.round(weatherQuery.data.humidityPercent)}%</Text>
             </View>
             <View style={styles.statBox}>
-              <Text style={styles.statLabel}>Recent rainfall</Text>
+              <Text style={styles.statLabel}>{t("weather.recentRainfall")}</Text>
               <Text style={styles.statValue}>{weatherQuery.data.recentRainfallMm.toFixed(1)} mm</Text>
             </View>
           </View>
 
           <View style={styles.statsRow}>
             <View style={styles.statBox}>
-              <Text style={styles.statLabel}>Tonight's low</Text>
+              <Text style={styles.statLabel}>{t("weather.tonightLow")}</Text>
               <Text style={styles.statValue}>{Math.round(weatherQuery.data.forecastMinTempCelsius)}°C</Text>
             </View>
             <View style={styles.statBox}>
-              <Text style={styles.statLabel}>Next 24h rain</Text>
+              <Text style={styles.statLabel}>{t("weather.next24hRain")}</Text>
               <Text style={styles.statValue}>{weatherQuery.data.forecastPrecipitationNext24hMm.toFixed(1)} mm</Text>
             </View>
           </View>
@@ -195,11 +198,11 @@ export const WeatherScreen = () => {
 
       {location && weatherQuery.data && (
         <View style={styles.trendCard}>
-          <Text style={styles.trendTitle}>NEXT 7 DAYS</Text>
+          <Text style={styles.trendTitle}>{t("weather.next7Days")}</Text>
           {(weatherQuery.data.daily?.length ?? 0) >= 2 ? (
             <WeatherForecastChart daily={weatherQuery.data.daily ?? []} />
           ) : (
-            <Text style={styles.helperText}>The 7-day trend is unavailable right now.</Text>
+            <Text style={styles.helperText}>{t("weather.trendUnavailable")}</Text>
           )}
         </View>
       )}

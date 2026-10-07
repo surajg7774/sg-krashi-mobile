@@ -69,7 +69,7 @@ export const useWeatherLocation = () => {
   const location: WeatherLocation | null = manualLocation
     ? { ...manualLocation, source: "manual" }
     : geolocation.status === "granted" && geolocation.coords
-      ? { ...geolocation.coords, label: "Your current location", source: "geolocation" }
+      ? { ...geolocation.coords, label: "Your current location", source: "geolocation" } // i18n-ignore (the screen shows the translated text for this source)
       : null;
 
   const needsManualPrompt =

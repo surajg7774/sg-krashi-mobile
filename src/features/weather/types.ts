@@ -41,9 +41,9 @@ export interface WeatherLocation {
 // the web app's KHANDWA_SUGGESTION and the backend's own hardcoded farm
 // location (WeatherServiceImpl.java).
 export const KHANDWA_SUGGESTION: GeocodingResult = {
-  name: "Khandwa",
-  admin1: "Madhya Pradesh",
-  country: "India",
+  name: "Khandwa", // i18n-ignore (place-name data for the default suggestion)
+  admin1: "Madhya Pradesh", // i18n-ignore
+  country: "India", // i18n-ignore
   latitude: 21.83,
   longitude: 76.35,
 };

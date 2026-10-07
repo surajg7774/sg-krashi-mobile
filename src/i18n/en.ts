@@ -107,6 +107,31 @@ export const en = {
     productsEmpty: "No featured products right now — check back soon.",
     forYou: "For You",
   },
+  weather: {
+    title: "Weather",
+    location: "Location",
+    searchPlaceholder: "Search a city or place…",
+    noPlaces: "No places found.",
+    trySuggestion: "Try {place}",
+    currentLocation: "Your current location",
+    useCurrentLocation: "Use current location",
+    finding: "Finding your location…",
+    locationUnavailable: "Couldn't access your location. Search for a city above to see its weather.",
+    loadError: "Could not load weather for this location.",
+    humidity: "Humidity",
+    recentRainfall: "Recent rainfall",
+    tonightLow: "Tonight's low",
+    next24hRain: "Next 24h rain",
+    next7Days: "NEXT 7 DAYS",
+    trendUnavailable: "The 7-day trend is unavailable right now.",
+    chart: {
+      high: "High °C",
+      low: "Low °C",
+      rain: "Rain mm",
+      summary:
+        "{days}-day forecast: highs {highMin} to {highMax} degrees, lows {lowMin} to {lowMax} degrees, rain up to {rainMax} millimetres in a day",
+    },
+  },
 } as const;
 
 type Widen<T> = T extends string ? string : T extends PluralForms ? PluralForms : { readonly [K in keyof T]: Widen<T[K]> };

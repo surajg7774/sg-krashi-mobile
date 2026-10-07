@@ -4,16 +4,18 @@ import Svg, { Circle, Line, Polyline, Rect } from "react-native-svg";
 import { colors } from "@/theme/colors";
 import { columnCenters, scaleLinear, toPolylinePoints } from "@/shared/chartMath";
 import type { DailyForecastPoint } from "./types";
+import type { Lang } from "@/i18n";
+import { weekdayShort } from "@/i18n/format";
+import { useT } from "@/i18n/useT";
 
 const CHART_HEIGHT = 150;
 const PLOT_PAD = 8;
-const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 // "YYYY-MM-DD" is the location's own calendar day — built as a local date so
 // it never shifts a day in the viewer's timezone (new Date("2026-10-05") is UTC).
-const weekdayOf = (isoDate: string): string => {
+const weekdayOf = (isoDate: string, lang: Lang): string => {
   const [year, month, day] = isoDate.split("-").map(Number);
-  return WEEKDAYS[new Date(year, month - 1, day).getDay()];
+  return weekdayShort(new Date(year, month - 1, day).getDay(), lang);
 };
 
 interface WeatherForecastChartProps {
@@ -28,15 +30,20 @@ interface WeatherForecastChartProps {
  */
 export const WeatherForecastChart = ({ daily }: WeatherForecastChartProps) => {
   const [width, setWidth] = useState(0);
+  const { t, lang } = useT();
   const onLayout = (event: LayoutChangeEvent) => setWidth(Math.floor(event.nativeEvent.layout.width));
 
   const highs = daily.map((d) => d.tempMaxC);
   const lows = daily.map((d) => d.tempMinC);
   const rains = daily.map((d) => d.rainMm);
-  const summary =
-    `${daily.length}-day forecast: highs ${Math.round(Math.min(...highs))} to ${Math.round(Math.max(...highs))} degrees, ` +
-    `lows ${Math.round(Math.min(...lows))} to ${Math.round(Math.max(...lows))} degrees, ` +
-    `rain up to ${Math.max(...rains).toFixed(1)} millimetres in a day`;
+  const summary = t("weather.chart.summary", {
+    days: daily.length,
+    highMin: Math.round(Math.min(...highs)),
+    highMax: Math.round(Math.max(...highs)),
+    lowMin: Math.round(Math.min(...lows)),
+    lowMax: Math.round(Math.max(...lows)),
+    rainMax: Math.max(...rains).toFixed(1),
+  });
 
   const tempMin = Math.min(...lows) - 2;
   const tempMax = Math.max(...highs) + 2;
@@ -87,7 +94,7 @@ export const WeatherForecastChart = ({ daily }: WeatherForecastChartProps) => {
       <View style={styles.labelRow}>
         {daily.map((d) => (
           <View key={d.date} style={styles.labelCell}>
-            <Text style={styles.weekday}>{weekdayOf(d.date)}</Text>
+            <Text style={styles.weekday}>{weekdayOf(d.date, lang)}</Text>
             <Text style={[styles.temp, { color: colors.warning }]}>{Math.round(d.tempMaxC)}°</Text>
             <Text style={[styles.temp, { color: colors.info }]}>{Math.round(d.tempMinC)}°</Text>
           </View>
@@ -95,9 +102,9 @@ export const WeatherForecastChart = ({ daily }: WeatherForecastChartProps) => {
       </View>
 
       <View style={styles.legend}>
-        <LegendItem color={colors.warning} label="High °C" shape="line" />
-        <LegendItem color={colors.info} label="Low °C" shape="line" />
-        <LegendItem color={colors.primary} label="Rain mm" shape="bar" />
+        <LegendItem color={colors.warning} label={t("weather.chart.high")} shape="line" />
+        <LegendItem color={colors.info} label={t("weather.chart.low")} shape="line" />
+        <LegendItem color={colors.primary} label={t("weather.chart.rain")} shape="bar" />
       </View>
     </View>
   );

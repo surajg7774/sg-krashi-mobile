@@ -113,7 +113,8 @@ const scanFile = (file) => {
 
     if (ts.isJsxText(node)) {
       const t = node.getText(sf).trim();
-      if (hasLetters(t)) add(node, "jsx-text", t);
+      // Units stay as they are in every language (docs/I18N_DECISIONS.md, D3).
+      if (hasLetters(t) && !/^(mm|°C|km|kg|%)$/.test(t)) add(node, "jsx-text", t);
       return;
     }
 
