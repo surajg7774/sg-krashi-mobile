@@ -84,7 +84,7 @@ const read = (path: string) => readFileSync(new URL(path, import.meta.url), "utf
 test("logout() clears local user data", () => {
   const auth = read("../src/context/AuthContext.tsx");
   const logout = auth.slice(auth.indexOf("const logout = useCallback"), auth.indexOf("const refreshTokens"));
-  assert.match(logout, /clearLocalUserData\(\{\s*queryClient,\s*storage:\s*AsyncStorage\s*\}\)/);
+  assert.match(logout, /clearLocalUserData\(\{\s*queryClient,\s*storage:\s*AsyncStorage,\s*offlineCache\s*\}\)/);
 });
 
 test("forced logout (refresh rejected) calls logout()", () => {

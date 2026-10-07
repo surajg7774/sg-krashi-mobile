@@ -26,7 +26,16 @@ export const subscribeSessionCleared = (listener: Listener): (() => void) => {
   };
 };
 
-export const clearLocalUserData = async (deps: { queryClient: ClearableQueryClient; storage: RemovableStorage }): Promise<void> => {
+/** The offline copy of the signed-in user's private data (src/offline). */
+export interface PrivateOfflineCache {
+  clearPrivate: () => Promise<void>;
+}
+
+export const clearLocalUserData = async (deps: {
+  queryClient: ClearableQueryClient;
+  storage: RemovableStorage;
+  offlineCache?: PrivateOfflineCache;
+}): Promise<void> => {
   try {
     // In-flight requests first: a response landing after the clear would put the old user's data straight back.
     await deps.queryClient.cancelQueries();
@@ -34,6 +43,13 @@ export const clearLocalUserData = async (deps: { queryClient: ClearableQueryClie
     // Clear regardless: leaking the previous user's data is the worse failure.
   }
   deps.queryClient.clear();
+
+  try {
+    // The stored copy of this user's private data (orders). The shared public copy (weather, lists) stays.
+    await deps.offlineCache?.clearPrivate();
+  } catch {
+    // Storage unavailable: nothing more can be done here.
+  }
 
   try {
     await deps.storage.removeItem(WEATHER_LOCATION_KEY);

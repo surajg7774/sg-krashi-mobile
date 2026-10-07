@@ -5,6 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { registerAuthHandlers } from "@/api/client";
 import { shouldEndSession, type RefreshFailure } from "@/api/sessionPolicy";
 import { ensurePushPermissionAndRegister, unregisterPushToken } from "@/notifications/pushNotifications";
+import { offlineCache } from "@/offline";
 import { queryClient } from "@/shared/queryClient";
 import { clearLocalUserData } from "@/shared/sessionCleanup";
 import type {
@@ -105,7 +106,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     // Every session-ending path (menu "Log out", account deletion, forced logout after a refresh
     // rejection) ends here: cancel and drop every cached server response and the saved weather location,
     // so the next person on this phone never sees this person's data. The onboarding flag is kept.
-    await clearLocalUserData({ queryClient, storage: AsyncStorage });
+    await clearLocalUserData({ queryClient, storage: AsyncStorage, offlineCache });
     setUser(null);
   }, []);
 

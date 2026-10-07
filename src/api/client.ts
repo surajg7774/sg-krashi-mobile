@@ -1,6 +1,7 @@
 import axios, { type InternalAxiosRequestConfig, type AxiosError } from "axios";
 import type { ApiError, ApiErrorResponse, ApiResponse } from "./types";
 import { tokenStorage } from "./tokenStorage";
+import { timeoutForRequest } from "@/offline/queryPolicy";
 
 // Same production backend the web app (sg-krashi-client) already talks to.
 // No .env wiring for this milestone — a single real target, matching the
@@ -137,6 +138,12 @@ apiClient.interceptors.response.use(
 // reads are async, so this has to be a request interceptor (which axios lets
 // return a Promise<config>), not a plain header set at client-creation time.
 apiClient.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
+  // A timeout only for the GETs behind the screens that have an offline copy (not a global axios timeout):
+  // a dead connection then fails over to the cached data instead of hanging.
+  if (!config.timeout) {
+    const timeout = timeoutForRequest(config.method, config.url);
+    if (timeout) config.timeout = timeout;
+  }
   const token = await tokenStorage.getAccessToken();
   if (token) {
     config.headers.set("Authorization", `Bearer ${token}`);
