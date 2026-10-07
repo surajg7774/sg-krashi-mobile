@@ -1,4 +1,5 @@
 import { apiClient } from "@/api/client";
+import { unregisterWithFallback } from "./unregisterToken";
 import type { AppNotification, DevicePlatform, NotificationListResult } from "./types";
 
 // GET /notifications/my, PATCH /{id}/read, PATCH /read-all already existed
@@ -25,6 +26,7 @@ export const notificationService = {
   },
 
   unregisterDeviceToken: async (token: string): Promise<void> => {
-    await apiClient.delete("/notifications/device-tokens", { params: { token } });
+    // POST with the token in the body; falls back to the old DELETE ?token= only against an older server (404/405).
+    await unregisterWithFallback(apiClient, token);
   },
 };
