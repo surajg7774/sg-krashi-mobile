@@ -24,7 +24,7 @@ import { useAuth } from "@/context/AuthContext";
 import { colors } from "@/theme/colors";
 import { DELETE_ACCOUNT_URL } from "@/config/legal";
 import { ensureGoogleSignInConfigured } from "@/features/auth/googleAuth";
-import type { ApiError } from "@/api/types";
+import { useT } from "@/i18n/useT";
 import { accountService } from "./accountService";
 
 interface DeleteAccountModalProps {
@@ -42,6 +42,7 @@ interface DeleteAccountModalProps {
  */
 export const DeleteAccountModal = ({ visible, onClose }: DeleteAccountModalProps) => {
   const { logout } = useAuth();
+  const { t, errorText } = useT();
   const [password, setPassword] = useState("");
   const [googleToken, setGoogleToken] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -76,13 +77,13 @@ export const DeleteAccountModal = ({ visible, onClose }: DeleteAccountModalProps
       if (isSuccessResponse(response)) {
         setGoogleToken(response.data.idToken);
       } else if (!isCancelledResponse(response)) {
-        setError("Google confirmation did not complete. Please try again.");
+        setError(t("account.googleIncomplete"));
       }
     } catch (err) {
       if (isErrorWithCode(err) && err.code === statusCodes.SIGN_IN_CANCELLED) {
         return;
       }
-      setError("Couldn't confirm with Google. Please try again.");
+      setError(t("account.googleFailed"));
     } finally {
       setIsConfirmingGoogle(false);
     }
@@ -96,8 +97,8 @@ export const DeleteAccountModal = ({ visible, onClose }: DeleteAccountModalProps
       // The account is gone server-side; drop the local session (also unregisters push, best-effort).
       await logout();
     } catch (err) {
-      const apiError = err as ApiError;
-      setError(apiError.message || "Couldn't delete your account. Please try again.");
+      // The server says why it refuses (an order, booking or payout in flight); that message is shown as sent.
+      setError(errorText(err, t("account.deleteFailed"), { details: false }));
       setIsDeleting(false);
     }
   };
@@ -108,17 +109,14 @@ export const DeleteAccountModal = ({ visible, onClose }: DeleteAccountModalProps
     <Modal visible={visible} transparent animationType="fade" onRequestClose={close}>
       <KeyboardAvoidingView style={styles.backdrop} behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <View style={styles.card}>
-          <Text style={styles.title}>Delete your account?</Text>
-          <Text style={styles.body}>
-            This can&apos;t be undone. You&apos;ll be signed out, and your addresses, cart, chat history, scan
-            history and notifications will be deleted. Orders and payments we must keep stay, but are anonymized.
-          </Text>
+          <Text style={styles.title}>{t("account.title")}</Text>
+          <Text style={styles.body}>{t("account.body")}</Text>
           <Pressable
             onPress={() => void Linking.openURL(DELETE_ACCOUNT_URL).catch(() => undefined)}
             style={({ pressed }) => [styles.linkRow, pressed && { opacity: 0.6 }]}
             hitSlop={{ top: 8, bottom: 8 }}
           >
-            <Text style={styles.link}>See exactly what is deleted and kept</Text>
+            <Text style={styles.link}>{t("account.seeDetails")}</Text>
           </Pressable>
 
           {error && <Text style={styles.error}>{error}</Text>}
@@ -126,7 +124,7 @@ export const DeleteAccountModal = ({ visible, onClose }: DeleteAccountModalProps
           {usesPassword ? (
             <TextInput
               style={styles.input}
-              placeholder="Confirm with your password"
+              placeholder={t("account.passwordPlaceholder")}
               placeholderTextColor={colors.textSecondary}
               secureTextEntry
               autoCapitalize="none"
@@ -135,7 +133,7 @@ export const DeleteAccountModal = ({ visible, onClose }: DeleteAccountModalProps
               editable={!isDeleting}
             />
           ) : googleToken ? (
-            <Text style={styles.confirmed}>Confirmed with Google ✓</Text>
+            <Text style={styles.confirmed}>{t("account.googleConfirmed")}</Text>
           ) : (
             <Pressable
               style={({ pressed }) => [styles.googleButton, pressed && { opacity: 0.6 }]}
@@ -145,7 +143,7 @@ export const DeleteAccountModal = ({ visible, onClose }: DeleteAccountModalProps
               {isConfirmingGoogle ? (
                 <ActivityIndicator color={colors.primary} />
               ) : (
-                <Text style={styles.googleButtonText}>Confirm with Google</Text>
+                <Text style={styles.googleButtonText}>{t("account.confirmWithGoogle")}</Text>
               )}
             </Pressable>
           )}
@@ -156,7 +154,7 @@ export const DeleteAccountModal = ({ visible, onClose }: DeleteAccountModalProps
               onPress={close}
               disabled={isDeleting}
             >
-              <Text style={styles.cancelText}>Cancel</Text>
+              <Text style={styles.cancelText}>{t("common.cancel")}</Text>
             </Pressable>
             <Pressable
               style={({ pressed }) => [
@@ -170,7 +168,7 @@ export const DeleteAccountModal = ({ visible, onClose }: DeleteAccountModalProps
               {isDeleting ? (
                 <ActivityIndicator color={colors.primaryContrastText} />
               ) : (
-                <Text style={styles.deleteText}>Delete permanently</Text>
+                <Text style={styles.deleteText}>{t("account.deletePermanently")}</Text>
               )}
             </Pressable>
           </View>

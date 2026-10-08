@@ -10,12 +10,19 @@ import type { TabParamList } from "@/navigation/TabNavigator";
 import type { MainStackParamList } from "@/navigation/MainStackNavigator";
 import { PRIVACY_POLICY_URL, TERMS_URL } from "@/config/legal";
 import { LanguageToggle } from "@/components/LanguageToggle";
+import type { MessageKey } from "@/i18n";
 import { useT } from "@/i18n/useT";
 import { DeleteAccountModal } from "./DeleteAccountModal";
 
 // The legal pages are the website's; open them in the browser rather than keeping a copy in the app.
 const openWebPage = (url: string) => {
   void Linking.openURL(url).catch(() => undefined);
+};
+
+const ROLE_KEYS: Record<string, MessageKey | undefined> = {
+  FARMER: "profile.roles.FARMER",
+  CUSTOMER: "profile.roles.CUSTOMER",
+  ADMIN: "profile.roles.ADMIN",
 };
 
 type Navigation = CompositeNavigationProp<
@@ -48,7 +55,9 @@ export const ProfileScreen = () => {
         </View>
         <Text style={styles.name}>{user?.name}</Text>
         <Text style={styles.email}>{user?.email}</Text>
-        {!!user?.roles?.length && <Text style={styles.roles}>{user.roles.join(", ")}</Text>}
+        {!!user?.roles?.length && (
+          <Text style={styles.roles}>{user.roles.map((role) => (ROLE_KEYS[role] ? t(ROLE_KEYS[role]) : role)).join(", ")}</Text>
+        )}
 
         <View style={styles.languageSection}>
           <Text style={styles.sectionLabel}>{t("language.title")}</Text>
@@ -60,19 +69,19 @@ export const ProfileScreen = () => {
             style={styles.menuItem}
             onPress={() => navigation.navigate("Notifications")}
           >
-            <Text style={styles.menuItemText}>Notifications</Text>
+            <Text style={styles.menuItemText}>{t("profile.notifications")}</Text>
             <Text style={styles.menuItemChevron}>›</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.menuItem} onPress={() => openWebPage(PRIVACY_POLICY_URL)}>
-            <Text style={styles.menuItemText}>Privacy Policy</Text>
+            <Text style={styles.menuItemText}>{t("profile.privacyPolicy")}</Text>
             <Text style={styles.menuItemChevron}>›</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.menuItem} onPress={() => openWebPage(TERMS_URL)}>
-            <Text style={styles.menuItemText}>Terms &amp; Conditions</Text>
+            <Text style={styles.menuItemText}>{t("profile.terms")}</Text>
             <Text style={styles.menuItemChevron}>›</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.menuItem} onPress={() => setShowDeleteAccount(true)}>
-            <Text style={[styles.menuItemText, styles.menuItemDestructive]}>Delete account</Text>
+            <Text style={[styles.menuItemText, styles.menuItemDestructive]}>{t("profile.deleteAccount")}</Text>
             <Text style={styles.menuItemChevron}>›</Text>
           </TouchableOpacity>
         </View>
@@ -82,10 +91,10 @@ export const ProfileScreen = () => {
 
       <View style={[styles.footer, { paddingBottom: insets.bottom + 16 }]}>
         <TouchableOpacity style={styles.ordersButton} onPress={() => navigation.navigate("OrderHistory")}>
-          <Text style={styles.ordersButtonText}>My Orders</Text>
+          <Text style={styles.ordersButtonText}>{t("profile.myOrders")}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.logoutButton} onPress={() => void logout()}>
-          <Text style={styles.logoutButtonText}>Log out</Text>
+          <Text style={styles.logoutButtonText}>{t("profile.logout")}</Text>
         </TouchableOpacity>
       </View>
     </View>

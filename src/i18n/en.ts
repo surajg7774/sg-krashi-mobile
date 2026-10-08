@@ -326,6 +326,33 @@ export const en = {
     loadError: "Could not load your orders.",
     empty: "You haven't placed any orders yet.",
   },
+  profile: {
+    notifications: "Notifications",
+    privacyPolicy: "Privacy Policy",
+    terms: "Terms & Conditions",
+    deleteAccount: "Delete account",
+    myOrders: "My Orders",
+    logout: "Log out",
+    // Role codes from the server. English shows the code exactly as before; other languages name the role.
+    roles: {
+      FARMER: "FARMER",
+      CUSTOMER: "CUSTOMER",
+      ADMIN: "ADMIN",
+    },
+  },
+  account: {
+    title: "Delete your account?",
+    body:
+      "This can't be undone. You'll be signed out, and your addresses, cart, chat history, scan history and notifications will be deleted. Orders and payments we must keep stay, but are anonymized.",
+    seeDetails: "See exactly what is deleted and kept",
+    passwordPlaceholder: "Confirm with your password",
+    googleConfirmed: "Confirmed with Google ✓",
+    confirmWithGoogle: "Confirm with Google",
+    googleIncomplete: "Google confirmation did not complete. Please try again.",
+    googleFailed: "Couldn't confirm with Google. Please try again.",
+    deleteFailed: "Couldn't delete your account. Please try again.",
+    deletePermanently: "Delete permanently",
+  },
 } as const;
 
 type Widen<T> = T extends string ? string : T extends PluralForms ? PluralForms : { readonly [K in keyof T]: Widen<T[K]> };
