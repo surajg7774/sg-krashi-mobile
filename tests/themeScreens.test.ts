@@ -73,3 +73,15 @@ test("product and crop cards are tinted; the price is the gold accent (dark text
   assert.match(read("src/features/crop-marketplace/CropListingDetailScreen.tsx"), /price: \{[^}]*color: colors\.secondaryDark/);
   assert.match(read("src/features/store/ProductDetailScreen.tsx"), /price: \{[^}]*color: colors\.secondaryDark/s);
 });
+
+// ---- weather -----------------------------------------------------------------------------------------------------
+
+test("Weather: the current-weather and 7-day cards are sky-blue tints with deep-blue or dark text", () => {
+  const weather = read("src/features/weather/WeatherScreen.tsx");
+  assert.match(weather, /\n  card: \{[^}]*backgroundColor: colors\.blueTint/s);
+  assert.match(weather, /trendCard: \{[^}]*backgroundColor: colors\.blueTint/s);
+  assert.match(weather, /temperature: \{[^}]*color: accents\.blue\.text/);
+  assert.match(weather, /trendTitle: \{[^}]*color: accents\.blue\.text/);
+  assert.match(weather, /forecastSummary: \{[^}]*color: colors\.textSecondary/);
+  assert.match(weather, /screenTitle: \{[^}]*color: colors\.primaryDark/);
+});

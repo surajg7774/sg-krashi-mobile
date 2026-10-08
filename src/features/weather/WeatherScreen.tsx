@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { colors } from "@/theme/colors";
+import { accents, colors } from "@/theme/colors";
 import { ICONS } from "@/theme/icons";
 import { screenTopPadding } from "@/theme/insets";
 import { useDebouncedValue } from "@/shared/useDebouncedValue";
@@ -227,7 +227,7 @@ const formatLabel = (result: GeocodingResult) =>
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   content: { padding: 16 },
-  screenTitle: { fontSize: 22, fontWeight: "700", color: colors.textPrimary, marginBottom: 16 },
+  screenTitle: { fontSize: 22, fontWeight: "700", color: colors.primaryDark, marginBottom: 16 },
   sectionTitle: { fontSize: 13, fontWeight: "600", color: colors.textSecondary, marginBottom: 8 },
   searchRow: { flexDirection: "row", gap: 8 },
   searchInput: {
@@ -284,20 +284,21 @@ const styles = StyleSheet.create({
   divider: { height: 1, backgroundColor: colors.divider, marginVertical: 16 },
   centered: { alignItems: "center", paddingVertical: 24 },
   helperText: { color: colors.textSecondary, fontSize: 13, marginTop: 8, textAlign: "center" },
+  // The weather card and the 7-day card are soft sky-blue tints; text on them is dark or deep blue (4.5:1 or better).
   card: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.blueTint,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: colors.divider,
+    borderColor: colors.blueTintStrong,
     padding: 20,
     alignItems: "center",
   },
-  temperature: { fontSize: 42, fontWeight: "700", color: colors.textPrimary },
+  temperature: { fontSize: 42, fontWeight: "700", color: accents.blue.text },
   forecastSummary: { fontSize: 14, color: colors.textSecondary, marginTop: 4, textAlign: "center" },
   statsRow: { flexDirection: "row", gap: 12, marginTop: 16, width: "100%" },
   statBox: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.surface,
     borderRadius: 10,
     paddingVertical: 12,
     alignItems: "center",
@@ -305,12 +306,12 @@ const styles = StyleSheet.create({
   statLabel: { fontSize: 12, color: colors.textSecondary },
   statValue: { fontSize: 16, fontWeight: "700", color: colors.textPrimary, marginTop: 4 },
   trendCard: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.blueTint,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: colors.divider,
+    borderColor: colors.blueTintStrong,
     padding: 16,
     marginTop: 16,
   },
-  trendTitle: { fontSize: 12, fontWeight: "700", color: colors.primary, letterSpacing: 0.8, marginBottom: 12 },
+  trendTitle: { fontSize: 12, fontWeight: "700", color: accents.blue.text, letterSpacing: 0.8, marginBottom: 12 },
 });
