@@ -10,7 +10,9 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "@/theme/colors";
+import { screenTopPadding } from "@/theme/insets";
 import { useDebouncedValue } from "@/shared/useDebouncedValue";
 import { ErrorState } from "@/components/ErrorState";
 import { BlockSkeleton } from "@/components/Skeleton";
@@ -37,6 +39,7 @@ export const WeatherScreen = () => {
     retryGeolocation,
   } = useWeatherLocation();
   const { t, lang } = useT();
+  const insets = useSafeAreaInsets();
   const [searchInput, setSearchInput] = useState("");
   const [hasSearchedOnce, setHasSearchedOnce] = useState(false);
   const search = useDebouncedValue(searchInput, 300);
@@ -67,7 +70,7 @@ export const WeatherScreen = () => {
   const showResults = search.trim().length >= MIN_SEARCH_LENGTH;
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView style={styles.container} contentContainerStyle={[styles.content, { paddingTop: screenTopPadding(insets.top) }]}>
       <Text style={styles.screenTitle}>{t("weather.title")}</Text>
       <Text style={styles.sectionTitle}>{t("weather.location")}</Text>
       <View style={styles.searchRow}>
@@ -216,7 +219,7 @@ const formatLabel = (result: GeocodingResult) =>
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  content: { padding: 16, paddingTop: 20 },
+  content: { padding: 16 },
   screenTitle: { fontSize: 22, fontWeight: "700", color: colors.textPrimary, marginBottom: 16 },
   sectionTitle: { fontSize: 13, fontWeight: "600", color: colors.textSecondary, marginBottom: 8 },
   searchRow: { flexDirection: "row", gap: 8 },

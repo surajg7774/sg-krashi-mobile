@@ -33,6 +33,7 @@ import { PricePill } from "@/components/PricePill";
 import { NewBadge } from "@/components/NewBadge";
 import { Rating } from "@/components/Rating";
 import { cardShadow } from "@/theme/shadow";
+import { screenTopPadding } from "@/theme/insets";
 import type { MessageKey } from "@/i18n";
 import { useT } from "@/i18n/useT";
 
@@ -139,7 +140,7 @@ export const HomeScreen = () => {
       style={styles.container}
       refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
     >
-      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
+      <View style={[styles.header, { paddingTop: screenTopPadding(insets.top, 16) }]}>
         <View style={styles.headerTopRow}>
           <Text style={styles.greeting} numberOfLines={1}>
             {user ? t("home.welcomeName", { name: user.name }) : t("home.welcome")}

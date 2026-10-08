@@ -6,6 +6,7 @@ import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useAuth } from "@/context/AuthContext";
 import { colors } from "@/theme/colors";
+import { screenTopPadding } from "@/theme/insets";
 import type { TabParamList } from "@/navigation/TabNavigator";
 import type { MainStackParamList } from "@/navigation/MainStackNavigator";
 import { PRIVACY_POLICY_URL, TERMS_URL } from "@/config/legal";
@@ -47,7 +48,7 @@ export const ProfileScreen = () => {
   return (
     <View style={styles.container}>
       <ScrollView
-        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 24 }]}
+        contentContainerStyle={[styles.scrollContent, { paddingTop: screenTopPadding(insets.top, 24) }]}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.avatar}>

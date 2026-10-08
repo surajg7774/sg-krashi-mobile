@@ -13,7 +13,9 @@ import * as Haptics from "expo-haptics";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RouteProp } from "@react-navigation/native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "@/theme/colors";
+import { screenTopPadding } from "@/theme/insets";
 import { useAuth } from "@/context/AuthContext";
 import { authService } from "./authService";
 import { splitTemplate } from "@/i18n";
@@ -35,6 +37,7 @@ export const VerifyOtpScreen = () => {
   const { email } = route.params;
   const { verifyOtp } = useAuth();
   const { t, lang, errorText } = useT();
+  const insets = useSafeAreaInsets();
 
   const [otp, setOtp] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
@@ -78,7 +81,7 @@ export const VerifyOtpScreen = () => {
   };
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+    <KeyboardAvoidingView style={[styles.container, { paddingTop: screenTopPadding(insets.top) }]} behavior={Platform.OS === "ios" ? "padding" : undefined}>
       <View style={styles.content}>
         <Text style={styles.title}>{t("auth.otp.title")}</Text>
         <Text style={[styles.subtitle, { lineHeight: scriptLineHeight(lang, 15, 22) }]}>

@@ -13,7 +13,9 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useAuth } from "@/context/AuthContext";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "@/theme/colors";
+import { screenTopPadding } from "@/theme/insets";
 import { PasswordField } from "@/components/PasswordField";
 import { GoogleSignInButton } from "@/components/GoogleSignInButton";
 import { LanguageToggle } from "@/components/LanguageToggle";
@@ -26,6 +28,7 @@ export const LoginScreen = () => {
   const { login } = useAuth();
   const { t, errorText } = useT();
   const navigation = useNavigation<Navigation>();
+  const insets = useSafeAreaInsets();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -47,7 +50,7 @@ export const LoginScreen = () => {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { paddingTop: screenTopPadding(insets.top) }]}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <View style={styles.languageRow}>

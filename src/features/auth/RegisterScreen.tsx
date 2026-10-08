@@ -13,7 +13,9 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "@/theme/colors";
+import { screenTopPadding } from "@/theme/insets";
 import { PasswordField } from "@/components/PasswordField";
 import { GoogleSignInButton } from "@/components/GoogleSignInButton";
 import { authService } from "./authService";
@@ -38,6 +40,7 @@ const isPlausibleEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(va
 export const RegisterScreen = () => {
   const navigation = useNavigation<Navigation>();
   const { t, lang, errorText } = useT();
+  const insets = useSafeAreaInsets();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -74,7 +77,7 @@ export const RegisterScreen = () => {
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-      <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingTop: Math.max(40, screenTopPadding(insets.top, 24)) }]} keyboardShouldPersistTaps="handled">
         <Text style={styles.title}>{t("auth.register.title")}</Text>
 
         {error && <Text style={styles.errorText}>{error}</Text>}
