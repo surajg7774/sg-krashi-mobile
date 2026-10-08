@@ -395,7 +395,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   card: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.greenTint,
+    borderWidth: 1,
+    borderColor: colors.greenTintStrong,
     borderRadius: 12,
     padding: 10,
     width: "48%",

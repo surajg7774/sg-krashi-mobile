@@ -61,7 +61,9 @@ export const CropListingCard = ({ item, onPress }: { item: CropListingSummary; o
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.greenTint,
+    borderWidth: 1,
+    borderColor: colors.greenTintStrong,
     borderRadius: 12,
     padding: 10,
     width: "48%",

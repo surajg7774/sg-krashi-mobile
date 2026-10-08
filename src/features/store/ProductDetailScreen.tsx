@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 20,
     fontWeight: "700",
-    color: colors.primary,
+    color: colors.secondaryDark,
     marginTop: 10,
   },
   organicBadge: {

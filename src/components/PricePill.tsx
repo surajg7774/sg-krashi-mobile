@@ -5,7 +5,7 @@ export interface PricePillProps {
   label: string;
 }
 
-/** Mirrors sg-krashi-client's price-pill treatment (Trend Refresh #3) — a rounded, primary-colored badge instead of plain text, adapted to RN View/Text. */
+/** A rounded badge instead of plain text: the brand gold with dark text on it (7:1), so the price is what the eye finds first. */
 export const PricePill = ({ label }: PricePillProps) => (
   <View style={styles.pill}>
     <Text style={styles.text}>{label}</Text>
@@ -15,14 +15,14 @@ export const PricePill = ({ label }: PricePillProps) => (
 const styles = StyleSheet.create({
   pill: {
     alignSelf: "flex-start",
-    backgroundColor: colors.primary,
+    backgroundColor: colors.secondary,
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 3,
     marginTop: 4,
   },
   text: {
-    color: colors.primaryContrastText,
+    color: colors.onGold,
     fontWeight: "700",
     fontSize: 13,
   },

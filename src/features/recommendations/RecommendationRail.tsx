@@ -49,7 +49,9 @@ const styles = StyleSheet.create({
   row: { paddingHorizontal: 16, gap: 12 },
   card: {
     width: 130,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.greenTint,
+    borderWidth: 1,
+    borderColor: colors.greenTintStrong,
     borderRadius: 12,
     padding: 10,
     ...cardShadow,

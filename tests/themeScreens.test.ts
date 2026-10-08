@@ -42,3 +42,34 @@ test("Home: deep-green hero with a gold edge and white greeting; six tiles, each
   assert.match(home, /color=\{colors\.white\}/);
   assert.ok(colors.primaryDark !== colors.background);
 });
+
+// ---- chips, cards, prices ---------------------------------------------------------------------------------------
+
+test("filter chips: selected = filled green with white text, the others a soft green tint with deep-green text", () => {
+  const chips = read("src/components/ChipRow.tsx");
+  assert.match(chips, /chipActive: \{ backgroundColor: colors\.primary, borderColor: colors\.primary \}/);
+  assert.match(chips, /chipTextActive: \{ color: colors\.primaryContrastText/);
+  assert.match(chips, /chip: \{[^}]*backgroundColor: colors\.greenTint/s);
+  assert.match(chips, /chipText: \{ fontSize: CHIP_FONT_SIZE, color: colors\.primaryDark \}/);
+  // size and padding still come from chipLayout, so the Hindi chip-height tests keep their meaning
+  assert.match(chips, /paddingVertical: CHIP_PADDING_VERTICAL/);
+  assert.match(chips, /borderWidth: CHIP_BORDER/);
+});
+
+test("product and crop cards are tinted; the price is the gold accent (dark text on gold, or deep gold text on light)", () => {
+  for (const path of [
+    "src/features/store/StoreScreen.tsx",
+    "src/features/home/HomeScreen.tsx",
+    "src/features/crop-marketplace/CropListingCard.tsx",
+    "src/features/recommendations/RecommendationRail.tsx",
+  ]) {
+    const source = read(path);
+    assert.match(source, /card: \{[^}]*backgroundColor: colors\.greenTint/s, path);
+    assert.match(source, /card: \{[^}]*borderColor: colors\.greenTintStrong/s, path);
+  }
+  const pill = read("src/components/PricePill.tsx");
+  assert.match(pill, /backgroundColor: colors\.secondary/);
+  assert.match(pill, /color: colors\.onGold/);
+  assert.match(read("src/features/crop-marketplace/CropListingDetailScreen.tsx"), /price: \{[^}]*color: colors\.secondaryDark/);
+  assert.match(read("src/features/store/ProductDetailScreen.tsx"), /price: \{[^}]*color: colors\.secondaryDark/s);
+});

@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
   harvestChip: { borderWidth: 1, borderColor: colors.divider, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 },
   harvestChipUpcoming: { borderColor: colors.info },
   harvestChipText: { color: colors.textSecondary, fontSize: 12 },
-  price: { fontSize: 26, fontWeight: "700", color: colors.primary, marginTop: 12 },
+  price: { fontSize: 26, fontWeight: "700", color: colors.secondaryDark, marginTop: 12 },
   availability: { fontSize: 14, color: colors.textSecondary, marginTop: 4 },
   soldOutText: { color: colors.error, fontWeight: "700" },
   description: { fontSize: 15, color: colors.textPrimary, lineHeight: 22, marginTop: 14 },

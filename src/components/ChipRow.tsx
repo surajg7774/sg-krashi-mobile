@@ -56,13 +56,13 @@ const styles = StyleSheet.create({
   content: { gap: 8, alignItems: "center", paddingVertical: CHIP_ROW_PADDING_VERTICAL },
   chip: {
     borderWidth: CHIP_BORDER,
-    borderColor: colors.divider,
+    borderColor: colors.greenTintStrong,
     borderRadius: 999,
     paddingHorizontal: 14,
     paddingVertical: CHIP_PADDING_VERTICAL,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.greenTint,
   },
   chipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
-  chipText: { fontSize: CHIP_FONT_SIZE, color: colors.textPrimary },
+  chipText: { fontSize: CHIP_FONT_SIZE, color: colors.primaryDark },
   chipTextActive: { color: colors.primaryContrastText, fontWeight: "600" },
 });
