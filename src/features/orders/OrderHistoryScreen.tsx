@@ -4,6 +4,7 @@ import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { colors } from "@/theme/colors";
+import { ICONS } from "@/theme/icons";
 import { orderService } from "./orderService";
 import type { OrderSummary } from "./types";
 import { orderStatusColor, orderStatusLabel } from "./orderStatusDisplay";
@@ -81,7 +82,7 @@ export const OrderHistoryScreen = () => {
     return (
       <View style={styles.centered}>
         <EmptyState
-          icon="📦"
+          icon={ICONS.emptyBox}
           message={t("orders.empty")}
           action={
             <Pressable

@@ -11,6 +11,7 @@ import type { MainStackParamList } from "@/navigation/MainStackNavigator";
 import { ErrorState } from "@/components/ErrorState";
 import { EmptyState } from "@/components/EmptyState";
 import { trimName } from "@/features/crop-marketplace/cropLogic";
+import { ICONS } from "@/theme/icons";
 import { useT } from "@/i18n/useT";
 
 type Navigation = NativeStackNavigationProp<MainStackParamList, "Cart">;
@@ -120,7 +121,7 @@ export const CartScreen = () => {
     return (
       <View style={styles.centered}>
         <EmptyState
-          icon="🛒"
+          icon={ICONS.cart}
           message={t("cart.empty")}
           action={
             <View style={styles.browseButtons}>

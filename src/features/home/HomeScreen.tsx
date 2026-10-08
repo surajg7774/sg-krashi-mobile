@@ -32,7 +32,9 @@ import { EmptyState } from "@/components/EmptyState";
 import { PricePill } from "@/components/PricePill";
 import { NewBadge } from "@/components/NewBadge";
 import { Rating } from "@/components/Rating";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { cardShadow } from "@/theme/shadow";
+import { ICONS, type IconName } from "@/theme/icons";
 import { screenTopPadding } from "@/theme/insets";
 import type { MessageKey } from "@/i18n";
 import { LastUpdated } from "@/components/LastUpdated";
@@ -52,19 +54,19 @@ type Navigation = CompositeNavigationProp<
 interface QuickLink {
   id: string;
   label: MessageKey;
-  emoji: string;
+  icon: IconName;
   onPress: (navigation: Navigation) => void;
 }
 
 const QUICK_LINKS: QuickLink[] = [
-  // 🏪 (storefront), not 🛒 — the cart look now belongs to the header's
+  // The storefront icon, not the cart — the cart look now belongs to the header's
   // dedicated Cart button, so Store needs a visually distinct icon.
-  { id: "store", label: "home.links.store", emoji: "🏪", onPress: (nav) => nav.navigate("Store", { screen: "StoreList" }) },
-  { id: "cropDoctor", label: "home.links.cropDoctor", emoji: "🌿", onPress: (nav) => nav.navigate("CropDoctor", { screen: "CropDoctorHome" }) },
-  { id: "weather", label: "home.links.weather", emoji: "☀️", onPress: (nav) => nav.navigate("Weather") },
-  { id: "mandi", label: "home.links.mandi", emoji: "📈", onPress: (nav) => nav.navigate("Mandi") },
-  { id: "assistant", label: "home.links.assistant", emoji: "🤖", onPress: (nav) => nav.navigate("Chat") },
-  { id: "crops", label: "home.links.cropMarketplace", emoji: "🌾", onPress: (nav) => nav.navigate("Store", { screen: "CropList" }) },
+  { id: "store", label: "home.links.store", icon: ICONS.store, onPress: (nav) => nav.navigate("Store", { screen: "StoreList" }) },
+  { id: "cropDoctor", label: "home.links.cropDoctor", icon: ICONS.cropDoctor, onPress: (nav) => nav.navigate("CropDoctor", { screen: "CropDoctorHome" }) },
+  { id: "weather", label: "home.links.weather", icon: ICONS.weather, onPress: (nav) => nav.navigate("Weather") },
+  { id: "mandi", label: "home.links.mandi", icon: ICONS.mandi, onPress: (nav) => nav.navigate("Mandi") },
+  { id: "assistant", label: "home.links.assistant", icon: ICONS.assistant, onPress: (nav) => nav.navigate("Chat") },
+  { id: "crops", label: "home.links.cropMarketplace", icon: ICONS.cropMarketplace, onPress: (nav) => nav.navigate("Store", { screen: "CropList" }) },
 ];
 
 const ProductCard = ({ item, onPress }: { item: ProductSummary; onPress: () => void }) => (
@@ -153,8 +155,13 @@ export const HomeScreen = () => {
             {user ? t("home.welcomeName", { name: user.name }) : t("home.welcome")}
           </Text>
           <View style={styles.headerIcons}>
-            <Pressable style={({ pressed }) => [styles.iconButton, pressed && { opacity: 0.6 }]} onPress={() => navigation.navigate("Cart")}>
-              <Text style={styles.iconEmoji}>🛒</Text>
+            <Pressable
+              style={({ pressed }) => [styles.iconButton, pressed && { opacity: 0.6 }]}
+              onPress={() => navigation.navigate("Cart")}
+              accessibilityRole="button"
+              accessibilityLabel={t("nav.headers.cart")}
+            >
+              <Ionicons name={ICONS.cart} size={26} color={colors.textPrimary} />
               {!!cartQuery.data?.itemCount && (
                 <View style={styles.iconBadge}>
                   <Text style={styles.iconBadgeText}>
@@ -163,8 +170,13 @@ export const HomeScreen = () => {
                 </View>
               )}
             </Pressable>
-            <Pressable style={({ pressed }) => [styles.iconButton, pressed && { opacity: 0.6 }]} onPress={() => navigation.navigate("Notifications")}>
-              <Text style={styles.iconEmoji}>🔔</Text>
+            <Pressable
+              style={({ pressed }) => [styles.iconButton, pressed && { opacity: 0.6 }]}
+              onPress={() => navigation.navigate("Notifications")}
+              accessibilityRole="button"
+              accessibilityLabel={t("nav.headers.notifications")}
+            >
+              <Ionicons name={ICONS.notifications} size={26} color={colors.textPrimary} />
               {!!notificationsQuery.data?.unreadCount && (
                 <View style={styles.iconBadge}>
                   <Text style={styles.iconBadgeText}>
@@ -180,7 +192,7 @@ export const HomeScreen = () => {
       <View style={styles.quickLinksRow}>
         {QUICK_LINKS.map((link) => (
           <Pressable key={link.id} style={({ pressed }) => [styles.quickLink, pressed && { opacity: 0.6 }]} onPress={() => link.onPress(navigation)}>
-            <Text style={styles.quickLinkEmoji}>{link.emoji}</Text>
+            <Ionicons name={link.icon} size={26} color={colors.primary} />
             <Text style={styles.quickLinkLabel}>{t(link.label)}</Text>
           </Pressable>
         ))}
@@ -206,7 +218,7 @@ export const HomeScreen = () => {
       )}
 
       {productsQuery.data && productsQuery.data.items.length === 0 && (
-        <EmptyState icon="📦" message={t("home.productsEmpty")} />
+        <EmptyState icon={ICONS.emptyBox} message={t("home.productsEmpty")} />
       )}
 
       {productsQuery.data && productsQuery.data.items.length > 0 && (
@@ -238,7 +250,7 @@ export const HomeScreen = () => {
 
       {shouldShowFullError(cropsQuery) && <ErrorState message={t("crops.browse.loadError")} onRetry={() => void cropsQuery.refetch()} />}
 
-      {cropsQuery.data && cropsQuery.data.items.length === 0 && <EmptyState icon="🌾" message={t("crops.browse.homeEmpty")} />}
+      {cropsQuery.data && cropsQuery.data.items.length === 0 && <EmptyState icon={ICONS.cropMarketplace} message={t("crops.browse.homeEmpty")} />}
 
       {cropsQuery.data && cropsQuery.data.items.length > 0 && (
         <RecommendationRail

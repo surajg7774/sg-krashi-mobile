@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Modal, Platform, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from "react-native";
 import DateTimePicker, { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { colors } from "@/theme/colors";
+import { ICONS } from "@/theme/icons";
 import { EMPTY_FILTERS, formatDay, fromIsoDay, toIsoDay, validateFilters, type CropFilters } from "./cropLogic";
 import { useT } from "@/i18n/useT";
 
@@ -42,7 +44,7 @@ const DateField = ({ label, value, onChange }: { label: string; value: string; o
         </Pressable>
         {value ? (
           <Pressable style={({ pressed }) => [styles.clearDate, pressed && { opacity: 0.6 }]} onPress={() => onChange("")} accessibilityRole="button" accessibilityLabel={`${t("crops.browse.clearFilters")}: ${label}`}>
-            <Text style={styles.clearDateText}>✕</Text>
+            <Ionicons name={ICONS.close} size={16} color={colors.textSecondary} />
           </Pressable>
         ) : null}
       </View>

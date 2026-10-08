@@ -1,6 +1,5 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import type { NavigatorScreenParams } from "@react-navigation/native";
-import { Text } from "react-native";
 import { HomeScreen } from "@/features/home/HomeScreen";
 import { ProfileScreen } from "@/features/profile/ProfileScreen";
 import { WeatherScreen } from "@/features/weather/WeatherScreen";
@@ -8,7 +7,9 @@ import { StoreStackNavigator, type StoreStackParamList } from "./StoreStackNavig
 import { CropDoctorStackNavigator, type CropDoctorStackParamList } from "./CropDoctorStackNavigator";
 import { FarmerStackNavigator, type FarmerStackParamList } from "./FarmerStackNavigator";
 import { useAuth } from "@/context/AuthContext";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { colors } from "@/theme/colors";
+import { TAB_ICONS, TAB_ICON_SIZE } from "@/theme/icons";
 import { useT } from "@/i18n/useT";
 
 export type TabParamList = {
@@ -25,20 +26,6 @@ export type TabParamList = {
 
 const Tab = createBottomTabNavigator<TabParamList>();
 
-// Plain emoji icons for this milestone — swapping in a real icon set
-// (e.g. @expo/vector-icons, already bundled with Expo) is cosmetic polish,
-// not part of "get one real screen working end-to-end."
-const TAB_ICONS: Record<keyof TabParamList, string> = {
-  Home: "🏠",
-  // 🏪 (storefront), not 🛒 — the Home screen header now has a dedicated
-  // Cart icon, so Store needs to look visually distinct from it.
-  Store: "🏪",
-  CropDoctor: "🌿",
-  Weather: "☀️",
-  Farmer: "🚜",
-  Profile: "👤",
-};
-
 // First role-gated tab in the app — established here since nothing needed
 // it before. AuthUser.roles is already returned in full by /auth/mobile/login
 // (see auth/types.ts), so this reads it directly rather than decoding the
@@ -54,7 +41,11 @@ export const TabNavigator = () => {
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textSecondary,
-        tabBarIcon: () => <Text style={{ fontSize: 20 }}>{TAB_ICONS[route.name as keyof TabParamList]}</Text>,
+        // Outline when inactive, filled when active; the colour comes from the tint tokens above.
+        tabBarIcon: ({ focused, color }) => {
+          const icon = TAB_ICONS[route.name as keyof typeof TAB_ICONS];
+          return <Ionicons name={focused ? icon.active : icon.inactive} size={TAB_ICON_SIZE} color={color} />;
+        },
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} options={{ title: t("nav.tabs.home") }} />

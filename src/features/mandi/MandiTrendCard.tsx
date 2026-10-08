@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { StyleSheet, Text, View } from "react-native";
 import { colors } from "@/theme/colors";
+import { ICONS } from "@/theme/icons";
 import { percentChange } from "@/shared/chartMath";
 import { EmptyState } from "@/components/EmptyState";
 import { ErrorState } from "@/components/ErrorState";
@@ -50,7 +51,7 @@ export const MandiTrendCard = ({ commodity, state }: MandiTrendCardProps) => {
     return (
       <View style={styles.wrap}>
         <EmptyState
-          icon="📈"
+          icon={ICONS.mandi}
           message={
             points.length === 0
               ? t("mandi.awaiting")

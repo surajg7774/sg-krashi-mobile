@@ -6,6 +6,7 @@ import { useNavigation, useRoute, type RouteProp } from "@react-navigation/nativ
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { StoreStackParamList } from "@/navigation/StoreStackNavigator";
 import { colors } from "@/theme/colors";
+import { ICONS } from "@/theme/icons";
 import { ErrorState } from "@/components/ErrorState";
 import { LastUpdated } from "@/components/LastUpdated";
 import { OfflineBanner } from "@/components/OfflineBanner";
@@ -85,7 +86,7 @@ export const CropListingDetailScreen = () => {
     const notFound = (detailQuery.error as { status?: number } | null)?.status === 404;
     return (
       <View style={styles.centered}>
-        {notFound ? <EmptyState icon="🌾" message={t("crops.detail.notFound")} /> : <ErrorState message={t("crops.detail.loadError")} onRetry={() => void detailQuery.refetch()} />}
+        {notFound ? <EmptyState icon={ICONS.cropMarketplace} message={t("crops.detail.notFound")} /> : <ErrorState message={t("crops.detail.loadError")} onRetry={() => void detailQuery.refetch()} />}
       </View>
     );
   }

@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "@/theme/colors";
+import { ICONS } from "@/theme/icons";
 import { EmptyState } from "@/components/EmptyState";
 import { chatService } from "./chatService";
 import type { ChatMessage } from "./types";
@@ -89,7 +90,7 @@ export const ChatScreen = () => {
           contentContainerStyle={styles.messageList}
           ListEmptyComponent={
             <EmptyState
-              icon="🤖"
+              icon={ICONS.assistant}
               message={t("chat.intro")}
             />
           }

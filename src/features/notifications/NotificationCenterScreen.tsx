@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { colors } from "@/theme/colors";
+import { ICONS } from "@/theme/icons";
 import { ErrorState } from "@/components/ErrorState";
 import { EmptyState } from "@/components/EmptyState";
 import { ListRowSkeletonList } from "@/components/Skeleton";
@@ -98,7 +99,7 @@ export const NotificationCenterScreen = () => {
       )}
 
       {!notificationsQuery.isLoading && !notificationsQuery.isError && notifications.length === 0 && (
-        <EmptyState icon="🔔" message={t("notifications.empty")} />
+        <EmptyState icon={ICONS.notifications} message={t("notifications.empty")} />
       )}
 
       {notifications.length > 0 && (

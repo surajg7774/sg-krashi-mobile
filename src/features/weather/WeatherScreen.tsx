@@ -11,7 +11,9 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { colors } from "@/theme/colors";
+import { ICONS } from "@/theme/icons";
 import { screenTopPadding } from "@/theme/insets";
 import { useDebouncedValue } from "@/shared/useDebouncedValue";
 import { ErrorState } from "@/components/ErrorState";
@@ -84,8 +86,13 @@ export const WeatherScreen = () => {
             setHasSearchedOnce(true);
           }}
         />
-        <Pressable style={({ pressed }) => [styles.currentLocationButton, pressed && { opacity: 0.6 }]} onPress={() => void retryGeolocation()}>
-          <Text style={styles.currentLocationButtonText}>📍</Text>
+        <Pressable
+          style={({ pressed }) => [styles.currentLocationButton, pressed && { opacity: 0.6 }]}
+          onPress={() => void retryGeolocation()}
+          accessibilityRole="button"
+          accessibilityLabel={t("weather.useCurrentLocation")}
+        >
+          <Ionicons name={ICONS.locate} size={22} color={colors.primary} />
         </Pressable>
       </View>
 
@@ -128,7 +135,7 @@ export const WeatherScreen = () => {
           hitSlop={{ top: 12, bottom: 12 }}
         >
           <Text style={styles.locationLabel}>
-            {location.source === "geolocation" ? "📍 " : "📌 "}
+            <Ionicons name={location.source === "geolocation" ? ICONS.locationNow : ICONS.locationPinned} size={14} color={colors.primary} />{" "}
             {/* A picked place keeps the name it was saved with (place names are data); "current location" is app text. */}
             {location.source === "geolocation" ? t("weather.currentLocation") : location.label}
             {location.source === "manual" ? ` · ${t("weather.useCurrentLocation")}` : ""}

@@ -1,13 +1,15 @@
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View, type TextInputProps } from "react-native";
+import { Pressable, StyleSheet, TextInput, View, type TextInputProps } from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { colors } from "@/theme/colors";
+import { ICONS } from "@/theme/icons";
+import { useT } from "@/i18n/useT";
 
 interface PasswordFieldProps extends Omit<TextInputProps, "secureTextEntry" | "style"> {}
 
-// Shared by LoginScreen and RegisterScreen — plain emoji toggle rather than
-// an icon library, same "no new dependency for one glyph" reasoning as the
-// rest of this app's UI (SelectField's modal, etc.).
+// Shared by LoginScreen and RegisterScreen: the eye icon shows or hides what was typed.
 export const PasswordField = (props: PasswordFieldProps) => {
+  const { t } = useT();
   const [visible, setVisible] = useState(false);
 
   return (
@@ -18,8 +20,13 @@ export const PasswordField = (props: PasswordFieldProps) => {
         secureTextEntry={!visible}
         placeholderTextColor={colors.textSecondary}
       />
-      <Pressable style={({ pressed }) => [styles.toggle, pressed && { opacity: 0.6 }]} onPress={() => setVisible((v) => !v)}>
-        <Text style={styles.toggleText}>{visible ? "🙈" : "👁️"}</Text>
+      <Pressable
+        style={({ pressed }) => [styles.toggle, pressed && { opacity: 0.6 }]}
+        onPress={() => setVisible((v) => !v)}
+        accessibilityRole="button"
+        accessibilityLabel={t(visible ? "auth.login.hidePassword" : "auth.login.showPassword")}
+      >
+        <Ionicons name={visible ? ICONS.eyeOff : ICONS.eye} size={22} color={colors.textSecondary} />
       </Pressable>
     </View>
   );

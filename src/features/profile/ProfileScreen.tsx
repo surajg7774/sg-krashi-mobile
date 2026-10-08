@@ -4,7 +4,9 @@ import { useNavigation, type CompositeNavigationProp } from "@react-navigation/n
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useAuth } from "@/context/AuthContext";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { colors } from "@/theme/colors";
+import { ICONS } from "@/theme/icons";
 import { screenTopPadding } from "@/theme/insets";
 import type { TabParamList } from "@/navigation/TabNavigator";
 import type { MainStackParamList } from "@/navigation/MainStackNavigator";
@@ -50,8 +52,11 @@ export const ProfileScreen = () => {
 
         <View style={styles.menuCard}>
           <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("Notifications")}>
-            <Text style={styles.menuItemText}>{t("profile.notifications")}</Text>
-            <Text style={styles.menuItemChevron}>›</Text>
+            <View style={styles.menuItemLeft}>
+              <Ionicons name={ICONS.notifications} size={22} color={colors.primary} />
+              <Text style={styles.menuItemText}>{t("profile.notifications")}</Text>
+            </View>
+            <Ionicons name={ICONS.chevron} size={20} color={colors.textSecondary} />
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -63,7 +68,7 @@ export const ProfileScreen = () => {
         accessibilityRole="button"
         accessibilityLabel={t("settings.open")}
       >
-        <Text style={styles.settingsIcon}>⚙️</Text>
+        <Ionicons name={ICONS.settings} size={26} color={colors.textPrimary} />
       </TouchableOpacity>
 
       <View style={[styles.footer, { paddingBottom: insets.bottom + 16 }]}>
@@ -148,6 +153,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 16,
   },
+  menuItemLeft: { flexDirection: "row", alignItems: "center", gap: 12, flexShrink: 1 },
   menuItemText: {
     fontSize: 15,
     color: colors.textPrimary,

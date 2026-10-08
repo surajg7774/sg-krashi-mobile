@@ -16,6 +16,8 @@ import * as Haptics from "expo-haptics";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { colors } from "@/theme/colors";
+import { ICONS } from "@/theme/icons";
+import { IconLabel } from "@/components/IconLabel";
 import { useAuth } from "@/context/AuthContext";
 import { ErrorState } from "@/components/ErrorState";
 import { EmptyState } from "@/components/EmptyState";
@@ -285,10 +287,10 @@ export const CropDoctorScreen = () => {
 
           <View style={styles.pickButtonRow}>
             <Pressable style={({ pressed }) => [styles.pickButton, pressed && { opacity: 0.6 }]} onPress={pickFromCamera}>
-              <Text style={styles.pickButtonText}>{t("common.takePhoto")}</Text>
+              <IconLabel icon={ICONS.camera} label={t("common.takePhoto")} color={colors.primary} textStyle={styles.pickButtonText} />
             </Pressable>
             <Pressable style={({ pressed }) => [styles.pickButton, pressed && { opacity: 0.6 }]} onPress={pickFromGallery}>
-              <Text style={styles.pickButtonText}>{t("common.addFromGallery")}</Text>
+              <IconLabel icon={ICONS.gallery} label={t("common.addFromGallery")} color={colors.primary} textStyle={styles.pickButtonText} />
             </Pressable>
           </View>
 
@@ -318,7 +320,7 @@ export const CropDoctorScreen = () => {
             <ErrorState message={t("cropDoctor.historyError")} onRetry={() => void historyQuery.refetch()} />
           )}
           {!historyQuery.isLoading && scans.length === 0 && (
-            <EmptyState icon="🌿" message={t("cropDoctor.historyEmpty")} />
+            <EmptyState icon={ICONS.cropDoctor} message={t("cropDoctor.historyEmpty")} />
           )}
           {scans.map((item) => (
             <HistoryRow key={item.id} item={item} onPress={() => navigation.navigate("ScanDetail", { scanId: item.id })} />

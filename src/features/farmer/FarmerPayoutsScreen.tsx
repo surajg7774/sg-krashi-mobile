@@ -4,6 +4,7 @@ import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { colors } from "@/theme/colors";
+import { ICONS } from "@/theme/icons";
 import { ErrorState } from "@/components/ErrorState";
 import { EmptyState } from "@/components/EmptyState";
 import { ListRowSkeletonList } from "@/components/Skeleton";
@@ -77,7 +78,7 @@ export const FarmerPayoutsScreen = () => {
       )}
 
       {!payoutsQuery.isLoading && !payoutsQuery.isError && payouts.length === 0 && (
-        <EmptyState icon="💰" message={t("farmer.payouts.empty")} />
+        <EmptyState icon={ICONS.emptyMoney} message={t("farmer.payouts.empty")} />
       )}
 
       {payouts.length > 0 && (

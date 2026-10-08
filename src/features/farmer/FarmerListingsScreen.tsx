@@ -6,6 +6,7 @@ import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useDebouncedValue } from "@/shared/useDebouncedValue";
 import { colors } from "@/theme/colors";
+import { ICONS } from "@/theme/icons";
 import { MEDIA_WIDTH, resizedMediaUrl } from "@/shared/media";
 import { farmerListingStatus, formatRupees, trimName, type FarmerListingStatus } from "@/features/crop-marketplace/cropLogic";
 import type { MessageKey } from "@/i18n";
@@ -97,7 +98,7 @@ export const FarmerListingsScreen = () => {
 
       {!listingsQuery.isLoading && !listingsQuery.isError && listings.length === 0 && (
         <EmptyState
-          icon="🌾"
+          icon={ICONS.cropMarketplace}
           message={t("farmer.listings.empty")}
           action={
             <Pressable style={({ pressed }) => [styles.emptyAddButton, pressed && { opacity: 0.6 }]} onPress={() => navigation.navigate("FarmerListingForm", {})}>

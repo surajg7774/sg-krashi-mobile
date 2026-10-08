@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { APP_VERSION } from "@/config/appInfo";
@@ -8,6 +9,7 @@ import { DeleteAccountModal } from "@/features/profile/DeleteAccountModal";
 import { useT } from "@/i18n/useT";
 import { openWebPage } from "@/shared/openWebPage";
 import { colors } from "@/theme/colors";
+import { ICONS } from "@/theme/icons";
 
 /**
  * App-wide choices and the less-used account actions, moved off the Profile screen so Profile stays about the person:
@@ -27,20 +29,29 @@ export const SettingsScreen = () => {
       <Text style={styles.sectionLabel}>{t("settings.legal")}</Text>
       <View style={styles.card}>
         <TouchableOpacity style={styles.row} onPress={() => openWebPage(PRIVACY_POLICY_URL)} accessibilityRole="link">
-          <Text style={styles.rowText}>{t("settings.privacyPolicy")}</Text>
-          <Text style={styles.chevron}>›</Text>
+          <View style={styles.rowLeft}>
+            <Ionicons name={ICONS.privacy} size={22} color={colors.primary} />
+            <Text style={styles.rowText}>{t("settings.privacyPolicy")}</Text>
+          </View>
+          <Ionicons name={ICONS.chevron} size={20} color={colors.textSecondary} />
         </TouchableOpacity>
         <View style={styles.divider} />
         <TouchableOpacity style={styles.row} onPress={() => openWebPage(TERMS_URL)} accessibilityRole="link">
-          <Text style={styles.rowText}>{t("settings.terms")}</Text>
-          <Text style={styles.chevron}>›</Text>
+          <View style={styles.rowLeft}>
+            <Ionicons name={ICONS.terms} size={22} color={colors.primary} />
+            <Text style={styles.rowText}>{t("settings.terms")}</Text>
+          </View>
+          <Ionicons name={ICONS.chevron} size={20} color={colors.textSecondary} />
         </TouchableOpacity>
       </View>
 
       <Text style={styles.sectionLabel}>{t("settings.about")}</Text>
       <View style={styles.card}>
         <View style={styles.row}>
-          <Text style={styles.rowText}>{t("settings.version")}</Text>
+          <View style={styles.rowLeft}>
+            <Ionicons name={ICONS.version} size={22} color={colors.primary} />
+            <Text style={styles.rowText}>{t("settings.version")}</Text>
+          </View>
           <Text style={styles.value}>{APP_VERSION}</Text>
         </View>
       </View>
@@ -49,8 +60,11 @@ export const SettingsScreen = () => {
       <Text style={[styles.sectionLabel, styles.dangerLabel]}>{t("settings.dangerZone")}</Text>
       <View style={[styles.card, styles.dangerCard]}>
         <TouchableOpacity style={styles.row} onPress={() => setShowDeleteAccount(true)} accessibilityRole="button">
-          <Text style={[styles.rowText, styles.dangerText]}>{t("settings.deleteAccount")}</Text>
-          <Text style={styles.chevron}>›</Text>
+          <View style={styles.rowLeft}>
+            <Ionicons name={ICONS.deleteAccount} size={22} color={colors.error} />
+            <Text style={[styles.rowText, styles.dangerText]}>{t("settings.deleteAccount")}</Text>
+          </View>
+          <Ionicons name={ICONS.chevron} size={20} color={colors.textSecondary} />
         </TouchableOpacity>
       </View>
       <Text style={styles.dangerHint}>{t("settings.dangerHint")}</Text>
@@ -80,6 +94,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     gap: 12,
   },
+  rowLeft: { flexDirection: "row", alignItems: "center", gap: 12, flexShrink: 1 },
   rowText: { flexShrink: 1, fontSize: 15, color: colors.textPrimary, fontWeight: "500" },
   value: { fontSize: 15, color: colors.textSecondary },
   chevron: { fontSize: 20, color: colors.textSecondary },

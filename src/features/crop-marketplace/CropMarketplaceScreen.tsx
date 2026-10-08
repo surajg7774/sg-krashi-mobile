@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useDebouncedValue } from "@/shared/useDebouncedValue";
 import { colors } from "@/theme/colors";
+import { ICONS } from "@/theme/icons";
 import { CardSkeletonGrid } from "@/components/Skeleton";
 import { ErrorState } from "@/components/ErrorState";
 import { EmptyState } from "@/components/EmptyState";
@@ -98,7 +99,7 @@ export const CropMarketplaceScreen = () => {
 
       {!listingsQuery.isLoading && !shouldShowFullError(listingsQuery) && listings.length === 0 && (
         <EmptyState
-          icon="🌾"
+          icon={ICONS.cropMarketplace}
           message={
             search.trim() !== ""
               ? t("crops.browse.emptySearch", { search: search.trim() })

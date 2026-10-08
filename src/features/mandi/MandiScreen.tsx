@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { colors } from "@/theme/colors";
+import { ICONS } from "@/theme/icons";
 import { ChipRow } from "@/components/ChipRow";
 import { ErrorState } from "@/components/ErrorState";
 import { EmptyState } from "@/components/EmptyState";
@@ -120,7 +121,7 @@ export const MandiScreen = () => {
 
       {availability === "awaiting" && (
         <EmptyState
-          icon="📈"
+          icon={ICONS.mandi}
           message={t("mandi.awaiting")}
           description={t("mandi.awaitingBody")}
         />
@@ -131,7 +132,7 @@ export const MandiScreen = () => {
       )}
 
       {availability === "ready" && !pricesQuery.isLoading && !pricesQuery.isError && prices.length === 0 && (
-        <EmptyState icon="📈" message={t("mandi.noMatch")} />
+        <EmptyState icon={ICONS.mandi} message={t("mandi.noMatch")} />
       )}
 
       {prices.length > 0 && (

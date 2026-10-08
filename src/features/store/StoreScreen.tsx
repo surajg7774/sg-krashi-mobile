@@ -14,7 +14,9 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useDebouncedValue } from "@/shared/useDebouncedValue";
 import { colors } from "@/theme/colors";
 import { MEDIA_WIDTH, resizedMediaUrl } from "@/shared/media";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { cardShadow } from "@/theme/shadow";
+import { ICONS } from "@/theme/icons";
 import { ChipRow } from "@/components/ChipRow";
 import { LoadMoreFooter } from "@/components/LoadMoreFooter";
 import { useT } from "@/i18n/useT";
@@ -104,14 +106,14 @@ export const StoreScreen = () => {
         accessibilityRole="button"
         accessibilityLabel={`${t("crops.browse.title")}. ${t("crops.browse.storeEntrySubtitle")}`}
       >
-        <Text style={styles.cropBannerEmoji}>🌾</Text>
+        <Ionicons name={ICONS.cropMarketplace} size={28} color={colors.primary} />
         <View style={{ flex: 1 }}>
           <Text style={styles.cropBannerTitle}>{t("crops.browse.title")}</Text>
           <Text style={styles.cropBannerSubtitle} numberOfLines={1}>
             {t("crops.browse.storeEntrySubtitle")}
           </Text>
         </View>
-        <Text style={styles.cropBannerArrow}>→</Text>
+        <Ionicons name={ICONS.chevron} size={20} color={colors.primary} />
       </Pressable>
 
       <TextInput
@@ -145,7 +147,7 @@ export const StoreScreen = () => {
 
       {!productsQuery.isLoading && !shouldShowFullError(productsQuery) && products.length === 0 && (
         <EmptyState
-          icon="📦"
+          icon={ICONS.emptyBox}
           message={search ? t("store.noProductsFor", { search }) : t("store.noProducts")}
           action={
             search ? (

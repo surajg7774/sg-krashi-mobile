@@ -18,6 +18,8 @@ import DateTimePicker, { DateTimePickerAndroid } from "@react-native-community/d
 import { useNavigation, useRoute, type RouteProp } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { colors } from "@/theme/colors";
+import { ICONS } from "@/theme/icons";
+import { IconLabel } from "@/components/IconLabel";
 import { MEDIA_WIDTH, resizedMediaUrl } from "@/shared/media";
 import { canMarkSoldOut, trimName } from "@/features/crop-marketplace/cropLogic";
 import { useT } from "@/i18n/useT";
@@ -411,10 +413,10 @@ export const FarmerListingFormScreen = () => {
 
           <View style={styles.pickButtonRow}>
             <Pressable style={({ pressed }) => [styles.pickButton, pressed && { opacity: 0.6 }]} onPress={() => void pickAndUpload(true)}>
-              <Text style={styles.pickButtonText}>{t("common.takePhoto")}</Text>
+              <IconLabel icon={ICONS.camera} label={t("common.takePhoto")} color={colors.primary} textStyle={styles.pickButtonText} />
             </Pressable>
             <Pressable style={({ pressed }) => [styles.pickButton, pressed && { opacity: 0.6 }]} onPress={() => void pickAndUpload(false)}>
-              <Text style={styles.pickButtonText}>{t("common.addFromGallery")}</Text>
+              <IconLabel icon={ICONS.gallery} label={t("common.addFromGallery")} color={colors.primary} textStyle={styles.pickButtonText} />
             </Pressable>
           </View>
 
