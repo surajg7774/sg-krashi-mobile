@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, StyleSheet, Text, View } from "react-native";
 import { colors } from "@/theme/colors";
+import { ChipRow } from "@/components/ChipRow";
 import { ErrorState } from "@/components/ErrorState";
 import { EmptyState } from "@/components/EmptyState";
 import { ListRowSkeletonList } from "@/components/Skeleton";
@@ -88,40 +89,24 @@ export const MandiScreen = () => {
       )}
 
       {showChips && filtersQuery.data && filtersQuery.data.states.length > 0 && (
-        <FlatList
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          data={filtersQuery.data.states}
-          keyExtractor={(s) => s}
-          contentContainerStyle={styles.chipRow}
-          renderItem={({ item }) => (
-            <Pressable
-              style={({ pressed }) => [styles.chip, state === item && styles.chipActive, pressed && { opacity: 0.6 }]}
-              onPress={() => setState(state === item ? undefined : item)}
-              hitSlop={{ top: 7, bottom: 7 }}
-            >
-              <Text style={[styles.chipText, state === item && styles.chipTextActive]}>{item}</Text>
-            </Pressable>
-          )}
+        <ChipRow
+          items={filtersQuery.data.states.map((s) => ({
+            key: s,
+            label: s,
+            selected: state === s,
+            onPress: () => setState(state === s ? undefined : s),
+          }))}
         />
       )}
 
       {showChips && filtersQuery.data && filtersQuery.data.commodities.length > 0 && (
-        <FlatList
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          data={filtersQuery.data.commodities}
-          keyExtractor={(c) => c}
-          contentContainerStyle={styles.chipRow}
-          renderItem={({ item }) => (
-            <Pressable
-              style={({ pressed }) => [styles.chip, commodity === item && styles.chipActive, pressed && { opacity: 0.6 }]}
-              onPress={() => setCommodity(commodity === item ? undefined : item)}
-              hitSlop={{ top: 7, bottom: 7 }}
-            >
-              <Text style={[styles.chipText, commodity === item && styles.chipTextActive]}>{item}</Text>
-            </Pressable>
-          )}
+        <ChipRow
+          items={filtersQuery.data.commodities.map((c) => ({
+            key: c,
+            label: c,
+            selected: commodity === c,
+            onPress: () => setCommodity(commodity === c ? undefined : c),
+          }))}
         />
       )}
 
@@ -173,21 +158,6 @@ export const MandiScreen = () => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background, paddingHorizontal: 16, paddingTop: 12 },
   syncText: { fontSize: 12, color: colors.textSecondary, marginBottom: 8 },
-  chipRow: { gap: 8, paddingBottom: 10 },
-  // paddingVertical:6 renders a ~31pt-tall pill — under the 44pt minimum
-  // tap target. Fixed via hitSlop at the call site (not more padding) so
-  // the chip's visual size stays the same.
-  chip: {
-    borderWidth: 1,
-    borderColor: colors.divider,
-    borderRadius: 999,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    backgroundColor: colors.surface,
-  },
-  chipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
-  chipText: { fontSize: 13, color: colors.textPrimary },
-  chipTextActive: { color: colors.primaryContrastText, fontWeight: "600" },
   list: { paddingBottom: 24 },
   row: {
     backgroundColor: colors.surface,

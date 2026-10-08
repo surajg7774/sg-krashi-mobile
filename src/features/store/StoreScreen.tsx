@@ -16,6 +16,7 @@ import { useDebouncedValue } from "@/shared/useDebouncedValue";
 import { colors } from "@/theme/colors";
 import { MEDIA_WIDTH, resizedMediaUrl } from "@/shared/media";
 import { cardShadow } from "@/theme/shadow";
+import { ChipRow } from "@/components/ChipRow";
 import { useT } from "@/i18n/useT";
 import { productService } from "./productService";
 import type { ProductSummary } from "./types";
@@ -123,21 +124,13 @@ export const StoreScreen = () => {
       />
 
       {categoriesQuery.data && (
-        <FlatList
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          data={categoriesQuery.data}
-          keyExtractor={(c) => String(c.id)}
-          contentContainerStyle={styles.chipRow}
-          renderItem={({ item }) => (
-            <Pressable
-              style={({ pressed }) => [styles.chip, categoryId === item.id && styles.chipActive, pressed && { opacity: 0.6 }]}
-              onPress={() => setCategoryId(categoryId === item.id ? undefined : item.id)}
-              hitSlop={{ top: 7, bottom: 7 }}
-            >
-              <Text style={[styles.chipText, categoryId === item.id && styles.chipTextActive]}>{item.name}</Text>
-            </Pressable>
-          )}
+        <ChipRow
+          items={categoriesQuery.data.map((c) => ({
+            key: String(c.id),
+            label: c.name,
+            selected: categoryId === c.id,
+            onPress: () => setCategoryId(categoryId === c.id ? undefined : c.id),
+          }))}
         />
       )}
 
@@ -236,33 +229,6 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     backgroundColor: colors.surface,
     marginBottom: 10,
-  },
-  chipRow: {
-    gap: 8,
-    paddingBottom: 12,
-  },
-  // paddingVertical:6 renders a ~31pt-tall pill — under the 44pt minimum
-  // tap target. Fixed via hitSlop at the call site (not more padding) so
-  // the chip's visual size stays the same.
-  chip: {
-    borderWidth: 1,
-    borderColor: colors.divider,
-    borderRadius: 999,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    backgroundColor: colors.surface,
-  },
-  chipActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  chipText: {
-    fontSize: 13,
-    color: colors.textPrimary,
-  },
-  chipTextActive: {
-    color: colors.primaryContrastText,
-    fontWeight: "600",
   },
   clearSearchButton: {
     marginTop: 4,

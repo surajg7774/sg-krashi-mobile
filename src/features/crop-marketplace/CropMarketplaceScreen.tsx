@@ -13,6 +13,7 @@ import { cropService } from "./cropService";
 import { CropListingCard } from "./CropListingCard";
 import { CropFilterSheet } from "./CropFilterSheet";
 import { EMPTY_FILTERS, activeFilterCount, toListingQuery, type CropFilters } from "./cropLogic";
+import { ChipRow } from "@/components/ChipRow";
 import { useT } from "@/i18n/useT";
 import { LastUpdated } from "@/components/LastUpdated";
 import { OfflineBanner } from "@/components/OfflineBanner";
@@ -75,30 +76,18 @@ export const CropMarketplaceScreen = () => {
       </View>
 
       {categoriesQuery.data && categoriesQuery.data.length > 0 && (
-        <View style={styles.chipBar}>
-          <FlatList
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            data={[{ id: 0, name: t("crops.filters.all"), slug: "" }, ...categoriesQuery.data]}
-            keyExtractor={(c) => String(c.id)}
-            contentContainerStyle={styles.chipRow}
-            renderItem={({ item }) => {
-              const selected = item.slug === "" ? !filters.cropType : filters.cropType === item.slug;
-              return (
-                <Pressable
-                  style={({ pressed }) => [styles.chip, selected && styles.chipActive, pressed && { opacity: 0.6 }]}
-                  onPress={() => setFilters((f) => ({ ...f, cropType: item.slug === "" || f.cropType === item.slug ? undefined : item.slug }))}
-                  hitSlop={{ top: 7, bottom: 7 }}
-                  accessibilityRole="button"
-                  accessibilityLabel={item.slug === "" ? t("crops.filters.all") : t("crops.a11y.categoryChip", { name: item.name })}
-                  accessibilityState={{ selected }}
-                >
-                  <Text style={[styles.chipText, selected && styles.chipTextActive]}>{item.name}</Text>
-                </Pressable>
-              );
-            }}
-          />
-        </View>
+        <ChipRow
+          items={[{ id: 0, name: t("crops.filters.all"), slug: "" }, ...categoriesQuery.data].map((item) => {
+            const selected = item.slug === "" ? !filters.cropType : filters.cropType === item.slug;
+            return {
+              key: String(item.id),
+              label: item.name,
+              selected,
+              onPress: () => setFilters((f) => ({ ...f, cropType: item.slug === "" || f.cropType === item.slug ? undefined : item.slug })),
+              accessibilityLabel: item.slug === "" ? t("crops.filters.all") : t("crops.a11y.categoryChip", { name: item.name }),
+            };
+          })}
+        />
       )}
 
       {listingsQuery.isLoading && <CardSkeletonGrid count={6} />}
@@ -188,14 +177,6 @@ const styles = StyleSheet.create({
   filterButtonActive: { backgroundColor: colors.primary },
   filterButtonText: { color: colors.primary, fontWeight: "600" },
   filterButtonTextActive: { color: colors.primaryContrastText },
-  // A fixed-height bar so the horizontal list can never be squeezed by the grid below it.
-  chipBar: { height: 48, marginBottom: 4 },
-  chipRow: { gap: 8, alignItems: "center", paddingVertical: 4 },
-  // The chip looks ~31pt tall; hitSlop at the call site brings the tap area to 44pt without changing how it looks.
-  chip: { borderWidth: 1, borderColor: colors.divider, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 6, backgroundColor: colors.surface },
-  chipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
-  chipText: { fontSize: 13, color: colors.textPrimary },
-  chipTextActive: { color: colors.primaryContrastText, fontWeight: "600" },
   clearButton: { marginTop: 4, borderWidth: 1, borderColor: colors.primary, borderRadius: 8, paddingHorizontal: 20, paddingVertical: 10, minHeight: 44, justifyContent: "center" },
   clearButtonText: { color: colors.primary, fontWeight: "600" },
   list: { paddingBottom: 24 },
