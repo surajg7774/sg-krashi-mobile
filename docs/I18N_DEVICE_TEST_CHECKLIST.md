@@ -87,3 +87,44 @@ you saw (a photo of the screen helps).
 - [ ] Login with airplane mode on, tap Google: "Couldn't reach Google..." (हिन्दी: "Google से जुड़ा नहीं जा सका...").
 - [ ] A Google account that the server does not accept: "Google sign-in didn't work. Please try again or log in with
       your email." No codes, no English text in हिन्दी, nothing about Cloud Console.
+
+## Final round: offline on Home, "load more", friendly errors, icons
+
+### Offline: Home and lists
+- [ ] Open Home online (products and crops load), then airplane mode and reopen the app: both sections still show, with
+      ONE "You're offline" banner and "Last updated ..." (the older of the two). No red error box over saved data.
+- [ ] A section that has never loaded and is offline shows its error box with Retry (and works after reconnecting).
+- [ ] Orders list offline: every row's status chip has a dashed border and the line "Order status may be out of date
+      while you're offline." (हिन्दी: "आप ऑफ़लाइन हैं, इसलिए ऑर्डर की स्थिति पुरानी हो सकती है।"). Same line under the
+      status on an order's own page. Back online: the cue disappears.
+- [ ] Scroll to the bottom of Store / Crop Marketplace / Orders / Notifications / Mandi with a long list, turn airplane
+      mode on, scroll more: a small line "Connect to the internet to load more." appears (हिन्दी: "और देखने के लिए
+      इंटरनेट से जुड़ें।"). Tap it after reconnecting: the next page loads. It does not flicker or retry by itself in a loop.
+- [ ] Same for "Show more reviews" on a crop page.
+
+### Friendly error messages (try each in English and in हिन्दी; no code, no number, no server wording)
+- [ ] Login with a wrong password -> "Wrong email or password..." (and a hint to verify a new account first).
+- [ ] Register with an email that already exists -> "This email is already registered. Try logging in instead."
+- [ ] Register with a bad email / short password -> the field-specific line (email / "at least 8 characters").
+- [ ] OTP: a wrong code -> "That code isn't right or has expired..."; many wrong codes -> "Too many wrong codes..."; tap Resend
+      straight away (before the timer) -> "Please wait a little before asking for another code."
+- [ ] Many wrong logins in a row -> "Too many attempts. Please try again in about N minutes." (or "wait a short while").
+- [ ] Airplane mode: any action -> "No internet connection or the connection is slow. Please try again."
+- [ ] Checkout with an item that went out of stock -> "Some items are out of stock or not available in that quantity..."
+- [ ] Start a payment, then cancel/fail it -> "The payment didn't go through. Please try again." (Razorpay's own wording is not shown.)
+- [ ] Account deletion with the wrong password -> "That password isn't right."; with an order in progress -> "Your account
+      can't be deleted while an order, booking or payout is still in progress..."
+- [ ] Leave the app open until the login expires, then act -> "Your session has expired. Please log in again."
+- [ ] Anything that fails on the server -> "Something went wrong on our side. Please try again in a little while."
+- [ ] Upload a very large photo on a listing -> "That photo couldn't be used. Please choose a smaller photo (under 5 MB)..."
+
+### Icons and tab bar
+- [ ] Bottom tab bar: outline icons, the open tab is filled and green, the others grey; labels unchanged (Home, Store, Crop
+      Doctor, Weather, Profile, plus Farmer for farmers). Tap each tab: the icon switches to filled.
+- [ ] Home: cart and bell icons (with the number badge when there is something), six quick-link tiles with icons.
+- [ ] Profile: gear icon top right; Notifications row with an icon and arrow. Settings: icons on Privacy, Terms, Version, Delete.
+- [ ] Password field: the eye shows and hides the password.
+- [ ] Crop Doctor and farmer photo buttons: camera and gallery icons next to the text.
+- [ ] Empty screens (empty cart, no orders, no notifications) show a soft grey line icon, not an emoji.
+- [ ] No icon shows as an empty space or a "?" box, even on the very first screen after starting the app.
+- [ ] Still emoji on purpose: the five big onboarding pictures, star ratings, check marks inside sentences.

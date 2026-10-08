@@ -87,9 +87,17 @@ needs the owner's call is listed under **Open questions** at the end.
   (gear at the top right of Profile). Profile keeps the person's name, email, role, Notifications, My Orders and Log out.
   Delete account sits alone in a "danger" section at the bottom; its confirmation flow is unchanged.
 
+- **D19 - Errors are friendly, never raw.** Every failed request is turned into a translated sentence from the server's
+  stable error code and the HTTP status (src/i18n/friendlyError.ts); the server's own wording, codes and status numbers
+  are never shown (see docs/I18N.md, "Error messages"). Razorpay's own error text is not shown either. Question Q1 below
+  is therefore answered for the app: the server's English text no longer reaches Hindi readers.
+- **D20 - Icons are Ionicons, not emoji.** One family from @expo/vector-icons (only the Ionicons font is bundled).
+  Outline when inactive, filled when active in the tab bar. Emoji remain only as content (onboarding pictures, rating
+  stars, check marks inside sentences).
+
 ## Open questions
 
-- **Q1 - Server error messages.** Should the server send translated messages, or should the app map known error codes
-  (for example INVALID_CREDENTIALS) to Hindi text? Today a Hindi reader sees the server's English message in those
-  cases. This needs a server or contract decision, so it is not done here.
+- **Q1 - Server error messages.** Answered inside the app (D19): the app maps the server's error codes to Hindi and
+  English text itself. The server could still add codes (for example a separate "account not verified" code) to make a
+  few messages more specific.
 - **Q2 - Legal pages in Hindi.** Should the Privacy Policy and Terms get reviewed Hindi versions?
