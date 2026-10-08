@@ -27,6 +27,7 @@ import { OfflineBanner } from "@/components/OfflineBanner";
 import { useOfflineData } from "@/offline/useOfflineData";
 import { canAddToCart, shouldShowFullError, shouldShowOfflineBanner } from "@/offline/screenState";
 import { OFFLINE_STRINGS } from "@/offline/strings";
+import { useT } from "@/i18n/useT";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -36,6 +37,7 @@ type Navigation = NativeStackNavigationProp<StoreStackParamList, "ProductDetail"
 export const ProductDetailScreen = () => {
   const { params } = useRoute<DetailRoute>();
   const navigation = useNavigation<Navigation>();
+  const { t } = useT();
   const queryClient = useQueryClient();
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [addedFeedback, setAddedFeedback] = useState(false);
@@ -79,7 +81,7 @@ export const ProductDetailScreen = () => {
   if (shouldShowFullError(productQuery) || !product) {
     return (
       <View style={styles.centered}>
-        <ErrorState message="Could not load this product." onRetry={() => void refetch()} />
+        <ErrorState message={t("store.product.loadError")} onRetry={() => void refetch()} />
       </View>
     );
   }
@@ -119,7 +121,7 @@ export const ProductDetailScreen = () => {
         </>
       ) : (
         <View style={[styles.imagePlaceholder, { width: SCREEN_WIDTH, height: SCREEN_WIDTH }]}>
-          <Text style={styles.imagePlaceholderText}>No image available</Text>
+          <Text style={styles.imagePlaceholderText}>{t("store.product.noImage")}</Text>
         </View>
       )}
 
@@ -132,12 +134,12 @@ export const ProductDetailScreen = () => {
 
         {product.isOrganicCertified && (
           <View style={styles.organicBadge}>
-            <Text style={styles.organicBadgeText}>Organic Certified</Text>
+            <Text style={styles.organicBadgeText}>{t("store.product.organicCertified")}</Text>
           </View>
         )}
 
         <Text style={styles.stockStatus}>
-          {product.stockQty > 0 ? `${product.stockQty} in stock` : "Out of stock"}
+          {product.stockQty > 0 ? t("store.product.inStock", { count: product.stockQty }) : t("store.product.outOfStock")}
         </Text>
 
         <Text style={styles.description}>{product.description}</Text>
@@ -150,20 +152,20 @@ export const ProductDetailScreen = () => {
           {addToCartMutation.isPending ? (
             <ActivityIndicator color={colors.primaryContrastText} />
           ) : (
-            <Text style={styles.addButtonText}>{addedFeedback ? "Added ✓" : "Add to Cart"}</Text>
+            <Text style={styles.addButtonText}>{addedFeedback ? t("store.product.added") : t("store.product.addToCart")}</Text>
           )}
         </Pressable>
 
         {!cartAllowed && <Text style={styles.errorText}>{OFFLINE_STRINGS.addToCartNeedsInternet}</Text>}
 
         {addToCartMutation.isError && (
-          <Text style={styles.errorText}>Could not add to cart. Please try again.</Text>
+          <Text style={styles.errorText}>{t("store.product.addError")}</Text>
         )}
       </View>
 
       {frequentlyBoughtQuery.data && frequentlyBoughtQuery.data.items.length > 0 && (
         <RecommendationRail
-          title="Frequently Bought Together"
+          title={t("store.product.frequentlyBoughtTogether")}
           items={frequentlyBoughtQuery.data.items}
           onPressItem={(item) => navigation.push(item.itemType === "CROP_LISTING" ? "CropDetail" : "ProductDetail", { idOrSlug: item.slug })}
         />

@@ -10,12 +10,14 @@ import { orderService } from "@/features/orders/orderService";
 import type { MainStackParamList } from "@/navigation/MainStackNavigator";
 import { ErrorState } from "@/components/ErrorState";
 import { trimName } from "@/features/crop-marketplace/cropLogic";
+import { useT } from "@/i18n/useT";
 
 type Navigation = NativeStackNavigationProp<MainStackParamList, "Checkout">;
 type CheckoutRoute = RouteProp<MainStackParamList, "Checkout">;
 
 export const CheckoutScreen = () => {
   const navigation = useNavigation<Navigation>();
+  const { t } = useT();
   const { params } = useRoute<CheckoutRoute>();
   const queryClient = useQueryClient();
 
@@ -49,7 +51,7 @@ export const CheckoutScreen = () => {
   if (!address || !cart) {
     return (
       <View style={styles.centered}>
-        <ErrorState message="Could not load checkout details." onRetry={() => void addressesQuery.refetch()} />
+        <ErrorState message={t("checkout.loadError")} onRetry={() => void addressesQuery.refetch()} />
       </View>
     );
   }
@@ -57,7 +59,7 @@ export const CheckoutScreen = () => {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll}>
-        <Text style={styles.sectionTitle}>Shipping to</Text>
+        <Text style={styles.sectionTitle}>{t("checkout.shippingTo")}</Text>
         <View style={styles.card}>
           <Text style={styles.cardLine}>{address.line1}</Text>
           {address.line2 && <Text style={styles.cardLine}>{address.line2}</Text>}
@@ -66,7 +68,7 @@ export const CheckoutScreen = () => {
           </Text>
         </View>
 
-        <Text style={styles.sectionTitle}>Items ({cart.itemCount})</Text>
+        <Text style={styles.sectionTitle}>{t("checkout.items", { count: cart.itemCount })}</Text>
         <View style={styles.card}>
           {cart.items.map((item) => (
             <View key={item.id} style={styles.itemRow}>
@@ -78,13 +80,13 @@ export const CheckoutScreen = () => {
           ))}
           <View style={styles.divider} />
           <View style={styles.itemRow}>
-            <Text style={styles.totalLabel}>Total</Text>
+            <Text style={styles.totalLabel}>{t("common.total")}</Text>
             <Text style={styles.totalValue}>₹{cart.subtotal}</Text>
           </View>
         </View>
 
         {checkoutMutation.isError && (
-          <Text style={styles.errorText}>Could not place your order. Please try again.</Text>
+          <Text style={styles.errorText}>{t("checkout.placeError")}</Text>
         )}
       </ScrollView>
 
@@ -97,7 +99,7 @@ export const CheckoutScreen = () => {
           {checkoutMutation.isPending ? (
             <ActivityIndicator color={colors.primaryContrastText} />
           ) : (
-            <Text style={styles.placeOrderButtonText}>Place Order</Text>
+            <Text style={styles.placeOrderButtonText}>{t("checkout.placeOrder")}</Text>
           )}
         </Pressable>
       </View>

@@ -36,6 +36,7 @@ const PAGE_SIZE = 12;
 type Navigation = NativeStackNavigationProp<StoreStackParamList, "StoreList">;
 
 const ProductCard = ({ item, onPress }: { item: ProductSummary; onPress: () => void }) => {
+  const { t } = useT();
   const outOfStock = item.stockQty === 0;
   return (
     <Pressable style={({ pressed }) => [styles.card, pressed && { opacity: 0.6 }]} onPress={onPress}>
@@ -50,7 +51,7 @@ const ProductCard = ({ item, onPress }: { item: ProductSummary; onPress: () => v
         />
         {outOfStock ? (
           <View style={styles.outOfStockBadge}>
-            <Text style={styles.outOfStockText}>Out of Stock</Text>
+            <Text style={styles.outOfStockText}>{t("store.outOfStockBadge")}</Text>
           </View>
         ) : (
           <View style={styles.badgeSlot}>
@@ -114,7 +115,7 @@ export const StoreScreen = () => {
 
       <TextInput
         style={styles.searchInput}
-        placeholder="Search products…"
+        placeholder={t("store.searchPlaceholder")}
         placeholderTextColor={colors.textSecondary}
         value={searchInput}
         onChangeText={setSearchInput}
@@ -144,7 +145,7 @@ export const StoreScreen = () => {
 
       {shouldShowFullError(productsQuery) && (
         <ErrorState
-          message="Could not load products."
+          message={t("store.loadError")}
           onRetry={() => void productsQuery.refetch()}
         />
       )}
@@ -152,11 +153,11 @@ export const StoreScreen = () => {
       {!productsQuery.isLoading && !shouldShowFullError(productsQuery) && products.length === 0 && (
         <EmptyState
           icon="📦"
-          message={`No products found${search ? ` for "${search}"` : ""}.`}
+          message={search ? t("store.noProductsFor", { search }) : t("store.noProducts")}
           action={
             search ? (
               <Pressable style={({ pressed }) => [styles.clearSearchButton, pressed && { opacity: 0.6 }]} onPress={() => setSearchInput("")}>
-                <Text style={styles.clearSearchButtonText}>Clear search</Text>
+                <Text style={styles.clearSearchButtonText}>{t("store.clearSearch")}</Text>
               </Pressable>
             ) : undefined
           }

@@ -11,6 +11,7 @@ import type { MainStackParamList } from "@/navigation/MainStackNavigator";
 import { ErrorState } from "@/components/ErrorState";
 import { EmptyState } from "@/components/EmptyState";
 import { trimName } from "@/features/crop-marketplace/cropLogic";
+import { useT } from "@/i18n/useT";
 
 type Navigation = NativeStackNavigationProp<MainStackParamList, "Cart">;
 
@@ -28,52 +29,56 @@ const CartItemRow = ({
   onDecrement: () => void;
   onRemove: () => void;
   isMutating: boolean;
-}) => (
-  <View style={styles.row}>
-    <Pressable onPress={onOpen} accessible={false} style={({ pressed }) => pressed && { opacity: 0.6 }}>
-      <Image source={resizedMediaUrl(item.thumbnailUrl, MEDIA_WIDTH.row)} style={styles.thumb} contentFit="cover" />
-    </Pressable>
-    <View style={styles.rowMiddle}>
-      <Pressable onPress={onOpen} accessibilityRole="button" accessibilityLabel={`Open ${trimName(item.itemName)}`} style={({ pressed }) => pressed && { opacity: 0.6 }}>
-        <Text style={styles.itemName} numberOfLines={2}>
-          {trimName(item.itemName)}
-        </Text>
+}) => {
+  const { t } = useT();
+  return (
+    <View style={styles.row}>
+      <Pressable onPress={onOpen} accessible={false} style={({ pressed }) => pressed && { opacity: 0.6 }}>
+        <Image source={resizedMediaUrl(item.thumbnailUrl, MEDIA_WIDTH.row)} style={styles.thumb} contentFit="cover" />
       </Pressable>
-      <Text style={styles.unitPrice}>₹{item.unitPrice} each</Text>
-      <View style={styles.qtyRow}>
-        <Pressable
-          style={({ pressed }) => [styles.qtyButton, pressed && { opacity: 0.6 }]}
-          onPress={onDecrement}
-          disabled={isMutating || item.quantity <= 1}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        >
-          <Text style={styles.qtyButtonText}>−</Text>
+      <View style={styles.rowMiddle}>
+        <Pressable onPress={onOpen} accessibilityRole="button" accessibilityLabel={t("cart.openItem", { name: trimName(item.itemName) })} style={({ pressed }) => pressed && { opacity: 0.6 }}>
+          <Text style={styles.itemName} numberOfLines={2}>
+            {trimName(item.itemName)}
+          </Text>
         </Pressable>
-        <Text style={styles.qtyValue}>{item.quantity}</Text>
-        <Pressable
-          style={({ pressed }) => [styles.qtyButton, pressed && { opacity: 0.6 }]}
-          onPress={onIncrement}
-          disabled={isMutating || item.quantity >= item.availableQuantity}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        >
-          <Text style={styles.qtyButtonText}>+</Text>
-        </Pressable>
-        <Pressable
-          style={({ pressed }) => [styles.removeButton, pressed && { opacity: 0.6 }]}
-          onPress={onRemove}
-          disabled={isMutating}
-          hitSlop={{ top: 14, bottom: 14, left: 10, right: 10 }}
-        >
-          <Text style={styles.removeButtonText}>Remove</Text>
-        </Pressable>
+        <Text style={styles.unitPrice}>{t("cart.each", { price: item.unitPrice })}</Text>
+        <View style={styles.qtyRow}>
+          <Pressable
+            style={({ pressed }) => [styles.qtyButton, pressed && { opacity: 0.6 }]}
+            onPress={onDecrement}
+            disabled={isMutating || item.quantity <= 1}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Text style={styles.qtyButtonText}>−</Text>
+          </Pressable>
+          <Text style={styles.qtyValue}>{item.quantity}</Text>
+          <Pressable
+            style={({ pressed }) => [styles.qtyButton, pressed && { opacity: 0.6 }]}
+            onPress={onIncrement}
+            disabled={isMutating || item.quantity >= item.availableQuantity}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Text style={styles.qtyButtonText}>+</Text>
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [styles.removeButton, pressed && { opacity: 0.6 }]}
+            onPress={onRemove}
+            disabled={isMutating}
+            hitSlop={{ top: 14, bottom: 14, left: 10, right: 10 }}
+          >
+            <Text style={styles.removeButtonText}>{t("common.remove")}</Text>
+          </Pressable>
+        </View>
       </View>
+      <Text style={styles.lineTotal}>₹{item.lineTotal}</Text>
     </View>
-    <Text style={styles.lineTotal}>₹{item.lineTotal}</Text>
-  </View>
-);
+  );
+};
 
 export const CartScreen = () => {
   const navigation = useNavigation<Navigation>();
+  const { t } = useT();
   const queryClient = useQueryClient();
 
   const cartQuery = useQuery({ queryKey: CART_QUERY_KEY, queryFn: cartService.getCart });
@@ -104,7 +109,7 @@ export const CartScreen = () => {
   if (cartQuery.isError) {
     return (
       <View style={styles.centered}>
-        <ErrorState message="Could not load your cart." onRetry={() => void cartQuery.refetch()} />
+        <ErrorState message={t("cart.loadError")} onRetry={() => void cartQuery.refetch()} />
       </View>
     );
   }
@@ -116,20 +121,20 @@ export const CartScreen = () => {
       <View style={styles.centered}>
         <EmptyState
           icon="🛒"
-          message="Your cart is empty. Add products from the Store or crops from the Crop Marketplace to see them here."
+          message={t("cart.empty")}
           action={
             <View style={styles.browseButtons}>
               <Pressable
                 style={({ pressed }) => [styles.browseButton, pressed && { opacity: 0.6 }]}
                 onPress={() => navigation.navigate("MainTabs", { screen: "Store", params: { screen: "StoreList" } })}
               >
-                <Text style={styles.browseButtonText}>Browse Store</Text>
+                <Text style={styles.browseButtonText}>{t("cart.browseStore")}</Text>
               </Pressable>
               <Pressable
                 style={({ pressed }) => [styles.browseButton, pressed && { opacity: 0.6 }]}
                 onPress={() => navigation.navigate("MainTabs", { screen: "Store", params: { screen: "CropList" } })}
               >
-                <Text style={styles.browseButtonText}>Browse Crops</Text>
+                <Text style={styles.browseButtonText}>{t("cart.browseCrops")}</Text>
               </Pressable>
             </View>
           }
@@ -163,11 +168,11 @@ export const CartScreen = () => {
 
       <View style={styles.footer}>
         <View style={styles.totalRow}>
-          <Text style={styles.totalLabel}>Total</Text>
+          <Text style={styles.totalLabel}>{t("common.total")}</Text>
           <Text style={styles.totalValue}>₹{cart.subtotal}</Text>
         </View>
         <Pressable style={({ pressed }) => [styles.checkoutButton, pressed && { opacity: 0.6 }]} onPress={() => navigation.navigate("AddressSelect")}>
-          <Text style={styles.checkoutButtonText}>Proceed to Checkout</Text>
+          <Text style={styles.checkoutButtonText}>{t("cart.proceedToCheckout")}</Text>
         </Pressable>
       </View>
     </View>

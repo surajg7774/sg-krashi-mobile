@@ -2,6 +2,7 @@ import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import { WebView, type WebViewMessageEvent } from "react-native-webview";
 import { colors } from "@/theme/colors";
 import type { PaymentInitiation } from "./types";
+import { useT } from "@/i18n/useT";
 
 // Mirrors sg-krashi-client/src/shared/components/payment/RazorpayCheckoutButton.tsx
 // exactly (same script, same options shape, same "handler fires on modal
@@ -41,7 +42,7 @@ const buildCheckoutHtml = (
   initiation: PaymentInitiation,
   description: string,
   prefill?: { name?: string; email?: string }
-): string => `
+): string => /* i18n-ignore: Razorpay checkout page, not app text (D1) */ `
 <!DOCTYPE html>
 <html>
   <head>
@@ -94,6 +95,7 @@ export const RazorpayWebView = ({
   onDismiss,
   onError,
 }: RazorpayWebViewProps) => {
+  const { t } = useT();
   const handleMessage = (event: WebViewMessageEvent) => {
     try {
       const message = JSON.parse(event.nativeEvent.data) as BridgeMessage;
@@ -105,7 +107,7 @@ export const RazorpayWebView = ({
         onError(message.message);
       }
     } catch {
-      onError("Could not read the payment result. Please try again.");
+      onError(t("payment.readError"));
     }
   };
 
@@ -117,7 +119,7 @@ export const RazorpayWebView = ({
           onPress={onDismiss}
           hitSlop={{ top: 14, bottom: 14, left: 14, right: 14 }}
         >
-          <Text style={styles.closeText}>Cancel</Text>
+          <Text style={styles.closeText}>{t("common.cancel")}</Text>
         </Pressable>
       </View>
       <WebView

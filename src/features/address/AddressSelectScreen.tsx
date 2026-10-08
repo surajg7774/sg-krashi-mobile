@@ -17,24 +17,29 @@ import { addressService, ADDRESSES_QUERY_KEY } from "./addressService";
 import type { Address, AddressPayload } from "./types";
 import type { MainStackParamList } from "@/navigation/MainStackNavigator";
 import { ErrorState } from "@/components/ErrorState";
+import { useT } from "@/i18n/useT";
 
 type Navigation = NativeStackNavigationProp<MainStackParamList, "AddressSelect">;
 
-const AddressCard = ({ address, selected, onSelect }: { address: Address; selected: boolean; onSelect: () => void }) => (
-  <Pressable style={({ pressed }) => [styles.card, selected && styles.cardSelected, pressed && { opacity: 0.6 }]} onPress={onSelect}>
-    <Text style={styles.cardLine}>{address.line1}</Text>
-    {address.line2 && <Text style={styles.cardLine}>{address.line2}</Text>}
-    <Text style={styles.cardLine}>
-      {address.city}, {address.state} - {address.pincode}
-    </Text>
-    {address.isDefault && <Text style={styles.defaultBadge}>Default</Text>}
-  </Pressable>
-);
+const AddressCard = ({ address, selected, onSelect }: { address: Address; selected: boolean; onSelect: () => void }) => {
+  const { t } = useT();
+  return (
+    <Pressable style={({ pressed }) => [styles.card, selected && styles.cardSelected, pressed && { opacity: 0.6 }]} onPress={onSelect}>
+      <Text style={styles.cardLine}>{address.line1}</Text>
+      {address.line2 && <Text style={styles.cardLine}>{address.line2}</Text>}
+      <Text style={styles.cardLine}>
+        {address.city}, {address.state} - {address.pincode}
+      </Text>
+      {address.isDefault && <Text style={styles.defaultBadge}>{t("address.default")}</Text>}
+    </Pressable>
+  );
+};
 
 const EMPTY_FORM: AddressPayload = { line1: "", line2: "", city: "", state: "", pincode: "" };
 
 export const AddressSelectScreen = () => {
   const navigation = useNavigation<Navigation>();
+  const { t } = useT();
   const queryClient = useQueryClient();
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -65,7 +70,7 @@ export const AddressSelectScreen = () => {
   if (addressesQuery.isError) {
     return (
       <View style={styles.centered}>
-        <ErrorState message="Could not load your addresses." onRetry={() => void addressesQuery.refetch()} />
+        <ErrorState message={t("address.loadError")} onRetry={() => void addressesQuery.refetch()} />
       </View>
     );
   }
@@ -87,13 +92,13 @@ export const AddressSelectScreen = () => {
 
       {addresses.length === 0 && !showForm && (
         <View style={styles.centered}>
-          <Text style={styles.emptyText}>You don't have any saved addresses yet.</Text>
+          <Text style={styles.emptyText}>{t("address.empty")}</Text>
         </View>
       )}
 
       {!showForm && (
         <Pressable style={({ pressed }) => [styles.addLink, pressed && { opacity: 0.6 }]} onPress={() => setShowForm(true)}>
-          <Text style={styles.addLinkText}>+ Add a new address</Text>
+          <Text style={styles.addLinkText}>{t("address.add")}</Text>
         </Pressable>
       )}
 
@@ -101,46 +106,46 @@ export const AddressSelectScreen = () => {
         <ScrollView style={styles.formContainer} keyboardShouldPersistTaps="handled">
           <TextInput
             style={styles.input}
-            placeholder="Address line 1"
+            placeholder={t("address.line1")}
             placeholderTextColor={colors.textSecondary}
             value={form.line1}
             onChangeText={(v) => setForm((f) => ({ ...f, line1: v }))}
           />
           <TextInput
             style={styles.input}
-            placeholder="Address line 2 (optional)"
+            placeholder={t("address.line2")}
             placeholderTextColor={colors.textSecondary}
             value={form.line2 ?? ""}
             onChangeText={(v) => setForm((f) => ({ ...f, line2: v }))}
           />
           <TextInput
             style={styles.input}
-            placeholder="City"
+            placeholder={t("address.city")}
             placeholderTextColor={colors.textSecondary}
             value={form.city}
             onChangeText={(v) => setForm((f) => ({ ...f, city: v }))}
           />
           <TextInput
             style={styles.input}
-            placeholder="State"
+            placeholder={t("address.state")}
             placeholderTextColor={colors.textSecondary}
             value={form.state}
             onChangeText={(v) => setForm((f) => ({ ...f, state: v }))}
           />
           <TextInput
             style={styles.input}
-            placeholder="Pincode"
+            placeholder={t("address.pincode")}
             placeholderTextColor={colors.textSecondary}
             keyboardType="number-pad"
             value={form.pincode}
             onChangeText={(v) => setForm((f) => ({ ...f, pincode: v }))}
           />
 
-          {createMutation.isError && <Text style={styles.errorText}>Could not save this address. Please try again.</Text>}
+          {createMutation.isError && <Text style={styles.errorText}>{t("address.saveError")}</Text>}
 
           <View style={styles.formButtonRow}>
             <Pressable style={({ pressed }) => [styles.formCancelButton, pressed && { opacity: 0.6 }]} onPress={() => setShowForm(false)}>
-              <Text style={styles.formCancelText}>Cancel</Text>
+              <Text style={styles.formCancelText}>{t("common.cancel")}</Text>
             </Pressable>
             <Pressable
               style={({ pressed }) => [styles.formSaveButton, (!isFormValid || createMutation.isPending) && styles.disabledButton, pressed && { opacity: 0.6 }]}
@@ -150,7 +155,7 @@ export const AddressSelectScreen = () => {
               {createMutation.isPending ? (
                 <ActivityIndicator color={colors.primaryContrastText} />
               ) : (
-                <Text style={styles.formSaveText}>Save Address</Text>
+                <Text style={styles.formSaveText}>{t("address.save")}</Text>
               )}
             </Pressable>
           </View>
@@ -164,7 +169,7 @@ export const AddressSelectScreen = () => {
             disabled={!selectedId}
             onPress={() => navigation.navigate("Checkout", { addressId: selectedId! })}
           >
-            <Text style={styles.continueButtonText}>Continue to Review</Text>
+            <Text style={styles.continueButtonText}>{t("address.continue")}</Text>
           </Pressable>
         </View>
       )}
