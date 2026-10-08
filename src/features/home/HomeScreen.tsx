@@ -10,7 +10,8 @@ import {
 } from "react-native";
 import { Image } from "expo-image";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useNavigation, type CompositeNavigationProp } from "@react-navigation/native";
+import { useIsFocused, useNavigation, type CompositeNavigationProp } from "@react-navigation/native";
+import { StatusBar } from "expo-status-bar";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useAuth } from "@/context/AuthContext";
@@ -35,6 +36,7 @@ import { Rating } from "@/components/Rating";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { cardShadow } from "@/theme/shadow";
 import { ICONS, type IconName } from "@/theme/icons";
+import { accents, type AccentName } from "@/theme/colors";
 import { screenTopPadding } from "@/theme/insets";
 import type { MessageKey } from "@/i18n";
 import { LastUpdated } from "@/components/LastUpdated";
@@ -55,18 +57,19 @@ interface QuickLink {
   id: string;
   label: MessageKey;
   icon: IconName;
+  accent: AccentName;
   onPress: (navigation: Navigation) => void;
 }
 
 const QUICK_LINKS: QuickLink[] = [
   // The storefront icon, not the cart — the cart look now belongs to the header's
   // dedicated Cart button, so Store needs a visually distinct icon.
-  { id: "store", label: "home.links.store", icon: ICONS.store, onPress: (nav) => nav.navigate("Store", { screen: "StoreList" }) },
-  { id: "cropDoctor", label: "home.links.cropDoctor", icon: ICONS.cropDoctor, onPress: (nav) => nav.navigate("CropDoctor", { screen: "CropDoctorHome" }) },
-  { id: "weather", label: "home.links.weather", icon: ICONS.weather, onPress: (nav) => nav.navigate("Weather") },
-  { id: "mandi", label: "home.links.mandi", icon: ICONS.mandi, onPress: (nav) => nav.navigate("Mandi") },
-  { id: "assistant", label: "home.links.assistant", icon: ICONS.assistant, onPress: (nav) => nav.navigate("Chat") },
-  { id: "crops", label: "home.links.cropMarketplace", icon: ICONS.cropMarketplace, onPress: (nav) => nav.navigate("Store", { screen: "CropList" }) },
+  { id: "store", label: "home.links.store", icon: ICONS.store, accent: "green", onPress: (nav) => nav.navigate("Store", { screen: "StoreList" }) },
+  { id: "cropDoctor", label: "home.links.cropDoctor", icon: ICONS.cropDoctor, accent: "teal", onPress: (nav) => nav.navigate("CropDoctor", { screen: "CropDoctorHome" }) },
+  { id: "weather", label: "home.links.weather", icon: ICONS.weather, accent: "blue", onPress: (nav) => nav.navigate("Weather") },
+  { id: "mandi", label: "home.links.mandi", icon: ICONS.mandi, accent: "gold", onPress: (nav) => nav.navigate("Mandi") },
+  { id: "assistant", label: "home.links.assistant", icon: ICONS.assistant, accent: "purple", onPress: (nav) => nav.navigate("Chat") },
+  { id: "crops", label: "home.links.cropMarketplace", icon: ICONS.cropMarketplace, accent: "orange", onPress: (nav) => nav.navigate("Store", { screen: "CropList" }) },
 ];
 
 const ProductCard = ({ item, onPress }: { item: ProductSummary; onPress: () => void }) => (
@@ -95,6 +98,7 @@ export const HomeScreen = () => {
   const navigation = useNavigation<Navigation>();
   const insets = useSafeAreaInsets();
   const { t } = useT();
+  const isFocused = useIsFocused();
 
   // "Latest products" — the recommendation endpoints ("for you"/similar)
   // need real order history to return anything meaningful, and this test
@@ -149,6 +153,8 @@ export const HomeScreen = () => {
       style={styles.container}
       refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
     >
+      {/* The deep green header sits under the status bar, so the clock and battery are drawn light while Home is open. */}
+      {isFocused && <StatusBar style="light" />}
       <View style={[styles.header, { paddingTop: screenTopPadding(insets.top, 16) }]}>
         <View style={styles.headerTopRow}>
           <Text style={styles.greeting} numberOfLines={1}>
@@ -161,7 +167,7 @@ export const HomeScreen = () => {
               accessibilityRole="button"
               accessibilityLabel={t("nav.headers.cart")}
             >
-              <Ionicons name={ICONS.cart} size={26} color={colors.textPrimary} />
+              <Ionicons name={ICONS.cart} size={24} color={colors.white} />
               {!!cartQuery.data?.itemCount && (
                 <View style={styles.iconBadge}>
                   <Text style={styles.iconBadgeText}>
@@ -176,7 +182,7 @@ export const HomeScreen = () => {
               accessibilityRole="button"
               accessibilityLabel={t("nav.headers.notifications")}
             >
-              <Ionicons name={ICONS.notifications} size={26} color={colors.textPrimary} />
+              <Ionicons name={ICONS.notifications} size={24} color={colors.white} />
               {!!notificationsQuery.data?.unreadCount && (
                 <View style={styles.iconBadge}>
                   <Text style={styles.iconBadgeText}>
@@ -191,9 +197,13 @@ export const HomeScreen = () => {
 
       <View style={styles.quickLinksRow}>
         {QUICK_LINKS.map((link) => (
-          <Pressable key={link.id} style={({ pressed }) => [styles.quickLink, pressed && { opacity: 0.6 }]} onPress={() => link.onPress(navigation)}>
-            <Ionicons name={link.icon} size={26} color={colors.primary} />
-            <Text style={styles.quickLinkLabel}>{t(link.label)}</Text>
+          <Pressable
+            key={link.id}
+            style={({ pressed }) => [styles.quickLink, { backgroundColor: accents[link.accent].tint, borderColor: accents[link.accent].tint }, pressed && { opacity: 0.6 }]}
+            onPress={() => link.onPress(navigation)}
+          >
+            <Ionicons name={link.icon} size={26} color={accents[link.accent].icon} />
+            <Text style={[styles.quickLinkLabel, { color: accents[link.accent].text }]}>{t(link.label)}</Text>
           </Pressable>
         ))}
       </View>
@@ -282,9 +292,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
+  // The deep green hero with a thin gold edge: the brand's two colours.
   header: {
     paddingTop: 16,
     paddingHorizontal: 16,
+    paddingBottom: 18,
+    backgroundColor: colors.primaryDark,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    borderBottomWidth: 4,
+    borderBottomColor: colors.secondary,
   },
   headerTopRow: {
     flexDirection: "row",
@@ -295,7 +312,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 22,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: colors.white,
     marginRight: 12,
   },
   headerIcons: {
@@ -312,6 +329,8 @@ const styles = StyleSheet.create({
     minHeight: 44,
     alignItems: "center",
     justifyContent: "center",
+    borderRadius: 22,
+    backgroundColor: colors.primary,
   },
   iconEmoji: {
     fontSize: 22,
@@ -323,7 +342,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 9,
     right: 9,
-    backgroundColor: colors.error,
+    backgroundColor: colors.secondary,
     borderRadius: 8,
     minWidth: 16,
     height: 16,
@@ -332,7 +351,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 3,
   },
   iconBadgeText: {
-    color: colors.white,
+    color: colors.onGold,
     fontSize: 9,
     fontWeight: "700",
   },
@@ -366,7 +385,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 17,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: colors.primaryDark,
     marginTop: 20,
     marginHorizontal: 16,
     marginBottom: 10,

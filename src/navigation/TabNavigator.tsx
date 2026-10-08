@@ -40,7 +40,12 @@ export const TabNavigator = () => {
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.textSecondary,
+        tabBarInactiveTintColor: colors.tabInactive,
+        // The open tab sits in a soft green pill (colour and corner radius only: no size changes), the bar itself is white
+        // with a fine green-grey line above it.
+        tabBarActiveBackgroundColor: colors.greenTint,
+        tabBarItemStyle: { borderRadius: 14 },
+        tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.divider },
         // Outline when inactive, filled when active; the colour comes from the tint tokens above.
         tabBarIcon: ({ focused, color }) => {
           const icon = TAB_ICONS[route.name as keyof typeof TAB_ICONS];

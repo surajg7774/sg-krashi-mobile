@@ -35,7 +35,7 @@ test("the tab bar draws them: size 24, tint tokens from the theme, filled when f
   assert.equal(TAB_ICON_SIZE, 24);
   assert.match(tabs, /<Ionicons name=\{focused \? icon\.active : icon\.inactive\} size=\{TAB_ICON_SIZE\} color=\{color\} \/>/);
   assert.match(tabs, /tabBarActiveTintColor: colors\.primary/);
-  assert.match(tabs, /tabBarInactiveTintColor: colors\.textSecondary/);
+  assert.match(tabs, /tabBarInactiveTintColor: colors\.tabInactive/);
   // labels still come from the translated tab titles
   for (const key of ["home", "store", "cropDoctor", "weather", "farmer", "profile"]) assert.match(tabs, new RegExp(`t\\("nav\\.tabs\\.${key}"\\)`));
 });
