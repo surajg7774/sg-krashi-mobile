@@ -410,6 +410,13 @@ export const en = {
     pageOf: "Page {page} of {total}",
     scanLoadError: "Could not load this scan.",
   },
+  chat: {
+    sendError: "Could not send message. Please try again.",
+    unavailable: "The chat assistant is temporarily unavailable. Please check back later.",
+    intro: "Ask me anything about SG Krashi — orders, bookings, how the platform works, or farming questions.",
+    placeholder: "Type a message…",
+    send: "Send",
+  },
 } as const;
 
 type Widen<T> = T extends string ? string : T extends PluralForms ? PluralForms : { readonly [K in keyof T]: Widen<T[K]> };

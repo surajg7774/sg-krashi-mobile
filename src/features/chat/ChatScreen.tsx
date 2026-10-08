@@ -15,11 +15,13 @@ import { colors } from "@/theme/colors";
 import { EmptyState } from "@/components/EmptyState";
 import { chatService } from "./chatService";
 import type { ChatMessage } from "./types";
+import { useT } from "@/i18n/useT";
 
 let clientMessageIdCounter = -1;
 
 export const ChatScreen = () => {
   const insets = useSafeAreaInsets();
+  const { t, errorText } = useT();
   const [sessionId, setSessionId] = useState<number | null>(null);
   const [sessionError, setSessionError] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -54,7 +56,7 @@ export const ChatScreen = () => {
       const reply = await chatService.sendMessage(sessionId, text);
       setMessages((prev) => [...prev, reply]);
     } catch (err) {
-      setSendError((err as { message?: string })?.message || "Could not send message. Please try again.");
+      setSendError(errorText(err, t("chat.sendError"), { details: false }));
     } finally {
       setIsSending(false);
       setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 100);
@@ -64,7 +66,7 @@ export const ChatScreen = () => {
   if (sessionError) {
     return (
       <View style={styles.centered}>
-        <Text style={styles.errorText}>The chat assistant is temporarily unavailable. Please check back later.</Text>
+        <Text style={styles.errorText}>{t("chat.unavailable")}</Text>
       </View>
     );
   }
@@ -88,7 +90,7 @@ export const ChatScreen = () => {
           ListEmptyComponent={
             <EmptyState
               icon="🤖"
-              message="Ask me anything about SG Krashi — orders, bookings, how the platform works, or farming questions."
+              message={t("chat.intro")}
             />
           }
           renderItem={({ item }) => (
@@ -105,7 +107,7 @@ export const ChatScreen = () => {
       <View style={[styles.inputRow, { paddingBottom: insets.bottom + 12 }]}>
         <TextInput
           style={styles.input}
-          placeholder="Type a message…"
+          placeholder={t("chat.placeholder")}
           placeholderTextColor={colors.textSecondary}
           value={input}
           onChangeText={setInput}
@@ -121,7 +123,7 @@ export const ChatScreen = () => {
           disabled={!input.trim() || !sessionId || isSending}
           onPress={() => void handleSend()}
         >
-          <Text style={styles.sendButtonText}>Send</Text>
+          <Text style={styles.sendButtonText}>{t("chat.send")}</Text>
         </Pressable>
       </View>
     </KeyboardAvoidingView>
