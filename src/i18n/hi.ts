@@ -63,10 +63,9 @@ export const hi: Messages = {
       backToLogin: "लॉग इन पर वापस जाएं",
     },
     google: {
-      cancelled: "Google साइन-इन रद्द हो गया या मंज़ूर नहीं हुआ।",
-      unexpected: "Google साइन-इन पूरा नहीं हुआ। कृपया फिर से कोशिश करें।",
-      failedWithCode: "Google साइन-इन नहीं हो सका ({code}): {message}",
-      failed: "Google से साइन-इन नहीं हो सका। कृपया फिर से कोशिश करें।",
+      failed: "Google से साइन-इन नहीं हो सका। कृपया फिर से कोशिश करें या अपने ईमेल से लॉग इन करें।",
+      network: "Google से जुड़ा नहीं जा सका। अपना इंटरनेट जांचें और फिर से कोशिश करें।",
+      playServices: "इस फ़ोन में Google Play services नहीं है या पुराना है। उसे अपडेट करें और फिर से कोशिश करें।",
     },
   },
   onboarding: {

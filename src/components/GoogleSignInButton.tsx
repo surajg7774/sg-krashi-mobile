@@ -2,15 +2,14 @@ import { useEffect, useState } from "react";
 import {
   GoogleSignInButton as NativeGoogleSignInButton,
   GoogleOneTapSignIn,
-  isErrorWithCode,
   isSuccessResponse,
   isCancelledResponse,
   isNoSavedCredentialFoundResponse,
-  statusCodes,
 } from "react-native-nitro-google-signin";
 import { useAuth } from "@/context/AuthContext";
 import { ensureGoogleSignInConfigured, isGoogleSignInConfigured } from "@/features/auth/googleAuth";
 import { useT } from "@/i18n/useT";
+import { classifyGoogleFailure, googleCancelledResponse, googleUnexpectedResponse, type GoogleFailure } from "@/features/auth/googleErrors";
 
 interface GoogleSignInButtonProps {
   onError: (message: string) => void;
@@ -39,7 +38,7 @@ const withTimeout = <T,>(label: string, promise: Promise<T>): Promise<T> =>
 
 export const GoogleSignInButton = ({ onError }: GoogleSignInButtonProps) => {
   const { loginWithGoogle } = useAuth();
-  const { t, errorText } = useT();
+  const { t } = useT();
   const [isReady, setIsReady] = useState(false);
   const [isSigningIn, setIsSigningIn] = useState(false);
 
@@ -55,6 +54,13 @@ export const GoogleSignInButton = ({ onError }: GoogleSignInButtonProps) => {
   if (!isGoogleSignInConfigured()) {
     return null;
   }
+
+  // Real users see one of three translated messages, or nothing when they cancelled. The technical reason is only ever
+  // logged, and only in development builds (see googleErrors.ts).
+  const report = (failure: GoogleFailure) => {
+    if (__DEV__ && failure.devNote) console.warn("[GoogleSignInButton]", failure.devNote);
+    if (failure.kind === "message") onError(t(failure.key));
+  };
 
   const handlePress = async () => {
     console.log("[GoogleSignInButton] press — starting sign-in");
@@ -76,36 +82,14 @@ export const GoogleSignInButton = ({ onError }: GoogleSignInButtonProps) => {
         await loginWithGoogle(response.data.idToken);
         console.log("[GoogleSignInButton] loginWithGoogle() completed — should be authenticated now");
       } else if (isCancelledResponse(response)) {
-        console.warn("[GoogleSignInButton] response type = 'cancelled' (no thrown error)");
-        // The second sentence is a setup hint for whoever configures the app, so it stays in English (D5).
-        onError(
-          `${t("auth.google.cancelled")} ` +
-            "If you selected an account, check whether that account is added under Google Cloud Console → OAuth consent screen → Test users." // i18n-ignore
-        );
+        // The person backed out of the account picker: not an error, so nothing is shown (D17).
+        report(googleCancelledResponse());
       } else {
-        console.warn("[GoogleSignInButton] unexpected response type:", response.type);
-        onError(t("auth.google.unexpected"));
+        report(googleUnexpectedResponse(response.type));
       }
     } catch (err) {
-      if (isErrorWithCode(err)) {
-        console.error("[GoogleSignInButton] GoogleSignInError code:", err.code, "message:", err.message, "userInfo:", err.userInfo);
-        if (err.code === statusCodes.SIGN_IN_CANCELLED) {
-          return; // Real, unambiguous user cancellation — nothing to show.
-        }
-        if (err.code === statusCodes.DEVELOPER_ERROR) {
-          onError("Google sign-in configuration error (DEVELOPER_ERROR) — package name, SHA-1, or client ID mismatch. See Metro console for details."); // i18n-ignore
-          return;
-        }
-        onError(t("auth.google.failedWithCode", { code: err.code, message: err.message }));
-        return;
-      }
-      if (err instanceof Error && /did not resolve within/.test(err.message)) {
-        console.error("[GoogleSignInButton]", err.message);
-        onError(`Google sign-in hung on ${err.message.split(" did not")[0]} — see Metro console. This is a real, reported issue in this library's version.`); // i18n-ignore
-        return;
-      }
-      console.error("[GoogleSignInButton] non-library error during sign-in:", err);
-      onError(errorText(err, t("auth.google.failed")));
+      console.error("[GoogleSignInButton] sign-in failed:", err);
+      report(classifyGoogleFailure(err));
     } finally {
       setIsSigningIn(false);
     }

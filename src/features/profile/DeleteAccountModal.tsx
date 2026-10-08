@@ -14,16 +14,15 @@ import {
 import {
   GoogleOneTapSignIn,
   isCancelledResponse,
-  isErrorWithCode,
   isNoSavedCredentialFoundResponse,
   isSuccessResponse,
-  statusCodes,
 } from "react-native-nitro-google-signin";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/context/AuthContext";
 import { colors } from "@/theme/colors";
 import { DELETE_ACCOUNT_URL } from "@/config/legal";
 import { ensureGoogleSignInConfigured } from "@/features/auth/googleAuth";
+import { classifyGoogleFailure } from "@/features/auth/googleErrors";
 import { scriptLineHeight } from "@/i18n/layout";
 import { useT } from "@/i18n/useT";
 import { accountService } from "./accountService";
@@ -81,9 +80,8 @@ export const DeleteAccountModal = ({ visible, onClose }: DeleteAccountModalProps
         setError(t("account.googleIncomplete"));
       }
     } catch (err) {
-      if (isErrorWithCode(err) && err.code === statusCodes.SIGN_IN_CANCELLED) {
-        return;
-      }
+      // The same mapping as sign-in: backing out of the picker is not an error.
+      if (classifyGoogleFailure(err).kind === "silent") return;
       setError(t("account.googleFailed"));
     } finally {
       setIsConfirmingGoogle(false);

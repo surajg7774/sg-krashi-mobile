@@ -71,10 +71,9 @@ export const en = {
       backToLogin: "Back to Log In",
     },
     google: {
-      cancelled: "Google sign-in was cancelled or rejected.",
-      unexpected: "Google sign-in did not complete (unexpected response). Please try again.",
-      failedWithCode: "Google sign-in failed ({code}): {message}",
-      failed: "Could not sign in with Google. Please try again.",
+      failed: "Google sign-in didn't work. Please try again or log in with your email.",
+      network: "Couldn't reach Google. Check your internet connection and try again.",
+      playServices: "Google Play services is missing or out of date on this phone. Update it and try again.",
     },
   },
   onboarding: {

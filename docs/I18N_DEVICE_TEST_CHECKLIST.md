@@ -72,3 +72,18 @@ you saw (a photo of the screen helps).
 
 - [ ] Product, crop and place names; reviews; notification and chat text; the server's error messages; the Privacy
       and Terms pages (they are website pages).
+
+## UI fixes round (chips, status bar, Settings, Google messages)
+
+- [ ] Store: the category chips ("Grains", "Pulses & Lentils", ...) show fully, text not cut, and nothing from the product
+      grid peeks out under them. Same on Crop Marketplace (crop types) and Mandi (states and commodities).
+- [ ] Repeat with Settings > Display > Font size set to Largest, and in हिन्दी: chips stay whole.
+- [ ] Weather, Home, Profile, Login, Register, OTP: the title/first line is clear of the clock and battery icons. Try a
+      phone with a notch / camera hole too.
+- [ ] Profile: gear at the top right opens Settings (big enough to tap easily). Log out is still at the bottom of Profile.
+- [ ] Settings: language switch works and is remembered; Privacy Policy and Terms open the website; the app version shows;
+      Delete account is alone in the bottom section and its confirmation window is the same as before.
+- [ ] Login: tap "Sign in with Google" and back out of the account picker: no red message.
+- [ ] Login with airplane mode on, tap Google: "Couldn't reach Google..." (हिन्दी: "Google से जुड़ा नहीं जा सका...").
+- [ ] A Google account that the server does not accept: "Google sign-in didn't work. Please try again or log in with
+      your email." No codes, no English text in हिन्दी, nothing about Cloud Console.

@@ -19,9 +19,9 @@ needs the owner's call is listed under **Open questions** at the end.
   "PDF" are unchanged.
 - **D4 - Legal text stays in English.** The Privacy Policy and Terms pages are web pages; only the link labels that open
   them are translated. *TODO:* a Hindi version of the legal pages needs a reviewed translation and is out of scope.
-- **D5 - Developer diagnostics stay in English.** The Google sign-in setup hints (DEVELOPER_ERROR, Cloud Console test
-  users, "see Metro console") are for whoever configures the app, not for farmers. They are marked `// i18n-ignore`.
-  The user-facing part of each of those messages is translated.
+- **D5 - Developer diagnostics never reach the screen.** The Google sign-in setup hints (DEVELOPER_ERROR, Cloud Console
+  test users, SHA-1) used to be appended to a red message. They are now only logged, and only in development builds
+  (`__DEV__`); see D17. The people who use the app see translated text or nothing.
 - **D6 - Language names in the Crop Doctor "report language" list stay as they are.** Each is already written in its
   own script ("हिन्दी (Hindi)", "मराठी (Marathi)"). That list controls the AI report's language, not the app's
   language. It is a separate setting, as on the website.
@@ -73,6 +73,19 @@ needs the owner's call is listed under **Open questions** at the end.
   - In Hindi these are named ("स्वस्थ", "किसान").
   - English keeps showing the code exactly as before.
   - A code the app does not know is shown as sent.
+
+- **D17 - Google sign-in messages.**
+  - `src/features/auth/googleErrors.ts` maps every failure to one of: nothing (the person cancelled, or another
+    sign-in is already running), "Couldn't reach Google..." (network, timeout), "Google Play services is missing or
+    out of date...", or "Google sign-in didn't work. Please try again or log in with your email.".
+  - Cancelling the account picker shows **nothing** (my choice over a grey "cancelled" line). It is not an error, and
+    a neutral line would add UI state to Login and Register for no benefit. The old "check Test users" hint for a
+    "cancelled" answer is logged under `__DEV__` only, so a wrongly configured build is still easy to spot.
+  - Server wording is not shown for Google failures (it could be English); the generic message is used instead.
+  - Login, Register and the account-deletion Google step share this mapping.
+- **D18 - Settings screen.** Language, Privacy Policy, Terms, app version and Delete account live on a Settings screen
+  (gear at the top right of Profile). Profile keeps the person's name, email, role, Notifications, My Orders and Log out.
+  Delete account sits alone in a "danger" section at the bottom; its confirmation flow is unchanged.
 
 ## Open questions
 

@@ -77,7 +77,7 @@ const NON_UI_TEXTS = [/^Authorization$/, /^Bearer /, /^Content-Type$/, /must be 
 // Calls whose string arguments are route names, storage keys or patterns - never text.
 const NON_UI_CALLEES = /(^|\.)(navigate|push|replace|reset|getParent|setParams|jumpTo|dispatch|addListener|getItem|setItem|removeItem|includes|startsWith|endsWith|split|join|getNavigation)$/;
 // Object keys whose value is a route name or other identifier.
-const NON_UI_OBJECT_KEYS = new Set(["screen", "tab", "route", "icon", "initialRouteName", "routeName", "queryKey", "key", "id", "type", "status"]);
+const NON_UI_OBJECT_KEYS = new Set(["devNote", "screen", "tab", "route", "icon", "initialRouteName", "routeName", "queryKey", "key", "id", "type", "status"]);
 
 const insideNonUiCall = (node, sf) => {
   for (let p = node.parent; p && !ts.isSourceFile(p); p = p.parent) {
