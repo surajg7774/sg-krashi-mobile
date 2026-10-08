@@ -9,11 +9,9 @@ export const hi: Messages = {
     retry: "फिर से कोशिश करें",
     cancel: "रद्द करें",
     remove: "हटाएं",
-    save: "सेव करें",
     next: "आगे",
     previous: "पिछला",
     total: "कुल",
-    loading: "लोड हो रहा है…",
     new: "नया",
     select: "चुनें…",
     takePhoto: "📷 फ़ोटो लें",
@@ -25,7 +23,6 @@ export const hi: Messages = {
     english: "English",
     hindi: "हिन्दी",
     switchTo: "ऐप की भाषा बदलें",
-    selected: "{language}, चुनी गई",
   },
   errors: {
     network: "इंटरनेट कनेक्शन नहीं है। कृपया कनेक्शन जांचें और फिर से कोशिश करें।",
@@ -131,7 +128,6 @@ export const hi: Messages = {
   crops: {
     browse: {
       title: "फसल बाज़ार",
-      subtitle: "ताज़ा अनाज, दाल और सब्ज़ी की खेप, सीधे खेत से बेची जाती है।",
       filters: "फ़िल्टर",
       empty: "आपके फ़िल्टर से मेल खाने वाली कोई फसल लिस्टिंग नहीं मिली।",
       emptySearch: '"{search}" के लिए कोई फसल लिस्टिंग नहीं मिली।',

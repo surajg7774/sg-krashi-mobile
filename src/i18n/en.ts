@@ -17,11 +17,9 @@ export const en = {
     retry: "Retry",
     cancel: "Cancel",
     remove: "Remove",
-    save: "Save",
     next: "Next",
     previous: "Previous",
     total: "Total",
-    loading: "Loading…",
     new: "New",
     select: "Select…",
     takePhoto: "📷 Take Photo",
@@ -33,7 +31,6 @@ export const en = {
     english: "English",
     hindi: "हिन्दी",
     switchTo: "Change app language",
-    selected: "{language}, selected",
   },
   errors: {
     network: "No internet connection. Please check your connection and try again.",
@@ -141,7 +138,6 @@ export const en = {
   crops: {
     browse: {
       title: "Crop Marketplace",
-      subtitle: "Fresh grain, pulse, and vegetable batches, sold directly from the farm.",
       filters: "Filters",
       empty: "No crop listings match your filters.",
       emptySearch: 'No crop listings found for "{search}".',

@@ -70,7 +70,8 @@ test("{name} placeholders are filled; a missing value is left visible; text with
   assert.equal(interpolate("Hello {name}", {}), "Hello {name}");
   assert.equal(interpolate("Price {x} {x}", { x: "₹5" }), "Price ₹5 ₹5");
   assert.equal(interpolate("No params here {name}"), "No params here {name}");
-  assert.equal(translate("en", "language.selected", { language: "English" }), "English, selected");
+  assert.equal(translate("en", "auth.otp.resendIn", { seconds: 30 }), "Resend in 30s");
+  assert.equal(translate("hi", "auth.otp.resendIn", { seconds: 30 }), "30 सेकंड में दोबारा भेजें");
 });
 
 test("plural rules: English 'one' is exactly 1; Hindi 'one' is 0 and 1", () => {
