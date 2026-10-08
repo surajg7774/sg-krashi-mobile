@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { colors } from "@/theme/colors";
@@ -14,16 +14,19 @@ import { ListRowSkeletonList } from "@/components/Skeleton";
 import { LastUpdated } from "@/components/LastUpdated";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { useOfflineData } from "@/offline/useOfflineData";
-import { shouldShowFullError, shouldShowOfflineBanner } from "@/offline/screenState";
+import { shouldShowFullError, shouldShowOfflineBanner, shouldFetchNextPage } from "@/offline/screenState";
+import { LoadMoreFooter } from "@/components/LoadMoreFooter";
+import { StaleOrderCue } from "@/components/StaleOrderCue";
 import { useT } from "@/i18n/useT";
 
 type Navigation = NativeStackNavigationProp<MainStackParamList, "OrderHistory">;
 const PAGE_SIZE = 10;
 
-const OrderRow = ({ order, onPress }: { order: OrderSummary; onPress: () => void }) => {
+const OrderRow = ({ order, onPress, stale }: { order: OrderSummary; onPress: () => void; stale: boolean }) => {
   const { t, lang } = useT();
   return (
     <Pressable style={({ pressed }) => [styles.row, pressed && { opacity: 0.6 }]} onPress={onPress}>
+      <View style={styles.rowMain}>
       <View style={styles.rowLeft}>
         <Text style={styles.orderNumber}>#{order.orderNumber}</Text>
         <Text style={styles.itemCount}>
@@ -32,10 +35,13 @@ const OrderRow = ({ order, onPress }: { order: OrderSummary; onPress: () => void
       </View>
       <View style={styles.rowRight}>
         <Text style={styles.amount}>₹{order.totalAmount}</Text>
-        <View style={[styles.statusChip, { borderColor: orderStatusColor(order.status), backgroundColor: `${orderStatusColor(order.status)}1A` }]}>
+        <View style={[styles.statusChip, stale && styles.statusChipStale, { borderColor: orderStatusColor(order.status), backgroundColor: `${orderStatusColor(order.status)}1A` }]}>
           <Text style={[styles.statusChipText, { color: orderStatusColor(order.status) }]}>{orderStatusLabel(order.status, lang)}</Text>
         </View>
       </View>
+      </View>
+      {/* A status read from the saved copy may have moved on: say so on the row itself, next to the chip. */}
+      {stale && <StaleOrderCue align="right" />}
     </Pressable>
   );
 };
@@ -95,28 +101,20 @@ export const OrderHistoryScreen = () => {
       data={orders}
       keyExtractor={(o) => String(o.id)}
       renderItem={({ item }) => (
-        <OrderRow order={item} onPress={() => navigation.navigate("OrderConfirmation", { orderId: item.id })} />
+        <OrderRow order={item} stale={offline.isShowingOfflineData} onPress={() => navigation.navigate("OrderConfirmation", { orderId: item.id })} />
       )}
       contentContainerStyle={styles.list}
       ListHeaderComponent={
         <>
           <OfflineBanner visible={shouldShowOfflineBanner(offline)} onRetry={() => void ordersQuery.refetch()} />
-          <LastUpdated
-            timestamp={offline.lastUpdatedAt}
-            isShowingOfflineData={offline.isShowingOfflineData}
-            offlineNote={t("offline.orderMayBeOutOfDate")}
-          />
+          <LastUpdated timestamp={offline.lastUpdatedAt} isShowingOfflineData={offline.isShowingOfflineData} />
         </>
       }
       onEndReachedThreshold={0.4}
       onEndReached={() => {
-        if (ordersQuery.hasNextPage && !ordersQuery.isFetchingNextPage) {
-          void ordersQuery.fetchNextPage();
-        }
-      }}
-      ListFooterComponent={
-        ordersQuery.isFetchingNextPage ? <ActivityIndicator style={styles.footerLoader} color={colors.primary} /> : null
-      }
+            if (shouldFetchNextPage(ordersQuery)) void ordersQuery.fetchNextPage();
+          }}
+      ListFooterComponent={<LoadMoreFooter query={ordersQuery} />}
     />
   );
 };
@@ -135,8 +133,6 @@ const styles = StyleSheet.create({
   browseButtonText: { color: colors.primaryContrastText, fontWeight: "600" },
   list: { padding: 16, backgroundColor: colors.background },
   row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
     backgroundColor: colors.surface,
     borderRadius: 12,
     borderWidth: 1,
@@ -144,12 +140,14 @@ const styles = StyleSheet.create({
     padding: 14,
     marginBottom: 10,
   },
+  rowMain: { flexDirection: "row", justifyContent: "space-between" },
   rowLeft: {},
   orderNumber: { fontSize: 14, fontWeight: "700", color: colors.textPrimary },
   itemCount: { fontSize: 12, color: colors.textSecondary, marginTop: 2 },
   rowRight: { alignItems: "flex-end" },
   amount: { fontSize: 14, fontWeight: "700", color: colors.primary },
   statusChip: { marginTop: 4, borderWidth: 1, borderRadius: 10, paddingHorizontal: 8, paddingVertical: 2 },
+  statusChipStale: { borderStyle: "dashed" },
   statusChipText: { fontSize: 11, fontWeight: "700" },
   footerLoader: { marginVertical: 16 },
 });

@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { ActivityIndicator, FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, StyleSheet, Text, View } from "react-native";
 import { colors } from "@/theme/colors";
 import { ChipRow } from "@/components/ChipRow";
 import { ErrorState } from "@/components/ErrorState";
@@ -11,6 +11,8 @@ import { resolveMandiAvailability } from "./mandiAvailability";
 import { MandiTrendCard } from "./MandiTrendCard";
 import type { MandiPrice } from "./types";
 import { formatDate } from "@/i18n/format";
+import { shouldFetchNextPage } from "@/offline/screenState";
+import { LoadMoreFooter } from "@/components/LoadMoreFooter";
 import { useT } from "@/i18n/useT";
 
 const PAGE_SIZE = 20;
@@ -142,13 +144,9 @@ export const MandiScreen = () => {
           onRefresh={() => void pricesQuery.refetch()}
           onEndReachedThreshold={0.4}
           onEndReached={() => {
-            if (pricesQuery.hasNextPage && !pricesQuery.isFetchingNextPage) {
-              void pricesQuery.fetchNextPage();
-            }
+            if (shouldFetchNextPage(pricesQuery)) void pricesQuery.fetchNextPage();
           }}
-          ListFooterComponent={
-            pricesQuery.isFetchingNextPage ? <ActivityIndicator style={styles.footerLoader} color={colors.primary} /> : null
-          }
+          ListFooterComponent={<LoadMoreFooter query={pricesQuery} />}
         />
       )}
     </View>

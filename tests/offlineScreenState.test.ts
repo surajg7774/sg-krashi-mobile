@@ -4,6 +4,9 @@ import { test } from "node:test";
 import {
   STALE_LABEL_AFTER_MS,
   canOfferPayment,
+  combineOfflineStates,
+  shouldFetchNextPage,
+  showLoadMoreOfflineNote,
   formatLastUpdated,
   orderAddressView,
   shouldShowFullError,
@@ -11,6 +14,7 @@ import {
   shouldShowOfflineBanner,
 } from "../src/offline/screenState.ts";
 import { describeOfflineData } from "../src/offline/offlineError.ts";
+import { translate } from "../src/i18n/index.ts";
 import { roundCoordinate } from "../src/features/weather/coordinates.ts";
 import { stripOrderAddress } from "../src/offline/sanitize.ts";
 
@@ -152,10 +156,17 @@ for (const [path, decision] of SCREENS) {
   });
 }
 
-test("weather uses the 'Last updated' label always; the order screens add the 'may be out of date' note", () => {
+test("weather uses the 'Last updated' label always; order statuses from a saved copy carry the 'may be out of date' cue", () => {
   assert.match(read("../src/features/weather/WeatherScreen.tsx"), /<LastUpdated[^>]*\balways\b/);
-  assert.match(read("../src/features/orders/OrderHistoryScreen.tsx"), /offlineNote=\{t\("offline\.orderMayBeOutOfDate"\)\}/);
-  assert.match(read("../src/features/orders/OrderConfirmationScreen.tsx"), /offlineNote=\{t\("offline\.orderMayBeOutOfDate"\)\}/);
+  // On the list the cue sits on every row, beside the (dashed) status chip ...
+  const history = read("../src/features/orders/OrderHistoryScreen.tsx");
+  assert.match(history, /\{stale && <StaleOrderCue align="right" \/>\}/);
+  assert.match(history, /stale=\{offline\.isShowingOfflineData\}/);
+  assert.match(history, /statusChipStale: \{ borderStyle: "dashed" \}/);
+  // ... and on the order screen directly under the status badge.
+  assert.match(read("../src/features/orders/OrderConfirmationScreen.tsx"), /\{offline\.isShowingOfflineData && <StaleOrderCue \/>\}/);
+  // The cue says it with the existing wording.
+  assert.match(read("../src/components/StaleOrderCue.tsx"), /t\("offline\.orderMayBeOutOfDate"\)/);
 });
 
 test("the order screen offers payment only through canOfferPayment", () => {
@@ -173,4 +184,83 @@ test("in Hindi, 'Last updated' reads the Hindi way round and the address note is
   assert.equal(formatLastUpdated(at(2025, 11, 25, 18, 30), now, "hi"), "25 दिसंबर 2025, 6:30 PM पर अपडेट हुआ");
   assert.equal(formatLastUpdated(null, now, "hi"), null);
   assert.deepEqual(orderAddressView({ shippingLine1: "", shippingPincode: "" }, "hi"), { kind: "online-only", note: "पता ऑनलाइन होने पर दिखेगा" });
+});
+
+// ---- Home: two cached sections, one banner ---------------------------------------------------------------------
+
+test("two saved sections on one screen: banner if either is a saved copy, 'last updated' is the older time", () => {
+  assert.deepEqual(combineOfflineStates([{ isShowingOfflineData: true, lastUpdatedAt: 5000 }, { isShowingOfflineData: false, lastUpdatedAt: 9000 }]), {
+    isShowingOfflineData: true,
+    lastUpdatedAt: 5000,
+  });
+  assert.deepEqual(combineOfflineStates([{ isShowingOfflineData: false, lastUpdatedAt: 7000 }, { isShowingOfflineData: false, lastUpdatedAt: 3000 }]), {
+    isShowingOfflineData: false,
+    lastUpdatedAt: 3000,
+  });
+  assert.deepEqual(combineOfflineStates([{ isShowingOfflineData: false, lastUpdatedAt: null }, { isShowingOfflineData: true, lastUpdatedAt: 4000 }]), {
+    isShowingOfflineData: true,
+    lastUpdatedAt: 4000,
+  });
+  assert.deepEqual(combineOfflineStates([]), { isShowingOfflineData: false, lastUpdatedAt: null });
+});
+
+test("Home shows an error box only for a section that has nothing to show, and one banner for both", () => {
+  const home = read("../src/features/home/HomeScreen.tsx");
+  assert.match(home, /shouldShowFullError\(productsQuery\)/);
+  assert.match(home, /shouldShowFullError\(cropsQuery\)/);
+  assert.doesNotMatch(home, /(products|crops)Query\.isError\s*&&/);
+  assert.match(home, /combineOfflineStates\(\[useOfflineData\(productsQuery\), useOfflineData\(cropsQuery\)\]\)/);
+  assert.match(home, /<OfflineBanner\s+visible=\{shouldShowOfflineBanner\(offline\)\}/);
+});
+
+// ---- "load more" while offline ----------------------------------------------------------------------------------
+
+const paged = (over: Partial<Parameters<typeof shouldFetchNextPage>[0]> = {}) => ({
+  hasNextPage: true,
+  isFetchingNextPage: false,
+  isFetchNextPageError: false,
+  error: null as unknown,
+  ...over,
+});
+
+test("the next page is fetched at the end of the list, but not while loading, with no more pages, or straight after a failure", () => {
+  assert.equal(shouldFetchNextPage(paged()), true);
+  assert.equal(shouldFetchNextPage(paged({ hasNextPage: false })), false);
+  assert.equal(shouldFetchNextPage(paged({ hasNextPage: undefined })), false);
+  assert.equal(shouldFetchNextPage(paged({ isFetchingNextPage: true })), false);
+  assert.equal(shouldFetchNextPage(paged({ isFetchNextPageError: true, error: { code: "NETWORK_ERROR" } })), false);
+});
+
+test("'Connect to the internet to load more.' shows only when the next page failed for lack of connection", () => {
+  assert.equal(showLoadMoreOfflineNote(paged({ isFetchNextPageError: true, error: { code: "NETWORK_ERROR" } })), true);
+  assert.equal(showLoadMoreOfflineNote(paged({ isFetchNextPageError: true, error: { code: "SERVER_ERROR", status: 500 } })), false);
+  assert.equal(showLoadMoreOfflineNote(paged({ isFetchNextPageError: false, error: { code: "NETWORK_ERROR" } })), false);
+  assert.equal(showLoadMoreOfflineNote(paged()), false);
+});
+
+test("every paged list uses the shared footer and the guarded end-reached decision", () => {
+  const lists: [string, string][] = [
+    ["../src/features/store/StoreScreen.tsx", "productsQuery"],
+    ["../src/features/crop-marketplace/CropMarketplaceScreen.tsx", "listingsQuery"],
+    ["../src/features/orders/OrderHistoryScreen.tsx", "ordersQuery"],
+    ["../src/features/notifications/NotificationCenterScreen.tsx", "notificationsQuery"],
+    ["../src/features/farmer/FarmerListingsScreen.tsx", "listingsQuery"],
+    ["../src/features/farmer/FarmerPayoutsScreen.tsx", "payoutsQuery"],
+    ["../src/features/mandi/MandiScreen.tsx", "pricesQuery"],
+  ];
+  for (const [path, q] of lists) {
+    const source = read(path);
+    assert.ok(source.includes(`shouldFetchNextPage(${q})`), path);
+    assert.ok(source.includes(`<LoadMoreFooter query={${q}} />`), path);
+    assert.doesNotMatch(source, new RegExp(`${q}\.hasNextPage && !${q}\.isFetchingNextPage`), `${path} still has the unguarded check`);
+  }
+  assert.match(read("../src/features/crop-marketplace/CropReviews.tsx"), /showLoadMoreOfflineNote\(query\)/);
+});
+
+test("the load-more line is a translated, tappable note in both languages", () => {
+  assert.equal(translate("en", "offline.loadMoreNeedsInternet"), "Connect to the internet to load more.");
+  assert.match(translate("hi", "offline.loadMoreNeedsInternet"), /[ऀ-ॿ]/);
+  const footer = read("../src/components/LoadMoreFooter.tsx");
+  assert.match(footer, /t\("offline\.loadMoreNeedsInternet"\)/);
+  assert.match(footer, /accessibilityRole="button"/);
 });

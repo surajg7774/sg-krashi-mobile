@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useDebouncedValue } from "@/shared/useDebouncedValue";
@@ -14,11 +14,12 @@ import { CropListingCard } from "./CropListingCard";
 import { CropFilterSheet } from "./CropFilterSheet";
 import { EMPTY_FILTERS, activeFilterCount, toListingQuery, type CropFilters } from "./cropLogic";
 import { ChipRow } from "@/components/ChipRow";
+import { LoadMoreFooter } from "@/components/LoadMoreFooter";
 import { useT } from "@/i18n/useT";
 import { LastUpdated } from "@/components/LastUpdated";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { useOfflineData } from "@/offline/useOfflineData";
-import { shouldShowFullError, shouldShowOfflineBanner } from "@/offline/screenState";
+import { shouldShowFullError, shouldShowOfflineBanner, shouldFetchNextPage } from "@/offline/screenState";
 
 const PAGE_SIZE = 12;
 
@@ -133,11 +134,9 @@ export const CropMarketplaceScreen = () => {
           onRefresh={() => void listingsQuery.refetch()}
           onEndReachedThreshold={0.4}
           onEndReached={() => {
-            if (listingsQuery.hasNextPage && !listingsQuery.isFetchingNextPage) {
-              void listingsQuery.fetchNextPage();
-            }
+            if (shouldFetchNextPage(listingsQuery)) void listingsQuery.fetchNextPage();
           }}
-          ListFooterComponent={listingsQuery.isFetchingNextPage ? <ActivityIndicator style={styles.footerLoader} color={colors.primary} /> : null}
+          ListFooterComponent={<LoadMoreFooter query={listingsQuery} />}
         />
       )}
 

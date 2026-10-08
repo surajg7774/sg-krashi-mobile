@@ -35,6 +35,10 @@ import { Rating } from "@/components/Rating";
 import { cardShadow } from "@/theme/shadow";
 import { screenTopPadding } from "@/theme/insets";
 import type { MessageKey } from "@/i18n";
+import { LastUpdated } from "@/components/LastUpdated";
+import { OfflineBanner } from "@/components/OfflineBanner";
+import { useOfflineData } from "@/offline/useOfflineData";
+import { combineOfflineStates, shouldShowFullError, shouldShowOfflineBanner } from "@/offline/screenState";
 import { useT } from "@/i18n/useT";
 
 // Composite because Home needs to navigate both within its own tab
@@ -128,6 +132,9 @@ export const HomeScreen = () => {
     refetchInterval: 60_000,
   });
 
+  // Products and crops are both kept for offline reading: one banner for the page, "last updated" = the older of the two.
+  const offline = combineOfflineStates([useOfflineData(productsQuery), useOfflineData(cropsQuery)]);
+
   const isRefreshing = productsQuery.isRefetching || cartQuery.isRefetching || cropsQuery.isRefetching;
   const onRefresh = () => {
     void productsQuery.refetch();
@@ -179,11 +186,22 @@ export const HomeScreen = () => {
         ))}
       </View>
 
+      <View style={styles.offlineWrap}>
+        <OfflineBanner
+          visible={shouldShowOfflineBanner(offline)}
+          onRetry={() => {
+            void productsQuery.refetch();
+            void cropsQuery.refetch();
+          }}
+        />
+        <LastUpdated timestamp={offline.lastUpdatedAt} isShowingOfflineData={offline.isShowingOfflineData} />
+      </View>
+
       <Text style={styles.sectionTitle}>{t("home.featuredProducts")}</Text>
 
       {productsQuery.isLoading && <CardSkeletonGrid count={4} />}
 
-      {productsQuery.isError && (
+      {shouldShowFullError(productsQuery) && (
         <ErrorState message={t("home.productsLoadError")} onRetry={() => void productsQuery.refetch()} />
       )}
 
@@ -218,7 +236,7 @@ export const HomeScreen = () => {
         </View>
       )}
 
-      {cropsQuery.isError && <ErrorState message={t("crops.browse.loadError")} onRetry={() => void cropsQuery.refetch()} />}
+      {shouldShowFullError(cropsQuery) && <ErrorState message={t("crops.browse.loadError")} onRetry={() => void cropsQuery.refetch()} />}
 
       {cropsQuery.data && cropsQuery.data.items.length === 0 && <EmptyState icon="🌾" message={t("crops.browse.homeEmpty")} />}
 
@@ -247,6 +265,7 @@ export const HomeScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  offlineWrap: { paddingHorizontal: 16 },
   container: {
     flex: 1,
     backgroundColor: colors.background,

@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { colors } from "@/theme/colors";
 import { ErrorState } from "@/components/ErrorState";
 import { EmptyState } from "@/components/EmptyState";
@@ -9,6 +9,8 @@ import { notificationService } from "./notificationService";
 import { navigateToNotificationTarget } from "@/navigation/navigationRef";
 import type { AppNotification } from "./types";
 import type { TFunction } from "@/i18n";
+import { shouldFetchNextPage } from "@/offline/screenState";
+import { LoadMoreFooter } from "@/components/LoadMoreFooter";
 import { useT } from "@/i18n/useT";
 
 const PAGE_SIZE = 20;
@@ -109,13 +111,9 @@ export const NotificationCenterScreen = () => {
           onRefresh={() => void notificationsQuery.refetch()}
           onEndReachedThreshold={0.4}
           onEndReached={() => {
-            if (notificationsQuery.hasNextPage && !notificationsQuery.isFetchingNextPage) {
-              void notificationsQuery.fetchNextPage();
-            }
+            if (shouldFetchNextPage(notificationsQuery)) void notificationsQuery.fetchNextPage();
           }}
-          ListFooterComponent={
-            notificationsQuery.isFetchingNextPage ? <ActivityIndicator style={styles.footerLoader} color={colors.primary} /> : null
-          }
+          ListFooterComponent={<LoadMoreFooter query={notificationsQuery} />}
         />
       )}
     </View>

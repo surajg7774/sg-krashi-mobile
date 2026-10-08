@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import {
-  ActivityIndicator,
   FlatList,
   Pressable,
   StyleSheet,
@@ -17,6 +16,7 @@ import { colors } from "@/theme/colors";
 import { MEDIA_WIDTH, resizedMediaUrl } from "@/shared/media";
 import { cardShadow } from "@/theme/shadow";
 import { ChipRow } from "@/components/ChipRow";
+import { LoadMoreFooter } from "@/components/LoadMoreFooter";
 import { useT } from "@/i18n/useT";
 import { productService } from "./productService";
 import type { ProductSummary } from "./types";
@@ -30,7 +30,7 @@ import { Rating } from "@/components/Rating";
 import { LastUpdated } from "@/components/LastUpdated";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { useOfflineData } from "@/offline/useOfflineData";
-import { shouldShowFullError, shouldShowOfflineBanner } from "@/offline/screenState";
+import { shouldShowFullError, shouldShowOfflineBanner, shouldFetchNextPage } from "@/offline/screenState";
 
 const PAGE_SIZE = 12;
 
@@ -180,15 +180,9 @@ export const StoreScreen = () => {
           onRefresh={() => void productsQuery.refetch()}
           onEndReachedThreshold={0.4}
           onEndReached={() => {
-            if (productsQuery.hasNextPage && !productsQuery.isFetchingNextPage) {
-              void productsQuery.fetchNextPage();
-            }
+            if (shouldFetchNextPage(productsQuery)) void productsQuery.fetchNextPage();
           }}
-          ListFooterComponent={
-            productsQuery.isFetchingNextPage ? (
-              <ActivityIndicator style={styles.footerLoader} color={colors.primary} />
-            ) : null
-          }
+          ListFooterComponent={<LoadMoreFooter query={productsQuery} />}
         />
       )}
     </View>

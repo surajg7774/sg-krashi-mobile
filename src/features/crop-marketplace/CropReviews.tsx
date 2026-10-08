@@ -4,6 +4,8 @@ import { colors } from "@/theme/colors";
 import { ErrorState } from "@/components/ErrorState";
 import { cropService } from "./cropService";
 import { formatInstantIndia, starsText } from "./cropLogic";
+import { LoadMoreOfflineNote } from "@/components/LoadMoreFooter";
+import { showLoadMoreOfflineNote } from "@/offline/screenState";
 import { useT } from "@/i18n/useT";
 
 const PAGE_SIZE = 5;
@@ -58,7 +60,9 @@ export const CropReviews = ({ listingId }: { listingId: number }) => {
         </View>
       ))}
 
-      {query.hasNextPage && (
+      {query.hasNextPage && showLoadMoreOfflineNote(query) && <LoadMoreOfflineNote onRetry={() => void query.fetchNextPage()} />}
+
+      {query.hasNextPage && !showLoadMoreOfflineNote(query) && (
         <Pressable
           style={({ pressed }) => [styles.moreButton, pressed && { opacity: 0.6 }]}
           disabled={query.isFetchingNextPage}

@@ -556,6 +556,7 @@ export const en = {
     addressOnlineOnly: "Address shown when online",
     addToCartNeedsInternet: "Connect to the internet to add to cart",
     payNeedsInternet: "Connect to the internet to pay.",
+    loadMoreNeedsInternet: "Connect to the internet to load more.",
   },
 } as const;
 

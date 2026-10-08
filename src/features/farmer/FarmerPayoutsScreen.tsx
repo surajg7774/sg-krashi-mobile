@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { colors } from "@/theme/colors";
@@ -11,6 +11,8 @@ import { farmerPayoutService } from "./farmerPayoutService";
 import type { FarmerPayoutSummary, PayoutStatus } from "./types";
 import type { FarmerStackParamList } from "@/navigation/FarmerStackNavigator";
 import { PAYOUT_STATUS_KEY } from "./payoutLabels";
+import { shouldFetchNextPage } from "@/offline/screenState";
+import { LoadMoreFooter } from "@/components/LoadMoreFooter";
 import { useT } from "@/i18n/useT";
 
 const PAGE_SIZE = 20;
@@ -88,13 +90,9 @@ export const FarmerPayoutsScreen = () => {
           contentContainerStyle={styles.list}
           onEndReachedThreshold={0.4}
           onEndReached={() => {
-            if (payoutsQuery.hasNextPage && !payoutsQuery.isFetchingNextPage) {
-              void payoutsQuery.fetchNextPage();
-            }
+            if (shouldFetchNextPage(payoutsQuery)) void payoutsQuery.fetchNextPage();
           }}
-          ListFooterComponent={
-            payoutsQuery.isFetchingNextPage ? <ActivityIndicator style={styles.footerLoader} color={colors.primary} /> : null
-          }
+          ListFooterComponent={<LoadMoreFooter query={payoutsQuery} />}
         />
       )}
     </View>

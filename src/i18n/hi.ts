@@ -541,5 +541,6 @@ export const hi: Messages = {
     addressOnlineOnly: "पता ऑनलाइन होने पर दिखेगा",
     addToCartNeedsInternet: "कार्ट में जोड़ने के लिए इंटरनेट से जुड़ें",
     payNeedsInternet: "भुगतान के लिए इंटरनेट से जुड़ें।",
+    loadMoreNeedsInternet: "और देखने के लिए इंटरनेट से जुड़ें।",
   },
 };

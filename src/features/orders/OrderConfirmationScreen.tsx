@@ -22,6 +22,7 @@ import { LastUpdated } from "@/components/LastUpdated";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { useOfflineData } from "@/offline/useOfflineData";
 import { canOfferPayment, orderAddressView, shouldShowFullError, shouldShowOfflineBanner } from "@/offline/screenState";
+import { StaleOrderCue } from "@/components/StaleOrderCue";
 import { useT } from "@/i18n/useT";
 
 type Navigation = NativeStackNavigationProp<MainStackParamList, "OrderConfirmation">;
@@ -137,13 +138,11 @@ export const OrderConfirmationScreen = () => {
         <Text style={styles.title}>{orderStatusTitle(order.status, lang)}</Text>
         <Text style={styles.orderNumber}>{t("orders.orderNumber", { number: order.orderNumber })}</Text>
         <Text style={[styles.statusBadge, { color: orderStatusColor(order.status) }]}>{orderStatusLabel(order.status, lang)}</Text>
+        {/* The status below may have moved on since the copy was saved: say so right under it. */}
+        {offline.isShowingOfflineData && <StaleOrderCue />}
         <Text style={styles.amount}>₹{order.totalAmount}</Text>
         <OfflineBanner visible={shouldShowOfflineBanner(offline)} onRetry={() => void orderQuery.refetch()} />
-        <LastUpdated
-          timestamp={offline.lastUpdatedAt}
-          isShowingOfflineData={offline.isShowingOfflineData}
-          offlineNote={t("offline.orderMayBeOutOfDate")}
-        />
+        <LastUpdated timestamp={offline.lastUpdatedAt} isShowingOfflineData={offline.isShowingOfflineData} />
 
         {order.items.map((item) => (
           <Pressable

@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { Image } from "expo-image";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -9,6 +9,8 @@ import { colors } from "@/theme/colors";
 import { MEDIA_WIDTH, resizedMediaUrl } from "@/shared/media";
 import { farmerListingStatus, formatRupees, trimName, type FarmerListingStatus } from "@/features/crop-marketplace/cropLogic";
 import type { MessageKey } from "@/i18n";
+import { shouldFetchNextPage } from "@/offline/screenState";
+import { LoadMoreFooter } from "@/components/LoadMoreFooter";
 import { useT } from "@/i18n/useT";
 import { ErrorState } from "@/components/ErrorState";
 import { EmptyState } from "@/components/EmptyState";
@@ -117,13 +119,9 @@ export const FarmerListingsScreen = () => {
           onRefresh={() => void listingsQuery.refetch()}
           onEndReachedThreshold={0.4}
           onEndReached={() => {
-            if (listingsQuery.hasNextPage && !listingsQuery.isFetchingNextPage) {
-              void listingsQuery.fetchNextPage();
-            }
+            if (shouldFetchNextPage(listingsQuery)) void listingsQuery.fetchNextPage();
           }}
-          ListFooterComponent={
-            listingsQuery.isFetchingNextPage ? <ActivityIndicator style={styles.footerLoader} color={colors.primary} /> : null
-          }
+          ListFooterComponent={<LoadMoreFooter query={listingsQuery} />}
         />
       )}
     </View>
