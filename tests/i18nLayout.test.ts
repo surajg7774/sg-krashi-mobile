@@ -75,3 +75,21 @@ test("labels in small fixed slots stay short enough in both languages", () => {
     }
   }
 });
+
+// Texts with placeholders, measured with a realistic filled-in value (the longest the screen is likely to show).
+test("labels with a filled-in value stay short enough for their slot in both languages", () => {
+  const fill = (text: string, values: Record<string, string>): string => text.replace(/\{(\w+)\}/g, (_m, name: string) => values[name] ?? "");
+  const slots: { key: string; values: Record<string, string>; max: number; where: string }[] = [
+    { key: "farmer.payouts.net", values: { amount: "123456.78" }, max: 26, where: "payout row amount (beside the status badge)" },
+    { key: "farmer.payouts.approvedAt", values: { date: "28 सितंबर 2026, 12:00 PM" }, max: 60, where: "payout detail meta line (full width, 12sp)" },
+    { key: "farmer.payouts.paidAt", values: { date: "28 सितंबर 2026, 12:00 PM" }, max: 60, where: "payout detail meta line (full width, 12sp)" },
+    { key: "weather.tonightLow", values: {}, max: 32, where: "weather stat box label (half width, may wrap to two lines)" },
+    { key: "mandi.lastSynced", values: { date: "28 सितंबर 2026" }, max: 50, where: "mandi sync line" },
+  ];
+  for (const slot of slots) {
+    for (const [lang, dict] of [["en", en], ["hi", hi]] as const) {
+      const text = fill(get(dict, slot.key), slot.values);
+      assert.ok(width(text) <= slot.max, `${lang} ${slot.key} "${text}" is too wide for the ${slot.where} (${width(text).toFixed(1)} > ${slot.max})`);
+    }
+  }
+});
