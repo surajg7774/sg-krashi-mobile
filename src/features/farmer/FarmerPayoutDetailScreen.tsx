@@ -6,6 +6,9 @@ import { ErrorState } from "@/components/ErrorState";
 import { farmerPayoutService } from "./farmerPayoutService";
 import type { FarmerStackParamList } from "@/navigation/FarmerStackNavigator";
 import type { PayoutStatus } from "./types";
+import { formatDateTime } from "@/i18n/format";
+import { useT } from "@/i18n/useT";
+import { LINE_TYPE_KEY, PAYOUT_STATUS_KEY } from "./payoutLabels";
 
 type DetailRoute = RouteProp<FarmerStackParamList, "FarmerPayoutDetail">;
 
@@ -17,6 +20,7 @@ const statusColor: Record<PayoutStatus, string> = {
 
 export const FarmerPayoutDetailScreen = () => {
   const { params } = useRoute<DetailRoute>();
+  const { t, lang } = useT();
 
   const payoutQuery = useQuery({
     queryKey: ["farmer-payout-detail", params.payoutId],
@@ -34,7 +38,7 @@ export const FarmerPayoutDetailScreen = () => {
   if (payoutQuery.isError || !payoutQuery.data) {
     return (
       <View style={styles.centered}>
-        <ErrorState message="Could not load this payout." onRetry={() => void payoutQuery.refetch()} />
+        <ErrorState message={t("farmer.payouts.detailLoadError")} onRetry={() => void payoutQuery.refetch()} />
       </View>
     );
   }
@@ -47,38 +51,42 @@ export const FarmerPayoutDetailScreen = () => {
         <Text style={styles.cycleText}>
           {payout.cycleStartDate} → {payout.cycleEndDate}
         </Text>
-        <Text style={[styles.statusBadge, { color: statusColor[payout.status] }]}>{payout.status}</Text>
+        <Text style={[styles.statusBadge, { color: statusColor[payout.status] }]}>
+          {PAYOUT_STATUS_KEY[payout.status] ? t(PAYOUT_STATUS_KEY[payout.status]) : payout.status}
+        </Text>
 
         <View style={styles.amountsRow}>
           <View style={styles.amountBox}>
-            <Text style={styles.amountLabel}>Gross</Text>
+            <Text style={styles.amountLabel}>{t("farmer.payouts.gross")}</Text>
             <Text style={styles.amountValue}>₹{payout.grossAmount.toFixed(2)}</Text>
           </View>
           <View style={styles.amountBox}>
-            <Text style={styles.amountLabel}>Commission</Text>
+            <Text style={styles.amountLabel}>{t("farmer.payouts.commission")}</Text>
             <Text style={styles.amountValue}>₹{payout.commissionAmount.toFixed(2)}</Text>
           </View>
           <View style={styles.amountBox}>
-            <Text style={styles.amountLabel}>Net</Text>
+            <Text style={styles.amountLabel}>{t("farmer.payouts.netLabel")}</Text>
             <Text style={[styles.amountValue, { color: colors.primary }]}>₹{payout.netAmount.toFixed(2)}</Text>
           </View>
         </View>
 
-        {payout.approvedAt && <Text style={styles.metaText}>Approved: {new Date(payout.approvedAt).toLocaleString()}</Text>}
-        {payout.paidAt && <Text style={styles.metaText}>Paid: {new Date(payout.paidAt).toLocaleString()}</Text>}
+        {payout.approvedAt && <Text style={styles.metaText}>{t("farmer.payouts.approvedAt", { date: formatDateTime(new Date(payout.approvedAt), lang) })}</Text>}
+        {payout.paidAt && <Text style={styles.metaText}>{t("farmer.payouts.paidAt", { date: formatDateTime(new Date(payout.paidAt), lang) })}</Text>}
       </View>
 
-      <Text style={styles.sectionTitle}>Line Items</Text>
+      <Text style={styles.sectionTitle}>{t("farmer.payouts.lineItems")}</Text>
       {payout.lines.map((line) => (
         <View key={line.id} style={styles.lineRow}>
           <View style={{ flex: 1 }}>
             <Text style={styles.lineItemName} numberOfLines={1}>
               {line.itemNameSnapshot}
             </Text>
-            <Text style={styles.lineOrderNumber}>Order #{line.orderNumber}</Text>
+            <Text style={styles.lineOrderNumber}>{t("orders.orderNumber", { number: line.orderNumber })}</Text>
           </View>
           <View style={{ alignItems: "flex-end" }}>
-            <Text style={[styles.lineTypeBadge, line.lineType === "CLAWBACK" && styles.lineTypeClawback]}>{line.lineType}</Text>
+            <Text style={[styles.lineTypeBadge, line.lineType === "CLAWBACK" && styles.lineTypeClawback]}>
+              {LINE_TYPE_KEY[line.lineType] ? t(LINE_TYPE_KEY[line.lineType]) : line.lineType}
+            </Text>
             <Text style={styles.lineAmount}>₹{line.netAmount.toFixed(2)}</Text>
           </View>
         </View>

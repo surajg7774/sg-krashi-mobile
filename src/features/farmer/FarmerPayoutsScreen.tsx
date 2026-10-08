@@ -10,6 +10,8 @@ import { ListRowSkeletonList } from "@/components/Skeleton";
 import { farmerPayoutService } from "./farmerPayoutService";
 import type { FarmerPayoutSummary, PayoutStatus } from "./types";
 import type { FarmerStackParamList } from "@/navigation/FarmerStackNavigator";
+import { PAYOUT_STATUS_KEY } from "./payoutLabels";
+import { useT } from "@/i18n/useT";
 
 const PAGE_SIZE = 20;
 
@@ -21,20 +23,26 @@ const statusColor: Record<PayoutStatus, string> = {
   PAID: colors.success,
 };
 
-const PayoutRow = ({ item, onPress }: { item: FarmerPayoutSummary; onPress: () => void }) => (
-  <Pressable style={({ pressed }) => [styles.row, pressed && { opacity: 0.6 }]} onPress={onPress}>
-    <View style={{ flex: 1 }}>
-      <Text style={styles.cycleText}>
-        {item.cycleStartDate} → {item.cycleEndDate}
+const PayoutRow = ({ item, onPress }: { item: FarmerPayoutSummary; onPress: () => void }) => {
+  const { t } = useT();
+  return (
+    <Pressable style={({ pressed }) => [styles.row, pressed && { opacity: 0.6 }]} onPress={onPress}>
+      <View style={{ flex: 1 }}>
+        <Text style={styles.cycleText}>
+          {item.cycleStartDate} → {item.cycleEndDate}
+        </Text>
+        <Text style={styles.amountText}>{t("farmer.payouts.net", { amount: item.netAmount.toFixed(2) })}</Text>
+      </View>
+      <Text style={[styles.statusBadge, { color: statusColor[item.status] }]}>
+        {PAYOUT_STATUS_KEY[item.status] ? t(PAYOUT_STATUS_KEY[item.status]) : item.status}
       </Text>
-      <Text style={styles.amountText}>₹{item.netAmount.toFixed(2)} net</Text>
-    </View>
-    <Text style={[styles.statusBadge, { color: statusColor[item.status] }]}>{item.status}</Text>
-  </Pressable>
-);
+    </Pressable>
+  );
+};
 
 export const FarmerPayoutsScreen = () => {
   const navigation = useNavigation<Navigation>();
+  const { t } = useT();
 
   const pendingQuery = useQuery({
     queryKey: ["farmer-payouts-pending"],
@@ -54,20 +62,20 @@ export const FarmerPayoutsScreen = () => {
     <View style={styles.container}>
       {pendingQuery.data && (
         <View style={styles.pendingCard}>
-          <Text style={styles.pendingLabel}>Pending (accrued, not yet batched)</Text>
+          <Text style={styles.pendingLabel}>{t("farmer.payouts.pending")}</Text>
           <Text style={styles.pendingAmount}>₹{pendingQuery.data.netAmount.toFixed(2)}</Text>
-          <Text style={styles.pendingMeta}>{pendingQuery.data.itemCount} item(s)</Text>
+          <Text style={styles.pendingMeta}>{t("farmer.payouts.pendingItems", { count: pendingQuery.data.itemCount })}</Text>
         </View>
       )}
 
       {payoutsQuery.isLoading && <ListRowSkeletonList count={6} lines={2} trailing />}
 
       {payoutsQuery.isError && (
-        <ErrorState message="Could not load your payout history." onRetry={() => void payoutsQuery.refetch()} />
+        <ErrorState message={t("farmer.payouts.loadError")} onRetry={() => void payoutsQuery.refetch()} />
       )}
 
       {!payoutsQuery.isLoading && !payoutsQuery.isError && payouts.length === 0 && (
-        <EmptyState icon="💰" message="No payouts yet — these are created weekly once your delivered orders accrue." />
+        <EmptyState icon="💰" message={t("farmer.payouts.empty")} />
       )}
 
       {payouts.length > 0 && (

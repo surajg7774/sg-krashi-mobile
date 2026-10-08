@@ -107,7 +107,7 @@ export const FarmerListingFormScreen = () => {
       setMedia(detail.media);
       invalidateListingLists();
     },
-    onError: (err) => setFormError((err as { message?: string })?.message ?? "Could not save this listing."),
+    onError: (err) => setFormError(errorText(err, t("farmer.form.saveError"), { details: false })),
   });
 
   const updateMutation = useMutation({
@@ -116,9 +116,9 @@ export const FarmerListingFormScreen = () => {
       setFormError(null);
       invalidateListingLists();
       void queryClient.invalidateQueries({ queryKey: ["farmer-listing-detail", listingId] });
-      Alert.alert("Saved", "Your changes have been saved.");
+      Alert.alert(t("farmer.form.savedTitle"), t("farmer.form.savedBody"));
     },
-    onError: (err) => setFormError((err as { message?: string })?.message ?? "Could not save this listing."),
+    onError: (err) => setFormError(errorText(err, t("farmer.form.saveError"), { details: false })),
   });
 
   const deactivateMutation = useMutation({
@@ -173,11 +173,11 @@ export const FarmerListingFormScreen = () => {
 
   const handleDeactivate = () => {
     Alert.alert(
-      "Deactivate listing",
-      `Are you sure you want to deactivate "${trimName(form.name)}"? It will immediately disappear from the Crop Marketplace, on the website and in the app.`,
+      t("farmer.form.deactivateTitle"),
+      t("farmer.form.deactivateBody", { name: trimName(form.name) }),
       [
-        { text: "Cancel", style: "cancel" },
-        { text: "Deactivate", style: "destructive", onPress: () => deactivateMutation.mutate() },
+        { text: t("common.cancel"), style: "cancel" },
+        { text: t("farmer.form.deactivate"), style: "destructive", onPress: () => deactivateMutation.mutate() },
       ]
     );
   };
@@ -218,10 +218,10 @@ export const FarmerListingFormScreen = () => {
   };
 
   const handleDeleteMedia = (mediaId: number) => {
-    Alert.alert("Remove photo", "Remove this photo from the listing?", [
-      { text: "Cancel", style: "cancel" },
+    Alert.alert(t("farmer.form.removePhotoTitle"), t("farmer.form.removePhotoBody"), [
+      { text: t("common.cancel"), style: "cancel" },
       {
-        text: "Remove",
+        text: t("common.remove"),
         style: "destructive",
         onPress: () => {
           deleteMediaMutation.mutate(mediaId);
@@ -258,7 +258,7 @@ export const FarmerListingFormScreen = () => {
   if (params.listingId !== undefined && detailQuery.isError) {
     return (
       <View style={styles.centered}>
-        <ErrorState message="Could not load this listing." onRetry={() => void detailQuery.refetch()} />
+        <ErrorState message={t("farmer.form.loadError")} onRetry={() => void detailQuery.refetch()} />
       </View>
     );
   }
@@ -267,45 +267,45 @@ export const FarmerListingFormScreen = () => {
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.row}>
         <SelectField
-          label="Category"
+          label={t("farmer.form.category")}
           value={form.categoryId !== null ? String(form.categoryId) : ""}
           options={categoryOptions}
           onSelect={(value) => setForm((f) => ({ ...f, categoryId: Number(value) }))}
         />
       </View>
 
-      <Text style={styles.fieldLabel}>Name</Text>
+      <Text style={styles.fieldLabel}>{t("farmer.form.name")}</Text>
       <TextInput
         style={styles.input}
         value={form.name}
         onChangeText={(text) => setForm((f) => ({ ...f, name: text }))}
-        placeholder="e.g. Alphonso Mangoes"
+        placeholder={t("farmer.form.namePlaceholder")}
         placeholderTextColor={colors.textSecondary}
       />
 
-      <Text style={styles.fieldLabel}>Slug (optional)</Text>
+      <Text style={styles.fieldLabel}>{t("farmer.form.slug")}</Text>
       <TextInput
         style={styles.input}
         value={form.slug}
         onChangeText={(text) => setForm((f) => ({ ...f, slug: text }))}
-        placeholder="Leave blank to auto-generate from name"
+        placeholder={t("farmer.form.slugPlaceholder")}
         placeholderTextColor={colors.textSecondary}
         autoCapitalize="none"
       />
 
-      <Text style={styles.fieldLabel}>Description</Text>
+      <Text style={styles.fieldLabel}>{t("farmer.form.description")}</Text>
       <TextInput
         style={[styles.input, styles.textArea]}
         value={form.description}
         onChangeText={(text) => setForm((f) => ({ ...f, description: text }))}
         multiline
-        placeholder="Describe your crop…"
+        placeholder={t("farmer.form.descriptionPlaceholder")}
         placeholderTextColor={colors.textSecondary}
       />
 
       <View style={styles.row}>
         <View style={{ flex: 1 }}>
-          <Text style={styles.fieldLabel}>Unit Price (₹)</Text>
+          <Text style={styles.fieldLabel}>{t("farmer.form.unitPrice")}</Text>
           <TextInput
             style={styles.input}
             value={form.unitPrice !== null ? String(form.unitPrice) : ""}
@@ -316,7 +316,7 @@ export const FarmerListingFormScreen = () => {
         </View>
         <View style={{ width: 12 }} />
         <View style={{ flex: 1 }}>
-          <Text style={styles.fieldLabel}>Quantity Available</Text>
+          <Text style={styles.fieldLabel}>{t("farmer.form.quantityAvailable")}</Text>
           <TextInput
             style={styles.input}
             value={form.quantityAvailable !== null ? String(form.quantityAvailable) : ""}
@@ -327,10 +327,10 @@ export const FarmerListingFormScreen = () => {
         </View>
       </View>
 
-      <Text style={styles.fieldLabel}>Harvest Date</Text>
+      <Text style={styles.fieldLabel}>{t("farmer.form.harvestDate")}</Text>
       <Pressable style={({ pressed }) => [styles.input, pressed && { opacity: 0.6 }]} onPress={openDatePicker}>
         <Text style={{ color: form.harvestDate ? colors.textPrimary : colors.textSecondary }}>
-          {form.harvestDate || "Select a date"}
+          {form.harvestDate || t("farmer.form.selectDate")}
         </Text>
       </Pressable>
       {Platform.OS === "ios" && showDatePicker && (
@@ -346,7 +346,7 @@ export const FarmerListingFormScreen = () => {
       )}
 
       <View style={styles.switchRow}>
-        <Text style={styles.fieldLabel}>Organic Certified</Text>
+        <Text style={styles.fieldLabel}>{t("farmer.form.organicCertified")}</Text>
         <Switch
           value={form.isOrganicCertified}
           onValueChange={(value) => setForm((f) => ({ ...f, isOrganicCertified: value }))}
@@ -357,7 +357,7 @@ export const FarmerListingFormScreen = () => {
       {formError && <Text style={styles.errorText}>{formError}</Text>}
 
       <Pressable style={({ pressed }) => [styles.primaryButton, isSaving && styles.disabledButton, pressed && { opacity: 0.6 }]} disabled={isSaving} onPress={handleSubmit}>
-        {isSaving ? <ActivityIndicator color={colors.primaryContrastText} /> : <Text style={styles.primaryButtonText}>{isEditing ? "Save Changes" : "Create Listing"}</Text>}
+        {isSaving ? <ActivityIndicator color={colors.primaryContrastText} /> : <Text style={styles.primaryButtonText}>{isEditing ? t("farmer.form.saveChanges") : t("farmer.form.create")}</Text>}
       </Pressable>
 
       {isEditing && canMarkSoldOut(detailQuery.data?.isActive ?? false, form.quantityAvailable) && (
@@ -374,7 +374,7 @@ export const FarmerListingFormScreen = () => {
 
       {isEditing && (
         <View style={styles.mediaSection}>
-          <Text style={styles.sectionTitle}>Photos</Text>
+          <Text style={styles.sectionTitle}>{t("farmer.form.photos")}</Text>
           {media.map((item, index) => (
             <View key={item.id} style={styles.mediaRow}>
               <Image source={resizedMediaUrl(item.url, MEDIA_WIDTH.row)} style={styles.mediaThumb} contentFit="cover" />
@@ -401,7 +401,7 @@ export const FarmerListingFormScreen = () => {
                 onPress={() => handleDeleteMedia(item.id)}
                 hitSlop={{ top: 14, bottom: 14, left: 10, right: 10 }}
               >
-                <Text style={styles.mediaDeleteText}>Remove</Text>
+                <Text style={styles.mediaDeleteText}>{t("common.remove")}</Text>
               </Pressable>
             </View>
           ))}
@@ -410,10 +410,10 @@ export const FarmerListingFormScreen = () => {
 
           <View style={styles.pickButtonRow}>
             <Pressable style={({ pressed }) => [styles.pickButton, pressed && { opacity: 0.6 }]} onPress={() => void pickAndUpload(true)}>
-              <Text style={styles.pickButtonText}>📷 Take Photo</Text>
+              <Text style={styles.pickButtonText}>{t("common.takePhoto")}</Text>
             </Pressable>
             <Pressable style={({ pressed }) => [styles.pickButton, pressed && { opacity: 0.6 }]} onPress={() => void pickAndUpload(false)}>
-              <Text style={styles.pickButtonText}>🖼️ Add from Gallery</Text>
+              <Text style={styles.pickButtonText}>{t("common.addFromGallery")}</Text>
             </Pressable>
           </View>
 
@@ -422,7 +422,7 @@ export const FarmerListingFormScreen = () => {
             disabled={deactivateMutation.isPending}
             onPress={handleDeactivate}
           >
-            <Text style={styles.deactivateButtonText}>Deactivate Listing</Text>
+            <Text style={styles.deactivateButtonText}>{t("farmer.form.deactivateListing")}</Text>
           </Pressable>
         </View>
       )}

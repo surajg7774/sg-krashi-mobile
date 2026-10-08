@@ -59,6 +59,7 @@ const ListingRow = ({ item, onPress }: { item: CropListingSummary; onPress: () =
 
 export const FarmerListingsScreen = () => {
   const navigation = useNavigation<Navigation>();
+  const { t } = useT();
   const [searchInput, setSearchInput] = useState("");
   const search = useDebouncedValue(searchInput, 400);
 
@@ -76,29 +77,29 @@ export const FarmerListingsScreen = () => {
       <View style={styles.headerRow}>
         <TextInput
           style={styles.searchInput}
-          placeholder="Search your listings…"
+          placeholder={t("farmer.listings.searchPlaceholder")}
           placeholderTextColor={colors.textSecondary}
           value={searchInput}
           onChangeText={setSearchInput}
         />
         <Pressable style={({ pressed }) => [styles.addButton, pressed && { opacity: 0.6 }]} onPress={() => navigation.navigate("FarmerListingForm", {})}>
-          <Text style={styles.addButtonText}>+ Add</Text>
+          <Text style={styles.addButtonText}>{t("farmer.listings.add")}</Text>
         </Pressable>
       </View>
 
       {listingsQuery.isLoading && <ListRowSkeletonList count={6} thumbnailSize={56} lines={2} trailing />}
 
       {listingsQuery.isError && (
-        <ErrorState message="Could not load your listings." onRetry={() => void listingsQuery.refetch()} />
+        <ErrorState message={t("farmer.listings.loadError")} onRetry={() => void listingsQuery.refetch()} />
       )}
 
       {!listingsQuery.isLoading && !listingsQuery.isError && listings.length === 0 && (
         <EmptyState
           icon="🌾"
-          message="You haven't added any crop listings yet."
+          message={t("farmer.listings.empty")}
           action={
             <Pressable style={({ pressed }) => [styles.emptyAddButton, pressed && { opacity: 0.6 }]} onPress={() => navigation.navigate("FarmerListingForm", {})}>
-              <Text style={styles.emptyAddButtonText}>+ Add Your First Listing</Text>
+              <Text style={styles.emptyAddButtonText}>{t("farmer.listings.addFirst")}</Text>
             </Pressable>
           }
         />

@@ -7,6 +7,7 @@ import { ErrorState } from "@/components/ErrorState";
 import { farmerService } from "./farmerService";
 import { farmerPayoutService } from "./farmerPayoutService";
 import type { FarmerStackParamList } from "@/navigation/FarmerStackNavigator";
+import { useT } from "@/i18n/useT";
 
 type Navigation = NativeStackNavigationProp<FarmerStackParamList, "FarmerDashboard">;
 
@@ -19,6 +20,7 @@ const StatCard = ({ label, value }: { label: string; value: string | number }) =
 
 export const FarmerDashboardScreen = () => {
   const navigation = useNavigation<Navigation>();
+  const { t } = useT();
 
   const summaryQuery = useQuery({
     queryKey: ["farmer-dashboard-summary"],
@@ -41,7 +43,7 @@ export const FarmerDashboardScreen = () => {
   if (summaryQuery.isError || !summaryQuery.data) {
     return (
       <View style={styles.centered}>
-        <ErrorState message="Could not load your dashboard." onRetry={() => void summaryQuery.refetch()} />
+        <ErrorState message={t("farmer.dashboard.loadError")} onRetry={() => void summaryQuery.refetch()} />
       </View>
     );
   }
@@ -51,28 +53,28 @@ export const FarmerDashboardScreen = () => {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.statsGrid}>
-        <StatCard label="Total Listings" value={summary.totalListings} />
-        <StatCard label="Active Listings" value={summary.activeListings} />
-        <StatCard label="Orders w/ Your Crops" value={summary.ordersContainingListings} />
-        <StatCard label="Units Sold" value={summary.unitsSold} />
+        <StatCard label={t("farmer.dashboard.totalListings")} value={summary.totalListings} />
+        <StatCard label={t("farmer.dashboard.activeListings")} value={summary.activeListings} />
+        <StatCard label={t("farmer.dashboard.ordersWithCrops")} value={summary.ordersContainingListings} />
+        <StatCard label={t("farmer.dashboard.unitsSold")} value={summary.unitsSold} />
       </View>
 
       {pendingQuery.data && (
         <View style={styles.pendingCard}>
-          <Text style={styles.pendingLabel}>Pending payout (accrued, not yet batched)</Text>
+          <Text style={styles.pendingLabel}>{t("farmer.dashboard.pendingPayout")}</Text>
           <Text style={styles.pendingAmount}>₹{pendingQuery.data.netAmount.toFixed(2)}</Text>
-          <Text style={styles.pendingMeta}>{pendingQuery.data.itemCount} item(s) delivered, awaiting the weekly batch</Text>
+          <Text style={styles.pendingMeta}>{t("farmer.dashboard.pendingDelivered", { count: pendingQuery.data.itemCount })}</Text>
         </View>
       )}
 
       <Pressable style={({ pressed }) => [styles.navCard, pressed && { opacity: 0.6 }]} onPress={() => navigation.navigate("FarmerListings")}>
-        <Text style={styles.navCardTitle}>My Crop Listings</Text>
-        <Text style={styles.navCardSubtitle}>Manage your listings on the Crop Marketplace →</Text>
+        <Text style={styles.navCardTitle}>{t("farmer.dashboard.myListings")}</Text>
+        <Text style={styles.navCardSubtitle}>{t("farmer.dashboard.myListingsSubtitle")}</Text>
       </Pressable>
 
       <Pressable style={({ pressed }) => [styles.navCard, pressed && { opacity: 0.6 }]} onPress={() => navigation.navigate("FarmerPayouts")}>
-        <Text style={styles.navCardTitle}>Payout History</Text>
-        <Text style={styles.navCardSubtitle}>View your batched, approved, and paid payouts →</Text>
+        <Text style={styles.navCardTitle}>{t("farmer.dashboard.payoutHistory")}</Text>
+        <Text style={styles.navCardSubtitle}>{t("farmer.dashboard.payoutHistorySubtitle")}</Text>
       </Pressable>
     </ScrollView>
   );
