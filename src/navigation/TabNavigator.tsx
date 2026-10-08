@@ -9,6 +9,7 @@ import { CropDoctorStackNavigator, type CropDoctorStackParamList } from "./CropD
 import { FarmerStackNavigator, type FarmerStackParamList } from "./FarmerStackNavigator";
 import { useAuth } from "@/context/AuthContext";
 import { colors } from "@/theme/colors";
+import { useT } from "@/i18n/useT";
 
 export type TabParamList = {
   Home: undefined;
@@ -44,6 +45,7 @@ const TAB_ICONS: Record<keyof TabParamList, string> = {
 // JWT itself.
 export const TabNavigator = () => {
   const { user } = useAuth();
+  const { t } = useT();
   const isFarmer = user?.roles.includes("FARMER") ?? false;
 
   return (
@@ -55,12 +57,12 @@ export const TabNavigator = () => {
         tabBarIcon: () => <Text style={{ fontSize: 20 }}>{TAB_ICONS[route.name as keyof TabParamList]}</Text>,
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Store" component={StoreStackNavigator} />
-      <Tab.Screen name="CropDoctor" component={CropDoctorStackNavigator} options={{ title: "Crop Doctor" }} />
-      <Tab.Screen name="Weather" component={WeatherScreen} />
-      {isFarmer && <Tab.Screen name="Farmer" component={FarmerStackNavigator} />}
-      <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen name="Home" component={HomeScreen} options={{ title: t("nav.tabs.home") }} />
+      <Tab.Screen name="Store" component={StoreStackNavigator} options={{ title: t("nav.tabs.store") }} />
+      <Tab.Screen name="CropDoctor" component={CropDoctorStackNavigator} options={{ title: t("nav.tabs.cropDoctor") }} />
+      <Tab.Screen name="Weather" component={WeatherScreen} options={{ title: t("nav.tabs.weather") }} />
+      {isFarmer && <Tab.Screen name="Farmer" component={FarmerStackNavigator} options={{ title: t("nav.tabs.farmer") }} />}
+      <Tab.Screen name="Profile" component={ProfileScreen} options={{ title: t("nav.tabs.profile") }} />
     </Tab.Navigator>
   );
 };

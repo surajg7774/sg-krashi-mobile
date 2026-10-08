@@ -5,6 +5,7 @@ import { FarmerListingFormScreen } from "@/features/farmer/FarmerListingFormScre
 import { FarmerPayoutsScreen } from "@/features/farmer/FarmerPayoutsScreen";
 import { FarmerPayoutDetailScreen } from "@/features/farmer/FarmerPayoutDetailScreen";
 import { colors } from "@/theme/colors";
+import { useT } from "@/i18n/useT";
 
 export type FarmerStackParamList = {
   FarmerDashboard: undefined;
@@ -19,22 +20,25 @@ export type FarmerStackParamList = {
 
 const Stack = createNativeStackNavigator<FarmerStackParamList>();
 
-export const FarmerStackNavigator = () => (
-  <Stack.Navigator
-    screenOptions={{
-      headerStyle: { backgroundColor: colors.surface },
-      headerTintColor: colors.textPrimary,
-      headerShadowVisible: false,
-    }}
-  >
-    <Stack.Screen name="FarmerDashboard" component={FarmerDashboardScreen} options={{ title: "Farmer Dashboard" }} />
-    <Stack.Screen name="FarmerListings" component={FarmerListingsScreen} options={{ title: "My Listings" }} />
-    <Stack.Screen
-      name="FarmerListingForm"
-      component={FarmerListingFormScreen}
-      options={({ route }) => ({ title: route.params.listingId ? "Edit Listing" : "Add Listing" })}
-    />
-    <Stack.Screen name="FarmerPayouts" component={FarmerPayoutsScreen} options={{ title: "Payout History" }} />
-    <Stack.Screen name="FarmerPayoutDetail" component={FarmerPayoutDetailScreen} options={{ title: "Payout Detail" }} />
-  </Stack.Navigator>
-);
+export const FarmerStackNavigator = () => {
+  const { t } = useT();
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: colors.surface },
+        headerTintColor: colors.textPrimary,
+        headerShadowVisible: false,
+      }}
+    >
+      <Stack.Screen name="FarmerDashboard" component={FarmerDashboardScreen} options={{ title: t("nav.headers.farmerDashboard") }} />
+      <Stack.Screen name="FarmerListings" component={FarmerListingsScreen} options={{ title: t("nav.headers.myListings") }} />
+      <Stack.Screen
+        name="FarmerListingForm"
+        component={FarmerListingFormScreen}
+        options={({ route }) => ({ title: route.params.listingId ? t("nav.headers.editListing") : t("nav.headers.addListing") })}
+      />
+      <Stack.Screen name="FarmerPayouts" component={FarmerPayoutsScreen} options={{ title: t("nav.headers.payoutHistory") }} />
+      <Stack.Screen name="FarmerPayoutDetail" component={FarmerPayoutDetailScreen} options={{ title: t("nav.headers.payoutDetail") }} />
+    </Stack.Navigator>
+  );
+};

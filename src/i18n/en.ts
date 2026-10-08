@@ -505,6 +505,36 @@ export const en = {
     avgAcrossMarkets: "{commodity} · avg across markets",
     trendChange: "{arrow} {percent}% over {days} days",
   },
+  // Bottom tabs and screen headers. The tab labels used to be the route names, so the English values are exactly those.
+  nav: {
+    tabs: {
+      home: "Home",
+      store: "Store",
+      cropDoctor: "Crop Doctor",
+      weather: "Weather",
+      farmer: "Farmer",
+      profile: "Profile",
+    },
+    headers: {
+      cart: "Cart",
+      selectAddress: "Select Address",
+      reviewOrder: "Review Order",
+      order: "Order",
+      myOrders: "My Orders",
+      mandi: "Mandi Prices",
+      assistant: "AI Assistant",
+      notifications: "Notifications",
+      store: "Store",
+      cropDoctor: "AI Crop Doctor",
+      scanDetail: "Scan Detail",
+      farmerDashboard: "Farmer Dashboard",
+      myListings: "My Listings",
+      editListing: "Edit Listing",
+      addListing: "Add Listing",
+      payoutHistory: "Payout History",
+      payoutDetail: "Payout Detail",
+    },
+  },
 } as const;
 
 type Widen<T> = T extends string ? string : T extends PluralForms ? PluralForms : { readonly [K in keyof T]: Widen<T[K]> };

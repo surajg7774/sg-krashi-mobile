@@ -10,6 +10,7 @@ import { MandiScreen } from "@/features/mandi/MandiScreen";
 import { ChatScreen } from "@/features/chat/ChatScreen";
 import { NotificationCenterScreen } from "@/features/notifications/NotificationCenterScreen";
 import { colors } from "@/theme/colors";
+import { useT } from "@/i18n/useT";
 
 // Cart/Checkout/Orders are lifted above the tab navigator (not nested inside
 // any one tab) because they need to be reachable from multiple tabs (Home's
@@ -30,26 +31,29 @@ export type MainStackParamList = {
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
 
-export const MainStackNavigator = () => (
-  <Stack.Navigator
-    screenOptions={{
-      headerStyle: { backgroundColor: colors.surface },
-      headerTintColor: colors.textPrimary,
-      headerShadowVisible: false,
-    }}
-  >
-    <Stack.Screen name="MainTabs" component={TabNavigator} options={{ headerShown: false }} />
-    <Stack.Screen name="Cart" component={CartScreen} options={{ title: "Cart" }} />
-    <Stack.Screen name="AddressSelect" component={AddressSelectScreen} options={{ title: "Select Address" }} />
-    <Stack.Screen name="Checkout" component={CheckoutScreen} options={{ title: "Review Order" }} />
-    <Stack.Screen
-      name="OrderConfirmation"
-      component={OrderConfirmationScreen}
-      options={{ title: "Order", headerBackVisible: false }}
-    />
-    <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} options={{ title: "My Orders" }} />
-    <Stack.Screen name="Mandi" component={MandiScreen} options={{ title: "Mandi Prices" }} />
-    <Stack.Screen name="Chat" component={ChatScreen} options={{ title: "AI Assistant" }} />
-    <Stack.Screen name="Notifications" component={NotificationCenterScreen} options={{ title: "Notifications" }} />
-  </Stack.Navigator>
-);
+export const MainStackNavigator = () => {
+  const { t } = useT();
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: colors.surface },
+        headerTintColor: colors.textPrimary,
+        headerShadowVisible: false,
+      }}
+    >
+      <Stack.Screen name="MainTabs" component={TabNavigator} options={{ headerShown: false }} />
+      <Stack.Screen name="Cart" component={CartScreen} options={{ title: t("nav.headers.cart") }} />
+      <Stack.Screen name="AddressSelect" component={AddressSelectScreen} options={{ title: t("nav.headers.selectAddress") }} />
+      <Stack.Screen name="Checkout" component={CheckoutScreen} options={{ title: t("nav.headers.reviewOrder") }} />
+      <Stack.Screen
+        name="OrderConfirmation"
+        component={OrderConfirmationScreen}
+        options={{ title: t("nav.headers.order"), headerBackVisible: false }}
+      />
+      <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} options={{ title: t("nav.headers.myOrders") }} />
+      <Stack.Screen name="Mandi" component={MandiScreen} options={{ title: t("nav.headers.mandi") }} />
+      <Stack.Screen name="Chat" component={ChatScreen} options={{ title: t("nav.headers.assistant") }} />
+      <Stack.Screen name="Notifications" component={NotificationCenterScreen} options={{ title: t("nav.headers.notifications") }} />
+    </Stack.Navigator>
+  );
+};

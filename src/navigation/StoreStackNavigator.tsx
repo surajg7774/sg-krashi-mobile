@@ -27,7 +27,7 @@ export const StoreStackNavigator = () => {
         headerShadowVisible: false,
       }}
     >
-      <Stack.Screen name="StoreList" component={StoreScreen} options={{ title: "Store" }} />
+      <Stack.Screen name="StoreList" component={StoreScreen} options={{ title: t("nav.headers.store") }} />
       <Stack.Screen name="ProductDetail" component={ProductDetailScreen} options={{ title: "" }} />
       <Stack.Screen name="CropList" component={CropMarketplaceScreen} options={{ title: t("crops.browse.title") }} />
       <Stack.Screen name="CropDetail" component={CropListingDetailScreen} options={{ title: "" }} />
