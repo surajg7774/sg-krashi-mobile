@@ -3,8 +3,8 @@ import { StoreScreen } from "@/features/store/StoreScreen";
 import { ProductDetailScreen } from "@/features/store/ProductDetailScreen";
 import { CropMarketplaceScreen } from "@/features/crop-marketplace/CropMarketplaceScreen";
 import { CropListingDetailScreen } from "@/features/crop-marketplace/CropListingDetailScreen";
-import { cropStrings } from "@/features/crop-marketplace/strings";
 import { colors } from "@/theme/colors";
+import { useT } from "@/i18n/useT";
 
 export type StoreStackParamList = {
   StoreList: undefined;
@@ -17,17 +17,20 @@ export type StoreStackParamList = {
 
 const Stack = createNativeStackNavigator<StoreStackParamList>();
 
-export const StoreStackNavigator = () => (
-  <Stack.Navigator
-    screenOptions={{
-      headerStyle: { backgroundColor: colors.surface },
-      headerTintColor: colors.textPrimary,
-      headerShadowVisible: false,
-    }}
-  >
-    <Stack.Screen name="StoreList" component={StoreScreen} options={{ title: "Store" }} />
-    <Stack.Screen name="ProductDetail" component={ProductDetailScreen} options={{ title: "" }} />
-    <Stack.Screen name="CropList" component={CropMarketplaceScreen} options={{ title: cropStrings.browse.title }} />
-    <Stack.Screen name="CropDetail" component={CropListingDetailScreen} options={{ title: "" }} />
-  </Stack.Navigator>
-);
+export const StoreStackNavigator = () => {
+  const { t } = useT();
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: colors.surface },
+        headerTintColor: colors.textPrimary,
+        headerShadowVisible: false,
+      }}
+    >
+      <Stack.Screen name="StoreList" component={StoreScreen} options={{ title: "Store" }} />
+      <Stack.Screen name="ProductDetail" component={ProductDetailScreen} options={{ title: "" }} />
+      <Stack.Screen name="CropList" component={CropMarketplaceScreen} options={{ title: t("crops.browse.title") }} />
+      <Stack.Screen name="CropDetail" component={CropListingDetailScreen} options={{ title: "" }} />
+    </Stack.Navigator>
+  );
+};

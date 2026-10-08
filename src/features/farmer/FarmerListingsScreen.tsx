@@ -7,8 +7,9 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useDebouncedValue } from "@/shared/useDebouncedValue";
 import { colors } from "@/theme/colors";
 import { MEDIA_WIDTH, resizedMediaUrl } from "@/shared/media";
-import { fill, farmerListingStatus, formatRupees, trimName } from "@/features/crop-marketplace/cropLogic";
-import { cropStrings } from "@/features/crop-marketplace/strings";
+import { farmerListingStatus, formatRupees, trimName, type FarmerListingStatus } from "@/features/crop-marketplace/cropLogic";
+import type { MessageKey } from "@/i18n";
+import { useT } from "@/i18n/useT";
 import { ErrorState } from "@/components/ErrorState";
 import { EmptyState } from "@/components/EmptyState";
 import { ListRowSkeletonList } from "@/components/Skeleton";
@@ -22,19 +23,20 @@ const PAGE_SIZE = 20;
 
 type Navigation = NativeStackNavigationProp<FarmerStackParamList, "FarmerListings">;
 
-const STATUS_LABEL = { active: cropStrings.farmer.active, inactive: cropStrings.farmer.inactive, soldOut: cropStrings.farmer.soldOut } as const;
+const STATUS_LABEL: Record<FarmerListingStatus, MessageKey> = { active: "crops.farmer.active", inactive: "crops.farmer.inactive", soldOut: "crops.farmer.soldOut" };
 
 const ListingRow = ({ item, onPress }: { item: CropListingSummary; onPress: () => void }) => {
+  const { t } = useT();
   const status = farmerListingStatus(item);
   return (
     <Pressable
       style={({ pressed }) => [styles.row, pressed && { opacity: 0.6 }]}
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={fill(cropStrings.farmer.listingRow, {
+      accessibilityLabel={t("crops.farmer.listingRow", {
         name: trimName(item.name),
-        category: item.categoryName ?? cropStrings.farmer.uncategorized,
-        status: STATUS_LABEL[status],
+        category: item.categoryName ?? t("crops.farmer.uncategorized"),
+        status: t(STATUS_LABEL[status]),
         price: formatRupees(item.unitPrice),
       })}
     >
@@ -44,12 +46,12 @@ const ListingRow = ({ item, onPress }: { item: CropListingSummary; onPress: () =
           {trimName(item.name)}
         </Text>
         <Text style={styles.meta}>
-          {item.categoryName ?? cropStrings.farmer.uncategorized} · {status === "soldOut" ? cropStrings.farmer.soldOut : fill(cropStrings.farmer.available, { count: item.quantityAvailable })}
+          {item.categoryName ?? t("crops.farmer.uncategorized")} · {status === "soldOut" ? t("crops.farmer.soldOut") : t("crops.farmer.available", { count: item.quantityAvailable })}
         </Text>
         <PricePill label={formatRupees(item.unitPrice)} />
       </View>
       <Text style={[styles.statusBadge, status === "active" && styles.statusActive, status === "soldOut" && styles.statusSoldOut, status === "inactive" && styles.statusInactive]}>
-        {STATUS_LABEL[status]}
+        {t(STATUS_LABEL[status])}
       </Text>
     </Pressable>
   );

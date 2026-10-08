@@ -19,8 +19,8 @@ import { useNavigation, useRoute, type RouteProp } from "@react-navigation/nativ
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { colors } from "@/theme/colors";
 import { MEDIA_WIDTH, resizedMediaUrl } from "@/shared/media";
-import { canMarkSoldOut, fill, trimName } from "@/features/crop-marketplace/cropLogic";
-import { cropStrings } from "@/features/crop-marketplace/strings";
+import { canMarkSoldOut, trimName } from "@/features/crop-marketplace/cropLogic";
+import { useT } from "@/i18n/useT";
 import { SelectField } from "@/components/SelectField";
 import { ErrorState } from "@/components/ErrorState";
 import { farmerService } from "./farmerService";
@@ -52,6 +52,7 @@ const parseDate = (value: string): Date => {
 
 export const FarmerListingFormScreen = () => {
   const navigation = useNavigation<Navigation>();
+  const { t, errorText } = useT();
   const { params } = useRoute<FormRoute>();
   const queryClient = useQueryClient();
 
@@ -136,9 +137,9 @@ export const FarmerListingFormScreen = () => {
       setForm((f) => ({ ...f, quantityAvailable: 0 }));
       invalidateListingLists();
       void queryClient.invalidateQueries({ queryKey: ["farmer-listing-detail", listingId] });
-      Alert.alert(cropStrings.farmer.markSoldOutDoneTitle, cropStrings.farmer.markSoldOutDoneBody);
+      Alert.alert(t("crops.farmer.markSoldOutDoneTitle"), t("crops.farmer.markSoldOutDoneBody"));
     },
-    onError: (err) => setFormError((err as { message?: string })?.message ?? cropStrings.farmer.markSoldOutError),
+    onError: (err) => setFormError(errorText(err, t("crops.farmer.markSoldOutError"), { details: false })),
   });
 
   const uploadMediaMutation = useMutation({
@@ -164,9 +165,9 @@ export const FarmerListingFormScreen = () => {
   };
 
   const handleMarkSoldOut = () => {
-    Alert.alert(cropStrings.farmer.markSoldOutTitle, fill(cropStrings.farmer.markSoldOutBody, { name: trimName(form.name) }), [
-      { text: cropStrings.farmer.cancel, style: "cancel" },
-      { text: cropStrings.farmer.markSoldOut, onPress: () => soldOutMutation.mutate() },
+    Alert.alert(t("crops.farmer.markSoldOutTitle"), t("crops.farmer.markSoldOutBody", { name: trimName(form.name) }), [
+      { text: t("common.cancel"), style: "cancel" },
+      { text: t("crops.farmer.markSoldOut"), onPress: () => soldOutMutation.mutate() },
     ]);
   };
 
@@ -365,9 +366,9 @@ export const FarmerListingFormScreen = () => {
           disabled={soldOutMutation.isPending || isSaving}
           onPress={handleMarkSoldOut}
           accessibilityRole="button"
-          accessibilityLabel={cropStrings.farmer.markSoldOut}
+          accessibilityLabel={t("crops.farmer.markSoldOut")}
         >
-          {soldOutMutation.isPending ? <ActivityIndicator color={colors.primary} /> : <Text style={styles.soldOutButtonText}>{cropStrings.farmer.markSoldOut}</Text>}
+          {soldOutMutation.isPending ? <ActivityIndicator color={colors.primary} /> : <Text style={styles.soldOutButtonText}>{t("crops.farmer.markSoldOut")}</Text>}
         </Pressable>
       )}
 

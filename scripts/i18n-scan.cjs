@@ -73,7 +73,7 @@ const isIgnoredLine = (sf, node) => {
 };
 
 // Values that are code, not text: HTTP headers and developer-only assertions.
-const NON_UI_TEXTS = [/^Authorization$/, /^Bearer /, /^Content-Type$/, /must be used within/];
+const NON_UI_TEXTS = [/^Authorization$/, /^Bearer /, /^Content-Type$/, /must be used within/, /^YYYY-MM-DD$/];
 // Calls whose string arguments are route names, storage keys or patterns - never text.
 const NON_UI_CALLEES = /(^|\.)(navigate|push|replace|reset|getParent|setParams|jumpTo|dispatch|addListener|getItem|setItem|removeItem|includes|startsWith|endsWith|split|join|getNavigation)$/;
 // Object keys whose value is a route name or other identifier.

@@ -16,6 +16,7 @@ import { useDebouncedValue } from "@/shared/useDebouncedValue";
 import { colors } from "@/theme/colors";
 import { MEDIA_WIDTH, resizedMediaUrl } from "@/shared/media";
 import { cardShadow } from "@/theme/shadow";
+import { useT } from "@/i18n/useT";
 import { productService } from "./productService";
 import type { ProductSummary } from "./types";
 import type { StoreStackParamList } from "@/navigation/StoreStackNavigator";
@@ -25,7 +26,6 @@ import { EmptyState } from "@/components/EmptyState";
 import { PricePill } from "@/components/PricePill";
 import { NewBadge } from "@/components/NewBadge";
 import { Rating } from "@/components/Rating";
-import { cropStrings } from "@/features/crop-marketplace/strings";
 import { LastUpdated } from "@/components/LastUpdated";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { useOfflineData } from "@/offline/useOfflineData";
@@ -69,6 +69,7 @@ const ProductCard = ({ item, onPress }: { item: ProductSummary; onPress: () => v
 
 export const StoreScreen = () => {
   const navigation = useNavigation<Navigation>();
+  const { t } = useT();
   const [searchInput, setSearchInput] = useState("");
   const search = useDebouncedValue(searchInput, 400);
   const [categoryId, setCategoryId] = useState<number | undefined>(undefined);
@@ -99,13 +100,13 @@ export const StoreScreen = () => {
         style={({ pressed }) => [styles.cropBanner, pressed && { opacity: 0.6 }]}
         onPress={() => navigation.navigate("CropList")}
         accessibilityRole="button"
-        accessibilityLabel={`${cropStrings.browse.title}. ${cropStrings.browse.storeEntrySubtitle}`}
+        accessibilityLabel={`${t("crops.browse.title")}. ${t("crops.browse.storeEntrySubtitle")}`}
       >
         <Text style={styles.cropBannerEmoji}>🌾</Text>
         <View style={{ flex: 1 }}>
-          <Text style={styles.cropBannerTitle}>{cropStrings.browse.title}</Text>
+          <Text style={styles.cropBannerTitle}>{t("crops.browse.title")}</Text>
           <Text style={styles.cropBannerSubtitle} numberOfLines={1}>
-            {cropStrings.browse.storeEntrySubtitle}
+            {t("crops.browse.storeEntrySubtitle")}
           </Text>
         </View>
         <Text style={styles.cropBannerArrow}>→</Text>

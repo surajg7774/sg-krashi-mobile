@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import * as Haptics from "expo-haptics";
 import { colors } from "@/theme/colors";
-import { cropStrings as S } from "./strings";
+import { useT } from "@/i18n/useT";
 
 interface QuantityStepperProps {
   value: number;
@@ -12,18 +12,19 @@ interface QuantityStepperProps {
 
 /** − 3 + with 44-point touch targets, labelled for screen readers. */
 export const QuantityStepper = ({ value, max, onChange }: QuantityStepperProps) => {
+  const { t } = useT();
   const change = (next: number) => {
     void Haptics.selectionAsync();
     onChange(next);
   };
   return (
-    <View style={styles.row} accessibilityRole="adjustable" accessibilityLabel={`${S.detail.quantity} ${value}`} accessibilityValue={{ min: 1, max, now: value }}>
+    <View style={styles.row} accessibilityRole="adjustable" accessibilityLabel={`${t("crops.detail.quantity")} ${value}`} accessibilityValue={{ min: 1, max, now: value }}>
       <Pressable
         style={({ pressed }) => [styles.button, value <= 1 && styles.buttonDisabled, pressed && { opacity: 0.6 }]}
         disabled={value <= 1}
         onPress={() => change(Math.max(1, value - 1))}
         accessibilityRole="button"
-        accessibilityLabel={S.detail.decreaseQuantity}
+        accessibilityLabel={t("crops.detail.decreaseQuantity")}
         accessibilityState={{ disabled: value <= 1 }}
       >
         <Text style={styles.buttonText}>−</Text>
@@ -36,7 +37,7 @@ export const QuantityStepper = ({ value, max, onChange }: QuantityStepperProps) 
         disabled={value >= max}
         onPress={() => change(Math.min(max, value + 1))}
         accessibilityRole="button"
-        accessibilityLabel={S.detail.increaseQuantity}
+        accessibilityLabel={t("crops.detail.increaseQuantity")}
         accessibilityState={{ disabled: value >= max }}
       >
         <Text style={styles.buttonText}>+</Text>

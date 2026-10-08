@@ -1,5 +1,8 @@
 // The small rules behind the Crop Marketplace screens: how a name, price or date reads, which filters are valid,
-// and how many a buyer can add. Import-free on purpose so it is unit-tested with Node (tests/cropLogic.test.ts).
+// and how many a buyer can add. Imports only the pure i18n core, so it is unit-tested with Node
+// (tests/cropLogic.test.ts). Text functions take the language last and default to English (docs/I18N_DECISIONS.md, D13).
+import { translate, type Lang } from "../../i18n/index.ts";
+import { monthName } from "../../i18n/format.ts";
 
 /** The most a buyer can pick on the detail screen, like the website. The cart can go up to the stock. */
 export const MAX_ORDER_QUANTITY = 10;
@@ -34,32 +37,34 @@ export const formatRupees = (amount: number): string => {
   return `${negative ? "-" : ""}₹${grouped}${fraction ? `.${fraction}` : ""}`;
 };
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-/** "2026-10-05" -> "5 Oct 2026". Reads the calendar day as written; no time-zone conversion. */
-export const formatDay = (isoDate: string): string => {
+/** "2026-10-05" -> "5 Oct 2026" ("5 अक्टूबर 2026" in Hindi). Reads the calendar day as written; no time-zone conversion. */
+export const formatDay = (isoDate: string, lang: Lang = "en"): string => {
   const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(isoDate ?? "");
   if (!match) return "";
-  return `${Number(match[3])} ${MONTHS[Number(match[2]) - 1]} ${match[1]}`;
+  return `${Number(match[3])} ${monthName(Number(match[2]) - 1, lang)} ${match[1]}`;
 };
 
 /** A server timestamp (UTC) as the India calendar day it happened on. */
-export const formatInstantIndia = (instant: string): string => {
+export const formatInstantIndia = (instant: string, lang: Lang = "en"): string => {
   // The server writes microseconds ("...15.658976Z"); not every JavaScript engine reads more than milliseconds.
   const ms = Date.parse(String(instant).replace(/(\.\d{3})\d+/, "$1"));
   if (Number.isNaN(ms)) return "";
-  return formatDay(new Date(ms + 330 * 60_000).toISOString().slice(0, 10));
+  return formatDay(new Date(ms + 330 * 60_000).toISOString().slice(0, 10), lang);
 };
 
 /** Today in India as yyyy-mm-dd. */
 export const todayIndia = (now: Date = new Date()): string => new Date(now.getTime() + 330 * 60_000).toISOString().slice(0, 10);
 
 /** "Harvest: 12 Oct 2026" for a future date, "Harvested: 5 Oct 2026" otherwise. `today` is a yyyy-mm-dd day. */
-export const harvestLabel = (harvestDate: string, today: string = todayIndia()): { text: string; upcoming: boolean } => {
-  const day = formatDay(harvestDate);
+export const harvestLabel = (
+  harvestDate: string,
+  today: string = todayIndia(),
+  lang: Lang = "en"
+): { text: string; upcoming: boolean } => {
+  const day = formatDay(harvestDate, lang);
   if (!day) return { text: "", upcoming: false };
   const upcoming = harvestDate.slice(0, 10) > today;
-  return { text: `${upcoming ? "Harvest" : "Harvested"}: ${day}`, upcoming };
+  return { text: translate(lang, upcoming ? "crops.harvest.upcoming" : "crops.harvest.past", { date: day }), upcoming };
 };
 
 /** A Date as a local yyyy-mm-dd day (what the date picker returns). */
@@ -175,23 +180,23 @@ export const starsText = (rating: number): string => {
 };
 
 /** What a screen reader says for a listing card. */
-export const listingAccessibilityLabel = (listing: {
-  name: string;
-  unitPrice: number;
-  quantityAvailable: number;
-  isOrganicCertified: boolean;
-  categoryName?: string | null;
-  harvestDate: string;
-}): string => {
+export const listingAccessibilityLabel = (
+  listing: {
+    name: string;
+    unitPrice: number;
+    quantityAvailable: number;
+    isOrganicCertified: boolean;
+    categoryName?: string | null;
+    harvestDate: string;
+  },
+  lang: Lang = "en"
+): string => {
   const parts = [trimName(listing.name), formatRupees(listing.unitPrice)];
   if (listing.categoryName) parts.push(listing.categoryName);
-  if (listing.isOrganicCertified) parts.push("Organic certified");
-  parts.push(isSoldOut(listing.quantityAvailable) ? "Sold out" : "Available");
-  const harvest = harvestLabel(listing.harvestDate).text;
+  if (listing.isOrganicCertified) parts.push(translate(lang, "crops.a11y.organicCertified"));
+  parts.push(translate(lang, isSoldOut(listing.quantityAvailable) ? "crops.a11y.soldOut" : "crops.a11y.available"));
+  const harvest = harvestLabel(listing.harvestDate, undefined, lang).text;
   if (harvest) parts.push(harvest);
   return parts.join(", ");
 };
 
-/** A template like "Page {{page}} of {{total}}" filled in (same placeholder style as the website's translation files). */
-export const fill = (template: string, values: Record<string, string | number>): string =>
-  template.replace(/\{\{(\w+)\}\}/g, (_match, key: string) => (key in values ? String(values[key]) : ""));

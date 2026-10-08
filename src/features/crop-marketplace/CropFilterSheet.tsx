@@ -3,10 +3,11 @@ import { Modal, Platform, Pressable, ScrollView, StyleSheet, Switch, Text, TextI
 import DateTimePicker, { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import { colors } from "@/theme/colors";
 import { EMPTY_FILTERS, formatDay, fromIsoDay, toIsoDay, validateFilters, type CropFilters } from "./cropLogic";
-import { cropStrings as S } from "./strings";
+import { useT } from "@/i18n/useT";
 
 /** A harvest-date box: the phone's date picker on Android and iOS, plain typing in YYYY-MM-DD only where there is no picker (the web preview used for checks). */
 const DateField = ({ label, value, onChange }: { label: string; value: string; onChange: (next: string) => void }) => {
+  const { t, lang } = useT();
   const [iosOpen, setIosOpen] = useState(false);
   const open = () => {
     if (Platform.OS === "android") {
@@ -33,14 +34,14 @@ const DateField = ({ label, value, onChange }: { label: string; value: string; o
           style={({ pressed }) => [styles.dateButton, pressed && { opacity: 0.6 }]}
           onPress={open}
           accessibilityRole="button"
-          accessibilityLabel={`${label}: ${value ? formatDay(value) : S.filters.anyDate}`}
+          accessibilityLabel={`${label}: ${value ? formatDay(value, lang) : t("crops.filters.anyDate")}`}
         >
           <Text style={[styles.dateText, !value && { color: colors.textSecondary }]} numberOfLines={1}>
-            {value ? formatDay(value) : S.filters.anyDate}
+            {value ? formatDay(value, lang) : t("crops.filters.anyDate")}
           </Text>
         </Pressable>
         {value ? (
-          <Pressable style={({ pressed }) => [styles.clearDate, pressed && { opacity: 0.6 }]} onPress={() => onChange("")} accessibilityRole="button" accessibilityLabel={`${S.browse.clearFilters}: ${label}`}>
+          <Pressable style={({ pressed }) => [styles.clearDate, pressed && { opacity: 0.6 }]} onPress={() => onChange("")} accessibilityRole="button" accessibilityLabel={`${t("crops.browse.clearFilters")}: ${label}`}>
             <Text style={styles.clearDateText}>✕</Text>
           </Pressable>
         ) : null}
@@ -70,6 +71,7 @@ interface CropFilterSheetProps {
 
 /** Bottom sheet with the filters that do not fit on the chip row: organic only, price range and harvest dates. Nothing is applied until "Show Results". */
 export const CropFilterSheet = ({ visible, value, onApply, onClear, onClose }: CropFilterSheetProps) => {
+  const { t } = useT();
   const [draft, setDraft] = useState<CropFilters>(value);
   const errors = validateFilters(draft);
   const invalid = Object.keys(errors).length > 0;
@@ -84,45 +86,45 @@ export const CropFilterSheet = ({ visible, value, onApply, onClear, onClose }: C
       onShow={() => setDraft(value)}
     >
       <View style={styles.backdrop}>
-        <Pressable style={styles.backdropTap} onPress={onClose} accessibilityRole="button" accessibilityLabel="Close filters" />
+        <Pressable style={styles.backdropTap} onPress={onClose} accessibilityRole="button" accessibilityLabel={t("crops.filters.close")} />
         <View style={styles.sheet} accessibilityViewIsModal>
           <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.sheetContent}>
             <Text style={styles.title} accessibilityRole="header">
-              {S.browse.filters}
+              {t("crops.browse.filters")}
             </Text>
 
             <View style={styles.switchRow}>
-              <Text style={styles.switchLabel}>{S.filters.organicOnly}</Text>
+              <Text style={styles.switchLabel}>{t("crops.filters.organicOnly")}</Text>
               <Switch
                 value={draft.organicOnly}
                 onValueChange={(next) => set({ organicOnly: next })}
                 trackColor={{ true: colors.primaryLight, false: colors.grey300 }}
                 thumbColor={draft.organicOnly ? colors.primary : colors.surface}
-                accessibilityLabel={S.filters.organicOnly}
+                accessibilityLabel={t("crops.filters.organicOnly")}
               />
             </View>
 
-            <Text style={styles.sectionLabel}>{S.filters.priceRange}</Text>
+            <Text style={styles.sectionLabel}>{t("crops.filters.priceRange")}</Text>
             <View style={styles.pair}>
               <View style={{ flex: 1 }}>
-                <Text style={styles.fieldLabel}>{S.filters.minPrice}</Text>
-                <TextInput style={styles.input} value={draft.minPrice} onChangeText={(t) => set({ minPrice: t })} keyboardType="decimal-pad" placeholder="0" placeholderTextColor={colors.textSecondary} accessibilityLabel={S.filters.minPrice} />
+                <Text style={styles.fieldLabel}>{t("crops.filters.minPrice")}</Text>
+                <TextInput style={styles.input} value={draft.minPrice} onChangeText={(text) => set({ minPrice: text })} keyboardType="decimal-pad" placeholder="0" placeholderTextColor={colors.textSecondary} accessibilityLabel={t("crops.filters.minPrice")} />
               </View>
               <View style={{ width: 12 }} />
               <View style={{ flex: 1 }}>
-                <Text style={styles.fieldLabel}>{S.filters.maxPrice}</Text>
-                <TextInput style={styles.input} value={draft.maxPrice} onChangeText={(t) => set({ maxPrice: t })} keyboardType="decimal-pad" placeholder="∞" placeholderTextColor={colors.textSecondary} accessibilityLabel={S.filters.maxPrice} />
+                <Text style={styles.fieldLabel}>{t("crops.filters.maxPrice")}</Text>
+                <TextInput style={styles.input} value={draft.maxPrice} onChangeText={(text) => set({ maxPrice: text })} keyboardType="decimal-pad" placeholder="∞" placeholderTextColor={colors.textSecondary} accessibilityLabel={t("crops.filters.maxPrice")} />
               </View>
             </View>
-            {errors.price && <Text style={styles.error}>{errors.price === "invalid" ? S.filters.errors.priceInvalid : S.filters.errors.priceOrder}</Text>}
+            {errors.price && <Text style={styles.error}>{errors.price === "invalid" ? t("crops.filters.errors.priceInvalid") : t("crops.filters.errors.priceOrder")}</Text>}
 
-            <Text style={styles.sectionLabel}>{S.filters.harvestDate}</Text>
+            <Text style={styles.sectionLabel}>{t("crops.filters.harvestDate")}</Text>
             <View style={styles.pair}>
-              <DateField label={S.filters.from} value={draft.harvestFrom} onChange={(next) => set({ harvestFrom: next })} />
+              <DateField label={t("crops.filters.from")} value={draft.harvestFrom} onChange={(next) => set({ harvestFrom: next })} />
               <View style={{ width: 12 }} />
-              <DateField label={S.filters.to} value={draft.harvestTo} onChange={(next) => set({ harvestTo: next })} />
+              <DateField label={t("crops.filters.to")} value={draft.harvestTo} onChange={(next) => set({ harvestTo: next })} />
             </View>
-            {errors.harvest && <Text style={styles.error}>{errors.harvest === "invalid" ? S.filters.errors.harvestInvalid : S.filters.errors.harvestOrder}</Text>}
+            {errors.harvest && <Text style={styles.error}>{errors.harvest === "invalid" ? t("crops.filters.errors.harvestInvalid") : t("crops.filters.errors.harvestOrder")}</Text>}
           </ScrollView>
 
           <View style={styles.footer}>
@@ -134,7 +136,7 @@ export const CropFilterSheet = ({ visible, value, onApply, onClear, onClose }: C
               }}
               accessibilityRole="button"
             >
-              <Text style={styles.secondaryButtonText}>{S.browse.clearFilters}</Text>
+              <Text style={styles.secondaryButtonText}>{t("crops.browse.clearFilters")}</Text>
             </Pressable>
             <Pressable
               style={({ pressed }) => [styles.primaryButton, invalid && styles.primaryButtonDisabled, pressed && { opacity: 0.6 }]}
@@ -143,7 +145,7 @@ export const CropFilterSheet = ({ visible, value, onApply, onClear, onClose }: C
               accessibilityRole="button"
               accessibilityState={{ disabled: invalid }}
             >
-              <Text style={styles.primaryButtonText}>{S.browse.showResults}</Text>
+              <Text style={styles.primaryButtonText}>{t("crops.browse.showResults")}</Text>
             </Pressable>
           </View>
         </View>

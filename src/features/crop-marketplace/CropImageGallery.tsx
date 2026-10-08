@@ -3,13 +3,14 @@ import { FlatList, StyleSheet, Text, View, useWindowDimensions } from "react-nat
 import { Image } from "expo-image";
 import { colors } from "@/theme/colors";
 import { MEDIA_WIDTH, resizedMediaUrl } from "@/shared/media";
-import { fill, trimName } from "./cropLogic";
-import { cropStrings as S } from "./strings";
+import { trimName } from "./cropLogic";
+import { useT } from "@/i18n/useT";
 import type { CropListingMedia } from "./types";
 
 /** Swipeable full-width photos with a dot indicator; a plain placeholder when the listing has none. */
 export const CropImageGallery = ({ media, listingName }: { media: CropListingMedia[]; listingName: string }) => {
   const { width } = useWindowDimensions();
+  const { t } = useT();
   const [activeIndex, setActiveIndex] = useState(0);
   const photos = [...media].sort((a, b) => a.sortOrder - b.sortOrder);
   const name = trimName(listingName);
@@ -17,7 +18,7 @@ export const CropImageGallery = ({ media, listingName }: { media: CropListingMed
   if (photos.length === 0) {
     return (
       <View style={[styles.placeholder, { width, height: width }]}>
-        <Text style={styles.placeholderText}>{S.detail.noImage}</Text>
+        <Text style={styles.placeholderText}>{t("crops.detail.noImage")}</Text>
       </View>
     );
   }
@@ -40,12 +41,12 @@ export const CropImageGallery = ({ media, listingName }: { media: CropListingMed
             transition={150}
             accessible
             accessibilityRole="image"
-            accessibilityLabel={item.altText?.trim() || `${name}. ${fill(S.detail.photoOf, { index: index + 1, total: photos.length })}`}
+            accessibilityLabel={item.altText?.trim() || `${name}. ${t("crops.detail.photoOf", { index: index + 1, total: photos.length })}`}
           />
         )}
       />
       {photos.length > 1 && (
-        <View style={styles.dotsRow} accessible accessibilityLabel={fill(S.detail.photoOf, { index: activeIndex + 1, total: photos.length })}>
+        <View style={styles.dotsRow} accessible accessibilityLabel={t("crops.detail.photoOf", { index: activeIndex + 1, total: photos.length })}>
           {photos.map((m, i) => (
             <View key={m.id} style={[styles.dot, i === activeIndex && styles.dotActive]} />
           ))}

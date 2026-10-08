@@ -22,8 +22,8 @@ import { CropImageGallery } from "./CropImageGallery";
 import { CropReviews } from "./CropReviews";
 import { asRailItem } from "./railItem";
 import { QuantityStepper } from "./QuantityStepper";
-import { clampQuantity, fill, formatRupees, harvestLabel, isSoldOut, maxQuantity, trimName } from "./cropLogic";
-import { cropStrings as S } from "./strings";
+import { clampQuantity, formatRupees, harvestLabel, isSoldOut, maxQuantity, trimName } from "./cropLogic";
+import { useT } from "@/i18n/useT";
 
 type DetailRoute = RouteProp<StoreStackParamList, "CropDetail">;
 type Navigation = NativeStackNavigationProp<StoreStackParamList, "CropDetail">;
@@ -31,6 +31,7 @@ type Navigation = NativeStackNavigationProp<StoreStackParamList, "CropDetail">;
 export const CropListingDetailScreen = () => {
   const { params } = useRoute<DetailRoute>();
   const navigation = useNavigation<Navigation>();
+  const { t, lang, errorText } = useT();
   const queryClient = useQueryClient();
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
@@ -85,7 +86,7 @@ export const CropListingDetailScreen = () => {
     const notFound = (detailQuery.error as { status?: number } | null)?.status === 404;
     return (
       <View style={styles.centered}>
-        {notFound ? <EmptyState icon="🌾" message={S.detail.notFound} /> : <ErrorState message={S.detail.loadError} onRetry={() => void detailQuery.refetch()} />}
+        {notFound ? <EmptyState icon="🌾" message={t("crops.detail.notFound")} /> : <ErrorState message={t("crops.detail.loadError")} onRetry={() => void detailQuery.refetch()} />}
       </View>
     );
   }
@@ -95,11 +96,11 @@ export const CropListingDetailScreen = () => {
   const soldOut = isSoldOut(listing.quantityAvailable);
   const cap = maxQuantity(listing.quantityAvailable);
   const shownQuantity = clampQuantity(quantity, listing.quantityAvailable);
-  const harvest = harvestLabel(listing.harvestDate);
+  const harvest = harvestLabel(listing.harvestDate, undefined, lang);
   const related = listing.relatedListings.map(asRailItem);
   const relatedIds = new Set(related.map((r) => r.id));
   const similar = (similarQuery.data?.items ?? []).filter((item) => item.id !== listing.id && !relatedIds.has(item.id));
-  const addErrorMessage = (addMutation.error as { message?: string } | null)?.message || S.detail.addError;
+  const addErrorMessage = errorText(addMutation.error, t("crops.detail.addError"), { details: false });
 
   return (
     <ScrollView style={styles.container}>
@@ -117,7 +118,7 @@ export const CropListingDetailScreen = () => {
         <View style={styles.chipsRow}>
           {listing.isOrganicCertified && (
             <View style={styles.organicChip}>
-              <Text style={styles.organicChipText}>{S.detail.organicCertified}</Text>
+              <Text style={styles.organicChipText}>{t("crops.detail.organicCertified")}</Text>
             </View>
           )}
           {harvest.text ? (
@@ -130,7 +131,7 @@ export const CropListingDetailScreen = () => {
         <Text style={styles.price}>{formatRupees(listing.unitPrice)}</Text>
 
         <Text style={[styles.availability, soldOut && styles.soldOutText]}>
-          {soldOut ? S.detail.soldOut : fill(S.detail.available, { count: listing.quantityAvailable })}
+          {soldOut ? t("crops.detail.soldOut") : t("crops.detail.available", { count: listing.quantityAvailable })}
         </Text>
 
         <Text style={styles.description}>{listing.description}</Text>
@@ -143,13 +144,13 @@ export const CropListingDetailScreen = () => {
               disabled={addMutation.isPending || !cartAllowed}
               onPress={() => addMutation.mutate()}
               accessibilityRole="button"
-              accessibilityLabel={added ? S.detail.addedToCart : S.detail.addToCart}
+              accessibilityLabel={added ? t("crops.detail.addedToCart") : t("crops.detail.addToCart")}
               accessibilityState={{ busy: addMutation.isPending }}
             >
               {addMutation.isPending ? (
                 <ActivityIndicator color={colors.primaryContrastText} />
               ) : (
-                <Text style={styles.addButtonText}>{added ? `${S.detail.addedToCart} ✓` : S.detail.addToCart}</Text>
+                <Text style={styles.addButtonText}>{added ? `${t("crops.detail.addedToCart")} ✓` : t("crops.detail.addToCart")}</Text>
               )}
             </Pressable>
           </View>
@@ -169,12 +170,12 @@ export const CropListingDetailScreen = () => {
       </View>
 
       <RecommendationRail
-        title={S.detail.youMightAlsoLike}
+        title={t("crops.detail.youMightAlsoLike")}
         items={related}
         onPressItem={(item) => navigation.push(item.itemType === "CROP_LISTING" ? "CropDetail" : "ProductDetail", { idOrSlug: item.slug })}
       />
       <RecommendationRail
-        title={S.detail.similarItems}
+        title={t("crops.detail.similarItems")}
         items={similar}
         onPressItem={(item) => navigation.push(item.itemType === "CROP_LISTING" ? "CropDetail" : "ProductDetail", { idOrSlug: item.slug })}
       />

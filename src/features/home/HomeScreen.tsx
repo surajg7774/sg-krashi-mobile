@@ -18,7 +18,6 @@ import { colors } from "@/theme/colors";
 import { MEDIA_WIDTH, resizedMediaUrl } from "@/shared/media";
 import { cropService } from "@/features/crop-marketplace/cropService";
 import { asRailItem } from "@/features/crop-marketplace/railItem";
-import { cropStrings } from "@/features/crop-marketplace/strings";
 import { productService } from "@/features/store/productService";
 import { cartService, CART_QUERY_KEY } from "@/features/cart/cartService";
 import { recommendationService } from "@/features/recommendations/recommendationService";
@@ -210,7 +209,7 @@ export const HomeScreen = () => {
       )}
 
       {/* the rail prints its own title when there are crops; the other states need one here */}
-      {!(cropsQuery.data && cropsQuery.data.items.length > 0) && <Text style={styles.sectionTitle}>{cropStrings.browse.homeSection}</Text>}
+      {!(cropsQuery.data && cropsQuery.data.items.length > 0) && <Text style={styles.sectionTitle}>{t("crops.browse.homeSection")}</Text>}
 
       {cropsQuery.isLoading && (
         <View style={styles.cropSkeleton}>
@@ -218,13 +217,13 @@ export const HomeScreen = () => {
         </View>
       )}
 
-      {cropsQuery.isError && <ErrorState message={cropStrings.browse.loadError} onRetry={() => void cropsQuery.refetch()} />}
+      {cropsQuery.isError && <ErrorState message={t("crops.browse.loadError")} onRetry={() => void cropsQuery.refetch()} />}
 
-      {cropsQuery.data && cropsQuery.data.items.length === 0 && <EmptyState icon="🌾" message={cropStrings.browse.homeEmpty} />}
+      {cropsQuery.data && cropsQuery.data.items.length === 0 && <EmptyState icon="🌾" message={t("crops.browse.homeEmpty")} />}
 
       {cropsQuery.data && cropsQuery.data.items.length > 0 && (
         <RecommendationRail
-          title={cropStrings.browse.homeSection}
+          title={t("crops.browse.homeSection")}
           items={cropsQuery.data.items.map(asRailItem)}
           onPressItem={(item) => navigation.navigate("Store", { screen: "CropDetail", params: { idOrSlug: item.slug } })}
         />

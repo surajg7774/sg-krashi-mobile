@@ -6,21 +6,22 @@ import { MEDIA_WIDTH, resizedMediaUrl } from "@/shared/media";
 import { PricePill } from "@/components/PricePill";
 import { NewBadge } from "@/components/NewBadge";
 import { Rating } from "@/components/Rating";
-import { fill, formatRupees, harvestLabel, isSoldOut, listingAccessibilityLabel, trimName } from "./cropLogic";
-import { cropStrings as S } from "./strings";
+import { formatRupees, harvestLabel, isSoldOut, listingAccessibilityLabel, trimName } from "./cropLogic";
+import { useT } from "@/i18n/useT";
 import type { CropListingSummary } from "./types";
 
 /** One crop in the two-column grid: photo, Sold Out / New and Organic badges, name, rupee price, harvest date, rating. */
 export const CropListingCard = ({ item, onPress }: { item: CropListingSummary; onPress: () => void }) => {
+  const { t, lang } = useT();
   const soldOut = isSoldOut(item.quantityAvailable);
-  const harvest = harvestLabel(item.harvestDate);
+  const harvest = harvestLabel(item.harvestDate, undefined, lang);
 
   return (
     <Pressable
       style={({ pressed }) => [styles.card, pressed && { opacity: 0.6 }]}
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={fill(S.a11y.listing, { label: listingAccessibilityLabel(item) })}
+      accessibilityLabel={t("crops.a11y.listing", { label: listingAccessibilityLabel(item, lang) })}
     >
       <View style={styles.imageWrap}>
         <Image
@@ -34,7 +35,7 @@ export const CropListingCard = ({ item, onPress }: { item: CropListingSummary; o
         />
         {soldOut ? (
           <View style={styles.soldOutBadge}>
-            <Text style={styles.badgeText}>{S.detail.soldOut}</Text>
+            <Text style={styles.badgeText}>{t("crops.detail.soldOut")}</Text>
           </View>
         ) : (
           <View style={styles.leftBadgeSlot}>
@@ -43,7 +44,7 @@ export const CropListingCard = ({ item, onPress }: { item: CropListingSummary; o
         )}
         {item.isOrganicCertified && (
           <View style={styles.organicBadge}>
-            <Text style={styles.badgeText}>{S.detail.organic}</Text>
+            <Text style={styles.badgeText}>{t("crops.detail.organic")}</Text>
           </View>
         )}
       </View>

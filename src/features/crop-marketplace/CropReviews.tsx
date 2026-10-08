@@ -3,8 +3,8 @@ import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-nati
 import { colors } from "@/theme/colors";
 import { ErrorState } from "@/components/ErrorState";
 import { cropService } from "./cropService";
-import { fill, formatInstantIndia, starsText } from "./cropLogic";
-import { cropStrings as S } from "./strings";
+import { formatInstantIndia, starsText } from "./cropLogic";
+import { useT } from "@/i18n/useT";
 
 const PAGE_SIZE = 5;
 
@@ -13,6 +13,7 @@ const PAGE_SIZE = 5;
  * there are reviews, "No reviews yet." when there are none (never an invented rating), and a retry if loading fails.
  */
 export const CropReviews = ({ listingId }: { listingId: number }) => {
+  const { t, lang } = useT();
   const query = useInfiniteQuery({
     queryKey: ["crop-reviews", listingId],
     queryFn: ({ pageParam }) => cropService.getReviews(listingId, pageParam, PAGE_SIZE),
@@ -26,31 +27,31 @@ export const CropReviews = ({ listingId }: { listingId: number }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title} accessibilityRole="header">
-        {S.detail.reviews}
+        {t("crops.detail.reviews")}
       </Text>
 
       {query.isLoading && <ActivityIndicator color={colors.primary} style={{ marginVertical: 16 }} />}
 
-      {query.isError && <ErrorState message={S.reviews.loadError} onRetry={() => void query.refetch()} />}
+      {query.isError && <ErrorState message={t("crops.reviews.loadError")} onRetry={() => void query.refetch()} />}
 
-      {query.isSuccess && reviews.length === 0 && <Text style={styles.empty}>{S.reviews.empty}</Text>}
+      {query.isSuccess && reviews.length === 0 && <Text style={styles.empty}>{t("crops.reviews.empty")}</Text>}
 
       {summary && summary.avgRating !== null && summary.reviewCount > 0 && (
         <Text
           style={styles.summary}
-          accessibilityLabel={fill(S.reviews.summary, { rating: summary.avgRating.toFixed(1), count: summary.reviewCount })}
+          accessibilityLabel={t("crops.reviews.summary", { rating: summary.avgRating.toFixed(1), count: summary.reviewCount })}
         >
           ★ {summary.avgRating.toFixed(1)} · {summary.reviewCount}
         </Text>
       )}
 
       {reviews.map((review) => (
-        <View key={review.id} style={styles.card} accessible accessibilityLabel={`${review.reviewerName?.trim() || S.reviews.anonymous}, ${review.rating} out of 5. ${review.comment ?? ""}`}>
+        <View key={review.id} style={styles.card} accessible accessibilityLabel={t("crops.reviews.reviewA11y", { name: review.reviewerName?.trim() || t("crops.reviews.anonymous"), rating: review.rating, comment: review.comment ?? "" })}>
           <View style={styles.cardHeader}>
             <Text style={styles.name} numberOfLines={1}>
-              {review.reviewerName?.trim() || S.reviews.anonymous}
+              {review.reviewerName?.trim() || t("crops.reviews.anonymous")}
             </Text>
-            <Text style={styles.date}>{formatInstantIndia(review.createdAt)}</Text>
+            <Text style={styles.date}>{formatInstantIndia(review.createdAt, lang)}</Text>
           </View>
           <Text style={styles.stars}>{starsText(review.rating)}</Text>
           {review.comment ? <Text style={styles.comment}>{review.comment}</Text> : null}
@@ -64,7 +65,7 @@ export const CropReviews = ({ listingId }: { listingId: number }) => {
           onPress={() => void query.fetchNextPage()}
           accessibilityRole="button"
         >
-          {query.isFetchingNextPage ? <ActivityIndicator color={colors.primary} /> : <Text style={styles.moreText}>{S.reviews.showMore}</Text>}
+          {query.isFetchingNextPage ? <ActivityIndicator color={colors.primary} /> : <Text style={styles.moreText}>{t("crops.reviews.showMore")}</Text>}
         </Pressable>
       )}
     </View>

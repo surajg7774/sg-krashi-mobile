@@ -12,8 +12,8 @@ import type { StoreStackParamList } from "@/navigation/StoreStackNavigator";
 import { cropService } from "./cropService";
 import { CropListingCard } from "./CropListingCard";
 import { CropFilterSheet } from "./CropFilterSheet";
-import { EMPTY_FILTERS, activeFilterCount, fill, toListingQuery, type CropFilters } from "./cropLogic";
-import { cropStrings as S } from "./strings";
+import { EMPTY_FILTERS, activeFilterCount, toListingQuery, type CropFilters } from "./cropLogic";
+import { useT } from "@/i18n/useT";
 import { LastUpdated } from "@/components/LastUpdated";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { useOfflineData } from "@/offline/useOfflineData";
@@ -25,6 +25,7 @@ type Navigation = NativeStackNavigationProp<StoreStackParamList, "CropList">;
 
 export const CropMarketplaceScreen = () => {
   const navigation = useNavigation<Navigation>();
+  const { t } = useT();
   const [searchInput, setSearchInput] = useState("");
   const search = useDebouncedValue(searchInput, 400);
   const [filters, setFilters] = useState<CropFilters>(EMPTY_FILTERS);
@@ -53,21 +54,21 @@ export const CropMarketplaceScreen = () => {
       <View style={styles.searchRow}>
         <TextInput
           style={styles.searchInput}
-          placeholder={S.filters.searchPlaceholder}
+          placeholder={t("crops.filters.searchPlaceholder")}
           placeholderTextColor={colors.textSecondary}
           value={searchInput}
           onChangeText={setSearchInput}
           returnKeyType="search"
-          accessibilityLabel={S.a11y.searchField}
+          accessibilityLabel={t("crops.a11y.searchField")}
         />
         <Pressable
           style={({ pressed }) => [styles.filterButton, filterCount > 0 && styles.filterButtonActive, pressed && { opacity: 0.6 }]}
           onPress={() => setSheetOpen(true)}
           accessibilityRole="button"
-          accessibilityLabel={filterCount > 0 ? fill(S.a11y.filtersButton, { count: filterCount }) : S.a11y.filtersButtonNone}
+          accessibilityLabel={filterCount > 0 ? t("crops.a11y.filtersButton", { count: filterCount }) : t("crops.a11y.filtersButtonNone")}
         >
           <Text style={[styles.filterButtonText, filterCount > 0 && styles.filterButtonTextActive]}>
-            {S.browse.filters}
+            {t("crops.browse.filters")}
             {filterCount > 0 ? ` (${filterCount})` : ""}
           </Text>
         </Pressable>
@@ -78,7 +79,7 @@ export const CropMarketplaceScreen = () => {
           <FlatList
             horizontal
             showsHorizontalScrollIndicator={false}
-            data={[{ id: 0, name: S.filters.all, slug: "" }, ...categoriesQuery.data]}
+            data={[{ id: 0, name: t("crops.filters.all"), slug: "" }, ...categoriesQuery.data]}
             keyExtractor={(c) => String(c.id)}
             contentContainerStyle={styles.chipRow}
             renderItem={({ item }) => {
@@ -89,7 +90,7 @@ export const CropMarketplaceScreen = () => {
                   onPress={() => setFilters((f) => ({ ...f, cropType: item.slug === "" || f.cropType === item.slug ? undefined : item.slug }))}
                   hitSlop={{ top: 7, bottom: 7 }}
                   accessibilityRole="button"
-                  accessibilityLabel={item.slug === "" ? S.filters.all : fill(S.a11y.categoryChip, { name: item.name })}
+                  accessibilityLabel={item.slug === "" ? t("crops.filters.all") : t("crops.a11y.categoryChip", { name: item.name })}
                   accessibilityState={{ selected }}
                 >
                   <Text style={[styles.chipText, selected && styles.chipTextActive]}>{item.name}</Text>
@@ -103,22 +104,22 @@ export const CropMarketplaceScreen = () => {
       {listingsQuery.isLoading && <CardSkeletonGrid count={6} />}
 
       {/* Full-screen error only when there is nothing to show; saved listings stay on screen after a failed refresh. */}
-      {shouldShowFullError(listingsQuery) && <ErrorState message={S.browse.loadError} onRetry={() => void listingsQuery.refetch()} />}
+      {shouldShowFullError(listingsQuery) && <ErrorState message={t("crops.browse.loadError")} onRetry={() => void listingsQuery.refetch()} />}
 
       {!listingsQuery.isLoading && !shouldShowFullError(listingsQuery) && listings.length === 0 && (
         <EmptyState
           icon="🌾"
           message={
             search.trim() !== ""
-              ? fill(S.browse.emptySearch, { search: search.trim() })
+              ? t("crops.browse.emptySearch", { search: search.trim() })
               : filterCount > 0
-                ? S.browse.empty
-                : S.browse.emptyNone
+                ? t("crops.browse.empty")
+                : t("crops.browse.emptyNone")
           }
           action={
             hasConstraints ? (
               <Pressable style={({ pressed }) => [styles.clearButton, pressed && { opacity: 0.6 }]} onPress={clearAll} accessibilityRole="button">
-                <Text style={styles.clearButtonText}>{filterCount > 0 ? S.browse.clearFilters : S.browse.clearSearch}</Text>
+                <Text style={styles.clearButtonText}>{filterCount > 0 ? t("crops.browse.clearFilters") : t("crops.browse.clearSearch")}</Text>
               </Pressable>
             ) : undefined
           }

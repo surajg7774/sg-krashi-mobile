@@ -9,7 +9,6 @@ import {
   canMarkSoldOut,
   clampQuantity,
   farmerListingStatus,
-  fill,
   filtersAreValid,
   formatDay,
   formatInstantIndia,
@@ -171,11 +170,20 @@ test("a screen reader hears name, price, category, organic, availability and har
   );
 });
 
-test("placeholders are filled like the website's translation strings", () => {
-  assert.equal(fill("Page {{page}} of {{total}}", { page: 2, total: 5 }), "Page 2 of 5");
-  assert.equal(fill("{{count}} available", { count: 250 }), "250 available");
-  assert.equal(fill("Hello {{missing}}!", {}), "Hello !");
-  assert.equal(fill("No placeholders", { a: 1 }), "No placeholders");
+// The {{name}} fill() helper is gone: the crop text moved into src/i18n, whose {name} interpolation is tested in
+// tests/i18n.test.ts. These check the same functions in Hindi; the English checks above are unchanged.
+test("in Hindi, days use Hindi month names and the harvest and screen-reader labels are Hindi", () => {
+  assert.equal(formatDay("2026-10-05", "hi"), "5 अक्टूबर 2026");
+  assert.equal(formatInstantIndia("2026-10-05T19:00:00Z", "hi"), "6 अक्टूबर 2026");
+  assert.deepEqual(harvestLabel("2026-10-12", "2026-10-06", "hi"), { text: "कटाई: 12 अक्टूबर 2026", upcoming: true });
+  assert.deepEqual(harvestLabel("2026-09-25", "2026-10-06", "hi"), { text: "कटाई हुई: 25 सितंबर 2026", upcoming: false });
+  const base = { name: "Green chilli ", unitPrice: 51, quantityAvailable: 250, isOrganicCertified: true, categoryName: "Vegetables", harvestDate: "2020-09-25" };
+  // Server data (name, category) stays as sent; only the app's own words change.
+  assert.equal(listingAccessibilityLabel(base, "hi"), "Green chilli, ₹51, Vegetables, जैविक प्रमाणित, उपलब्ध, कटाई हुई: 25 सितंबर 2020");
+  assert.equal(
+    listingAccessibilityLabel({ ...base, quantityAvailable: 0, isOrganicCertified: false, categoryName: null }, "hi"),
+    "Green chilli, ₹51, स्टॉक समाप्त, कटाई हुई: 25 सितंबर 2020"
+  );
 });
 
 test("the date picker's Date and the typed yyyy-mm-dd day convert both ways", () => {
