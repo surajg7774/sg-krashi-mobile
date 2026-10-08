@@ -2,6 +2,9 @@ import { StyleSheet, Text, View } from "react-native";
 import { colors } from "@/theme/colors";
 import { buildOrderSteps, type StepState, type TimelineStep } from "./orderTimelineSteps";
 import type { OrderStatus, OrderStatusEvent } from "./types";
+import type { Lang, TFunction } from "@/i18n";
+import { formatDateTime } from "@/i18n/format";
+import { useT } from "@/i18n/useT";
 
 const DOT = 14;
 
@@ -36,9 +39,9 @@ const Dot = ({ state }: { state: StepState }) => {
   return <View style={[styles.dot, { backgroundColor: DOT_COLOR[state] }]} />;
 };
 
-const accessibilityText = (step: TimelineStep) => {
-  const when = step.occurredAt ? `, ${new Date(step.occurredAt).toLocaleString()}` : "";
-  const where = step.state === "current" ? ", current step" : step.state === "upcoming" ? ", not yet" : "";
+const accessibilityText = (step: TimelineStep, t: TFunction, lang: Lang) => {
+  const when = step.occurredAt ? `, ${formatDateTime(new Date(step.occurredAt), lang)}` : "";
+  const where = step.state === "current" ? `, ${t("orders.currentStep")}` : step.state === "upcoming" ? `, ${t("orders.notYet")}` : "";
   return `${step.label}${where}${when}`;
 };
 
@@ -55,14 +58,15 @@ interface Props {
  * greyed with no time.
  */
 export const OrderTimeline = ({ events, status }: Props) => {
-  const steps = buildOrderSteps(events, status);
+  const { t, lang } = useT();
+  const steps = buildOrderSteps(events, status, lang);
   return (
     <View style={styles.container}>
       {steps.map((step, index) => {
         const isLast = index === steps.length - 1;
         const nextIsUpcoming = steps[index + 1]?.state === "upcoming";
         return (
-          <View key={step.key} style={styles.row} accessible accessibilityLabel={accessibilityText(step)}>
+          <View key={step.key} style={styles.row} accessible accessibilityLabel={accessibilityText(step, t, lang)}>
             <View style={styles.rail}>
               <Dot state={step.state} />
               {!isLast && (
@@ -76,12 +80,12 @@ export const OrderTimeline = ({ events, status }: Props) => {
                 </Text>
                 {step.state === "current" && (
                   <View style={styles.currentChip}>
-                    <Text style={styles.currentChipText}>Current</Text>
+                    <Text style={styles.currentChipText}>{t("orders.currentChip")}</Text>
                   </View>
                 )}
               </View>
               {step.detail && <Text style={styles.detail}>{step.detail}</Text>}
-              {step.occurredAt && <Text style={styles.time}>{new Date(step.occurredAt).toLocaleString()}</Text>}
+              {step.occurredAt && <Text style={styles.time}>{formatDateTime(new Date(step.occurredAt), lang)}</Text>}
             </View>
           </View>
         );

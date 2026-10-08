@@ -1,14 +1,15 @@
 import { colors } from "@/theme/colors";
+import { translate, type Lang, type MessageKey } from "@/i18n";
 import type { OrderStatus } from "./types";
 
 /** What the customer reads for an order's status, and the colour it carries — one place for the list, the detail card and the title. */
-export const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
-  PENDING_PAYMENT: "Pending Payment",
-  CONFIRMED: "Confirmed",
-  SHIPPED: "Shipped",
-  DELIVERED: "Delivered",
-  PAYMENT_FAILED: "Payment Failed",
-  REFUNDED: "Refunded",
+const ORDER_STATUS_LABEL_KEY: Record<OrderStatus, MessageKey> = {
+  PENDING_PAYMENT: "orders.status.PENDING_PAYMENT",
+  CONFIRMED: "orders.status.CONFIRMED",
+  SHIPPED: "orders.status.SHIPPED",
+  DELIVERED: "orders.status.DELIVERED",
+  PAYMENT_FAILED: "orders.status.PAYMENT_FAILED",
+  REFUNDED: "orders.status.REFUNDED",
 };
 
 export const ORDER_STATUS_COLOR: Record<OrderStatus, string> = {
@@ -21,13 +22,13 @@ export const ORDER_STATUS_COLOR: Record<OrderStatus, string> = {
 };
 
 /** Headline on the order screen. */
-export const ORDER_STATUS_TITLE: Record<OrderStatus, string> = {
-  PENDING_PAYMENT: "Order Placed",
-  CONFIRMED: "Order Confirmed!",
-  SHIPPED: "Order Shipped",
-  DELIVERED: "Order Delivered",
-  PAYMENT_FAILED: "Payment Failed",
-  REFUNDED: "Order Refunded",
+const ORDER_STATUS_TITLE_KEY: Record<OrderStatus, MessageKey> = {
+  PENDING_PAYMENT: "orders.title.PENDING_PAYMENT",
+  CONFIRMED: "orders.title.CONFIRMED",
+  SHIPPED: "orders.title.SHIPPED",
+  DELIVERED: "orders.title.DELIVERED",
+  PAYMENT_FAILED: "orders.title.PAYMENT_FAILED",
+  REFUNDED: "orders.title.REFUNDED",
 };
 
 /**
@@ -35,8 +36,16 @@ export const ORDER_STATUS_TITLE: Record<OrderStatus, string> = {
  * never heard of (the server may add more later). Never crash on it: fall back
  * to the raw value, readable, in the neutral colour.
  */
-export const orderStatusLabel = (status: string): string =>
-  (ORDER_STATUS_LABEL as Record<string, string>)[status] ?? status.replace(/_/g, " ");
+export const orderStatusLabel = (status: string, lang: Lang = "en"): string => {
+  const key = (ORDER_STATUS_LABEL_KEY as Record<string, MessageKey | undefined>)[status];
+  return key ? translate(lang, key) : status.replace(/_/g, " ");
+};
+
+/** The order screen's headline; a status this build does not know reads "Order". */
+export const orderStatusTitle = (status: string, lang: Lang = "en"): string => {
+  const key = (ORDER_STATUS_TITLE_KEY as Record<string, MessageKey | undefined>)[status];
+  return translate(lang, key ?? "orders.fallbackTitle");
+};
 
 export const orderStatusColor = (status: string): string =>
   (ORDER_STATUS_COLOR as Record<string, string>)[status] ?? colors.textSecondary;

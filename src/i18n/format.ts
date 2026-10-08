@@ -24,6 +24,14 @@ export const weekdayShort = (dayIndex: number, lang: Lang = "en"): string => WEE
 export const formatDayMonth = (day: number, monthIndex: number, year: number | null, lang: Lang = "en"): string =>
   `${day} ${monthName(monthIndex, lang)}${year === null ? "" : ` ${year}`}`;
 
+/**
+ * A moment with date and time. English keeps exactly what the app always showed (the engine's toLocaleString, which
+ * follows the phone's own settings); Hindi gets "8 अक्टूबर 2026, 3:42 PM" so the month is in Hindi whatever the phone's
+ * region format is.
+ */
+export const formatDateTime = (date: Date, lang: Lang = "en"): string =>
+  lang === "en" ? date.toLocaleString() : `${formatDayMonth(date.getDate(), date.getMonth(), date.getFullYear(), lang)}, ${formatClock(date)}`;
+
 /** "3:42 PM" - the same in both languages. */
 export const formatClock = (date: Date): string => {
   const hours = date.getHours();

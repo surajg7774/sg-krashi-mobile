@@ -16,29 +16,34 @@ import { OfflineBanner } from "@/components/OfflineBanner";
 import { useOfflineData } from "@/offline/useOfflineData";
 import { shouldShowFullError, shouldShowOfflineBanner } from "@/offline/screenState";
 import { OFFLINE_STRINGS } from "@/offline/strings";
+import { useT } from "@/i18n/useT";
 
 type Navigation = NativeStackNavigationProp<MainStackParamList, "OrderHistory">;
 const PAGE_SIZE = 10;
 
-const OrderRow = ({ order, onPress }: { order: OrderSummary; onPress: () => void }) => (
-  <Pressable style={({ pressed }) => [styles.row, pressed && { opacity: 0.6 }]} onPress={onPress}>
-    <View style={styles.rowLeft}>
-      <Text style={styles.orderNumber}>#{order.orderNumber}</Text>
-      <Text style={styles.itemCount}>
-        {order.itemCount} item{order.itemCount === 1 ? "" : "s"}
-      </Text>
-    </View>
-    <View style={styles.rowRight}>
-      <Text style={styles.amount}>₹{order.totalAmount}</Text>
-      <View style={[styles.statusChip, { borderColor: orderStatusColor(order.status), backgroundColor: `${orderStatusColor(order.status)}1A` }]}>
-        <Text style={[styles.statusChipText, { color: orderStatusColor(order.status) }]}>{orderStatusLabel(order.status)}</Text>
+const OrderRow = ({ order, onPress }: { order: OrderSummary; onPress: () => void }) => {
+  const { t, lang } = useT();
+  return (
+    <Pressable style={({ pressed }) => [styles.row, pressed && { opacity: 0.6 }]} onPress={onPress}>
+      <View style={styles.rowLeft}>
+        <Text style={styles.orderNumber}>#{order.orderNumber}</Text>
+        <Text style={styles.itemCount}>
+          {t("common.itemCount", { count: order.itemCount })}
+        </Text>
       </View>
-    </View>
-  </Pressable>
-);
+      <View style={styles.rowRight}>
+        <Text style={styles.amount}>₹{order.totalAmount}</Text>
+        <View style={[styles.statusChip, { borderColor: orderStatusColor(order.status), backgroundColor: `${orderStatusColor(order.status)}1A` }]}>
+          <Text style={[styles.statusChipText, { color: orderStatusColor(order.status) }]}>{orderStatusLabel(order.status, lang)}</Text>
+        </View>
+      </View>
+    </Pressable>
+  );
+};
 
 export const OrderHistoryScreen = () => {
   const navigation = useNavigation<Navigation>();
+  const { t } = useT();
 
   const ordersQuery = useInfiniteQuery({
     queryKey: ["orders", "my"],
@@ -62,7 +67,7 @@ export const OrderHistoryScreen = () => {
   if (shouldShowFullError(ordersQuery)) {
     return (
       <View style={styles.centered}>
-        <ErrorState message="Could not load your orders." onRetry={() => void ordersQuery.refetch()} />
+        <ErrorState message={t("orders.loadError")} onRetry={() => void ordersQuery.refetch()} />
       </View>
     );
   }
@@ -72,13 +77,13 @@ export const OrderHistoryScreen = () => {
       <View style={styles.centered}>
         <EmptyState
           icon="📦"
-          message="You haven't placed any orders yet."
+          message={t("orders.empty")}
           action={
             <Pressable
               style={({ pressed }) => [styles.browseButton, pressed && { opacity: 0.6 }]}
               onPress={() => navigation.navigate("MainTabs", { screen: "Store", params: { screen: "StoreList" } })}
             >
-              <Text style={styles.browseButtonText}>Browse Store</Text>
+              <Text style={styles.browseButtonText}>{t("cart.browseStore")}</Text>
             </Pressable>
           }
         />

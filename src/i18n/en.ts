@@ -278,6 +278,54 @@ export const en = {
   payment: {
     readError: "Could not read the payment result. Please try again.",
   },
+  orders: {
+    status: {
+      PENDING_PAYMENT: "Pending Payment",
+      CONFIRMED: "Confirmed",
+      SHIPPED: "Shipped",
+      DELIVERED: "Delivered",
+      PAYMENT_FAILED: "Payment Failed",
+      REFUNDED: "Refunded",
+    },
+    title: {
+      PENDING_PAYMENT: "Order Placed",
+      CONFIRMED: "Order Confirmed!",
+      SHIPPED: "Order Shipped",
+      DELIVERED: "Order Delivered",
+      PAYMENT_FAILED: "Payment Failed",
+      REFUNDED: "Order Refunded",
+    },
+    fallbackTitle: "Order",
+    step: {
+      PENDING_PAYMENT: "Order placed",
+      CONFIRMED: "Payment confirmed",
+      SHIPPED: "Shipped",
+      DELIVERED: "Delivered",
+      PAYMENT_FAILED: "Payment failed",
+      REFUNDED: "Refunded",
+    },
+    waitingForPayment: "Waiting for payment",
+    currentChip: "Current",
+    currentStep: "current step",
+    notYet: "not yet",
+    notFound: "We couldn't find that order.",
+    orderNumber: "Order #{number}",
+    openItem: "Open {name}, quantity {quantity}, ₹{total}",
+    payNow: "Pay Now",
+    startPaymentError: "Unable to start payment. Please try again.",
+    waitingConfirmation: "Waiting for payment confirmation…",
+    takingLong:
+      "This is taking longer than expected. Your payment may still be processing — check Order History in a few minutes, or come back to this order later.",
+    checkAgain: "Check Again",
+    paymentFailed:
+      "Your payment didn't go through and the reserved stock has been released. Please place a new order to try again.",
+    statusSection: "Order status",
+    continueShopping: "Continue Shopping",
+    viewOrders: "View Orders",
+    paymentDescription: "Order {number}",
+    loadError: "Could not load your orders.",
+    empty: "You haven't placed any orders yet.",
+  },
 } as const;
 
 type Widen<T> = T extends string ? string : T extends PluralForms ? PluralForms : { readonly [K in keyof T]: Widen<T[K]> };

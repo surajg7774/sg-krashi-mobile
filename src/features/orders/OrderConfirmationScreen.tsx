@@ -15,7 +15,7 @@ import { RazorpayWebView, type RazorpaySuccessPayload } from "@/features/payment
 import type { PaymentInitiation } from "@/features/payment/types";
 import { OrderTimeline } from "./OrderTimeline";
 import { isActiveOrderStatus } from "./orderTimelineSteps";
-import { orderStatusColor, orderStatusLabel, ORDER_STATUS_TITLE } from "./orderStatusDisplay";
+import { orderStatusColor, orderStatusLabel, orderStatusTitle } from "./orderStatusDisplay";
 import type { MainStackParamList } from "@/navigation/MainStackNavigator";
 import { ErrorState } from "@/components/ErrorState";
 import { LastUpdated } from "@/components/LastUpdated";
@@ -23,6 +23,7 @@ import { OfflineBanner } from "@/components/OfflineBanner";
 import { useOfflineData } from "@/offline/useOfflineData";
 import { canOfferPayment, orderAddressView, shouldShowFullError, shouldShowOfflineBanner } from "@/offline/screenState";
 import { OFFLINE_STRINGS } from "@/offline/strings";
+import { useT } from "@/i18n/useT";
 
 type Navigation = NativeStackNavigationProp<MainStackParamList, "OrderConfirmation">;
 type ConfirmationRoute = RouteProp<MainStackParamList, "OrderConfirmation">;
@@ -48,6 +49,7 @@ export const OrderConfirmationScreen = () => {
   const navigation = useNavigation<Navigation>();
   const { params } = useRoute<ConfirmationRoute>();
   const { user } = useAuth();
+  const { t, lang } = useT();
   const queryClient = useQueryClient();
   const [initiation, setInitiation] = useState<PaymentInitiation | null>(null);
   const [paymentSubmitted, setPaymentSubmitted] = useState(false);
@@ -82,7 +84,7 @@ export const OrderConfirmationScreen = () => {
   const initiateMutation = useMutation({
     mutationFn: () => paymentService.initiatePayment({ payableType: "ORDER", payableId: params.orderId }),
     onSuccess: setInitiation,
-    onError: () => setPaymentError("Unable to start payment. Please try again."),
+    onError: () => setPaymentError(t("orders.startPaymentError")),
   });
 
   const handlePayNow = () => {
@@ -121,7 +123,7 @@ export const OrderConfirmationScreen = () => {
   if (shouldShowFullError(orderQuery) || !orderQuery.data) {
     return (
       <View style={styles.centered}>
-        <ErrorState message="We couldn't find that order." onRetry={() => void orderQuery.refetch()} />
+        <ErrorState message={t("orders.notFound")} onRetry={() => void orderQuery.refetch()} />
       </View>
     );
   }
@@ -133,9 +135,9 @@ export const OrderConfirmationScreen = () => {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.containerContent}>
       <View style={styles.card}>
-        <Text style={styles.title}>{ORDER_STATUS_TITLE[order.status] ?? "Order"}</Text>
-        <Text style={styles.orderNumber}>Order #{order.orderNumber}</Text>
-        <Text style={[styles.statusBadge, { color: orderStatusColor(order.status) }]}>{orderStatusLabel(order.status)}</Text>
+        <Text style={styles.title}>{orderStatusTitle(order.status, lang)}</Text>
+        <Text style={styles.orderNumber}>{t("orders.orderNumber", { number: order.orderNumber })}</Text>
+        <Text style={[styles.statusBadge, { color: orderStatusColor(order.status) }]}>{orderStatusLabel(order.status, lang)}</Text>
         <Text style={styles.amount}>₹{order.totalAmount}</Text>
         <OfflineBanner visible={shouldShowOfflineBanner(offline)} onRetry={() => void orderQuery.refetch()} />
         <LastUpdated
@@ -156,7 +158,7 @@ export const OrderConfirmationScreen = () => {
               })
             }
             accessibilityRole="button"
-            accessibilityLabel={`Open ${trimName(item.itemName)}, quantity ${item.quantity}, ₹${item.lineTotal}`}
+            accessibilityLabel={t("orders.openItem", { name: trimName(item.itemName), quantity: item.quantity, total: item.lineTotal })}
           >
             <Image source={resizedMediaUrl(item.thumbnailUrl, MEDIA_WIDTH.row)} style={styles.itemThumb} contentFit="cover" accessible={false} />
             <Text style={styles.itemName}>
@@ -181,7 +183,7 @@ export const OrderConfirmationScreen = () => {
               {initiateMutation.isPending ? (
                 <ActivityIndicator color={colors.primaryContrastText} />
               ) : (
-                <Text style={styles.payButtonText}>Pay Now</Text>
+                <Text style={styles.payButtonText}>{t("orders.payNow")}</Text>
               )}
             </Pressable>
           </>
@@ -190,33 +192,27 @@ export const OrderConfirmationScreen = () => {
         {order.status === "PENDING_PAYMENT" && paymentSubmitted && !pollTimedOut && (
           <View style={styles.waitingRow}>
             <ActivityIndicator color={colors.primary} />
-            <Text style={styles.waitingText}>Waiting for payment confirmation…</Text>
+            <Text style={styles.waitingText}>{t("orders.waitingConfirmation")}</Text>
           </View>
         )}
 
         {order.status === "PENDING_PAYMENT" && pollTimedOut && (
           <View style={styles.timeoutBox}>
-            <Text style={styles.timeoutText}>
-              This is taking longer than expected. Your payment may still be processing — check Order History in
-              a few minutes, or come back to this order later.
-            </Text>
+            <Text style={styles.timeoutText}>{t("orders.takingLong")}</Text>
             <Pressable style={({ pressed }) => [styles.refreshButton, pressed && { opacity: 0.6 }]} onPress={() => void orderQuery.refetch()}>
-              <Text style={styles.refreshButtonText}>Check Again</Text>
+              <Text style={styles.refreshButtonText}>{t("orders.checkAgain")}</Text>
             </Pressable>
           </View>
         )}
 
         {order.status === "PAYMENT_FAILED" && (
-          <Text style={styles.failedText}>
-            Your payment didn't go through and the reserved stock has been released. Please place a new order to
-            try again.
-          </Text>
+          <Text style={styles.failedText}>{t("orders.paymentFailed")}</Text>
         )}
 
         {addressView.kind === "online-only" && <Text style={styles.waitingText}>{addressView.note}</Text>}
 
         <View style={styles.timelineSection}>
-          <Text style={styles.sectionTitle}>Order status</Text>
+          <Text style={styles.sectionTitle}>{t("orders.statusSection")}</Text>
           <OrderTimeline events={order.statusHistory} status={order.status} />
         </View>
 
@@ -225,10 +221,10 @@ export const OrderConfirmationScreen = () => {
             style={({ pressed }) => [styles.secondaryButton, pressed && { opacity: 0.6 }]}
             onPress={() => navigation.navigate("MainTabs", { screen: "Store", params: { screen: "StoreList" } })}
           >
-            <Text style={styles.secondaryButtonText}>Continue Shopping</Text>
+            <Text style={styles.secondaryButtonText}>{t("orders.continueShopping")}</Text>
           </Pressable>
           <Pressable style={({ pressed }) => [styles.secondaryButton, pressed && { opacity: 0.6 }]} onPress={() => navigation.navigate("OrderHistory")}>
-            <Text style={styles.secondaryButtonText}>View Orders</Text>
+            <Text style={styles.secondaryButtonText}>{t("orders.viewOrders")}</Text>
           </Pressable>
         </View>
       </View>
@@ -237,7 +233,7 @@ export const OrderConfirmationScreen = () => {
         <RazorpayWebView
           visible
           initiation={initiation}
-          description={`Order ${order.orderNumber}`}
+          description={t("orders.paymentDescription", { number: order.orderNumber })}
           prefill={{ name: user?.name, email: user?.email }}
           onSuccess={(payload) => {
             void queryClient.invalidateQueries({ queryKey: ["order", params.orderId] });

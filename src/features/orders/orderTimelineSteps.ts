@@ -2,6 +2,7 @@
 // admin-only actor labels — the customer API never sends who made a change).
 // Keep the two in step: same states, same rule that "Shipped" is never a phantom
 // upcoming step.
+import { translate, type Lang, type MessageKey } from "../../i18n/index.ts";
 import type { OrderStatus, OrderStatusEvent } from "./types";
 
 export type StepState = "done" | "current" | "upcoming" | "failed" | "refunded";
@@ -17,13 +18,19 @@ export interface TimelineStep {
   detail: string | null;
 }
 
-export const STEP_LABEL: Record<OrderStatus, string> = {
-  PENDING_PAYMENT: "Order placed",
-  CONFIRMED: "Payment confirmed",
-  SHIPPED: "Shipped",
-  DELIVERED: "Delivered",
-  PAYMENT_FAILED: "Payment failed",
-  REFUNDED: "Refunded",
+const STEP_LABEL_KEY: Record<OrderStatus, MessageKey> = {
+  PENDING_PAYMENT: "orders.step.PENDING_PAYMENT",
+  CONFIRMED: "orders.step.CONFIRMED",
+  SHIPPED: "orders.step.SHIPPED",
+  DELIVERED: "orders.step.DELIVERED",
+  PAYMENT_FAILED: "orders.step.PAYMENT_FAILED",
+  REFUNDED: "orders.step.REFUNDED",
+};
+
+/** A step's label in `lang`; a status this build does not know is shown as sent. */
+export const stepLabel = (status: string, lang: Lang = "en"): string => {
+  const key = (STEP_LABEL_KEY as Record<string, MessageKey | undefined>)[status];
+  return key ? translate(lang, key) : status;
 };
 
 /** Statuses an order can still move on from by itself — worth re-checking in the background. */
@@ -51,7 +58,7 @@ const UPCOMING: Record<OrderStatus, OrderStatus[]> = {
  * failed/refunded for those terminal outcomes), then — only while the order is
  * still in progress — the greyed steps still ahead, with no time.
  */
-export const buildOrderSteps = (events: OrderStatusEvent[], status: OrderStatus): TimelineStep[] => {
+export const buildOrderSteps = (events: OrderStatusEvent[], status: OrderStatus, lang: Lang = "en"): TimelineStep[] => {
   const steps: TimelineStep[] = events.map((event, index) => {
     const isLast = index === events.length - 1;
     let state: StepState = "done";
@@ -62,10 +69,10 @@ export const buildOrderSteps = (events: OrderStatusEvent[], status: OrderStatus)
     return {
       key: `${event.status}-${event.occurredAt}`,
       status: event.status,
-      label: STEP_LABEL[event.status] ?? event.status,
+      label: stepLabel(event.status, lang),
       state,
       occurredAt: event.occurredAt,
-      detail: state === "current" && event.status === "PENDING_PAYMENT" ? "Waiting for payment" : null,
+      detail: state === "current" && event.status === "PENDING_PAYMENT" ? translate(lang, "orders.waitingForPayment") : null,
     };
   });
 
@@ -74,7 +81,7 @@ export const buildOrderSteps = (events: OrderStatusEvent[], status: OrderStatus)
     steps.push({
       key: `${status}-none`,
       status,
-      label: STEP_LABEL[status] ?? status,
+      label: stepLabel(status, lang),
       state: status === "PAYMENT_FAILED" ? "failed" : status === "REFUNDED" ? "refunded" : "current",
       occurredAt: null,
       detail: null,
@@ -86,7 +93,7 @@ export const buildOrderSteps = (events: OrderStatusEvent[], status: OrderStatus)
     steps.push({
       key: `${ahead}-upcoming`,
       status: ahead,
-      label: STEP_LABEL[ahead],
+      label: stepLabel(ahead, lang),
       state: "upcoming",
       occurredAt: null,
       detail: null,
