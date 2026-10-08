@@ -36,7 +36,7 @@ type Navigation = NativeStackNavigationProp<StoreStackParamList, "ProductDetail"
 export const ProductDetailScreen = () => {
   const { params } = useRoute<DetailRoute>();
   const navigation = useNavigation<Navigation>();
-  const { t } = useT();
+  const { t, errorText } = useT();
   const queryClient = useQueryClient();
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [addedFeedback, setAddedFeedback] = useState(false);
@@ -158,7 +158,7 @@ export const ProductDetailScreen = () => {
         {!cartAllowed && <Text style={styles.errorText}>{t("offline.addToCartNeedsInternet")}</Text>}
 
         {addToCartMutation.isError && (
-          <Text style={styles.errorText}>{t("store.product.addError")}</Text>
+          <Text style={styles.errorText}>{errorText(addToCartMutation.error, "cart")}</Text>
         )}
       </View>
 

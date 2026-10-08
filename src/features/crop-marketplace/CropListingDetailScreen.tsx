@@ -99,7 +99,7 @@ export const CropListingDetailScreen = () => {
   const related = listing.relatedListings.map(asRailItem);
   const relatedIds = new Set(related.map((r) => r.id));
   const similar = (similarQuery.data?.items ?? []).filter((item) => item.id !== listing.id && !relatedIds.has(item.id));
-  const addErrorMessage = errorText(addMutation.error, t("crops.detail.addError"), { details: false });
+  const addErrorMessage = errorText(addMutation.error, "cart");
 
   return (
     <ScrollView style={styles.container}>

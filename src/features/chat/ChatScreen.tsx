@@ -56,7 +56,7 @@ export const ChatScreen = () => {
       const reply = await chatService.sendMessage(sessionId, text);
       setMessages((prev) => [...prev, reply]);
     } catch (err) {
-      setSendError(errorText(err, t("chat.sendError"), { details: false }));
+      setSendError(errorText(err, "chat"));
     } finally {
       setIsSending(false);
       setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 100);

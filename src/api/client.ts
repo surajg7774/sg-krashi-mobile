@@ -1,5 +1,5 @@
 import axios, { type InternalAxiosRequestConfig, type AxiosError } from "axios";
-import type { ApiError, ApiErrorResponse, ApiResponse } from "./types";
+import type { ApiError, ApiErrorDetail, ApiErrorResponse, ApiResponse } from "./types";
 import { tokenStorage } from "./tokenStorage";
 import { timeoutForRequest } from "@/offline/queryPolicy";
 
@@ -117,16 +117,24 @@ apiClient.interceptors.response.use(
     }
 
     const responseBody = error.response?.data;
-    const normalized: ApiError = responseBody
+    const retryAfter = Number(error.response?.headers?.["retry-after"]);
+    const httpStatus: number | undefined = error.response?.status;
+    // An answer that is not our JSON error body (a proxy or CDN error page, an empty body) still has an HTTP status:
+    // keep it, so the friendly message can follow the status instead of this interceptor throwing.
+    const apiError = responseBody && typeof responseBody === "object" ? (responseBody as { error?: ApiErrorDetail }).error : undefined;
+    const normalized: ApiError = apiError
       ? {
-          code: responseBody.error.code,
-          message: responseBody.error.message,
-          details: responseBody.error.details,
+          code: apiError.code,
+          message: apiError.message,
+          details: Array.isArray(apiError.details) ? apiError.details : [],
           status: error.response?.status,
+          ...(Number.isFinite(retryAfter) && retryAfter > 0 ? { retryAfterSeconds: retryAfter } : {}),
         }
-      : {
+      : httpStatus !== undefined
+        ? { code: "HTTP_ERROR", message: "", details: [], status: httpStatus }
+        : {
           code: "NETWORK_ERROR",
-          message: error.message || "Network error", // i18n-ignore (errorText shows a translated sentence for NETWORK_ERROR)
+          message: error.message || "Network error", // i18n-ignore (never shown: the friendly message follows the NETWORK_ERROR code)
           details: [],
           status: error.response?.status,
         };

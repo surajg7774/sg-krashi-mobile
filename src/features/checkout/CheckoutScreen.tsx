@@ -17,7 +17,7 @@ type CheckoutRoute = RouteProp<MainStackParamList, "Checkout">;
 
 export const CheckoutScreen = () => {
   const navigation = useNavigation<Navigation>();
-  const { t } = useT();
+  const { t, errorText } = useT();
   const { params } = useRoute<CheckoutRoute>();
   const queryClient = useQueryClient();
 
@@ -86,7 +86,7 @@ export const CheckoutScreen = () => {
         </View>
 
         {checkoutMutation.isError && (
-          <Text style={styles.errorText}>{t("checkout.placeError")}</Text>
+          <Text style={styles.errorText}>{errorText(checkoutMutation.error, "checkout")}</Text>
         )}
       </ScrollView>
 

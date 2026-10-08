@@ -39,7 +39,7 @@ const EMPTY_FORM: AddressPayload = { line1: "", line2: "", city: "", state: "", 
 
 export const AddressSelectScreen = () => {
   const navigation = useNavigation<Navigation>();
-  const { t } = useT();
+  const { t, errorText } = useT();
   const queryClient = useQueryClient();
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -141,7 +141,7 @@ export const AddressSelectScreen = () => {
             onChangeText={(v) => setForm((f) => ({ ...f, pincode: v }))}
           />
 
-          {createMutation.isError && <Text style={styles.errorText}>{t("address.saveError")}</Text>}
+          {createMutation.isError && <Text style={styles.errorText}>{errorText(createMutation.error, "address")}</Text>}
 
           <View style={styles.formButtonRow}>
             <Pressable style={({ pressed }) => [styles.formCancelButton, pressed && { opacity: 0.6 }]} onPress={() => setShowForm(false)}>

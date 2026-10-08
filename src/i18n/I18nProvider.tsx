@@ -1,7 +1,7 @@
 import { createContext, useMemo, useSyncExternalStore, type ReactNode } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createLanguageStore, makeT, readDeviceLocale, type Lang, type TFunction } from "./index";
-import { errorText, type ErrorTextOptions } from "./errorText";
+import { friendlyError, type ErrorContext } from "./friendlyError";
 
 /**
  * The app's one language store. Created when this module is first imported (App.tsx imports it), so the stored
@@ -14,8 +14,11 @@ export interface I18nValue {
   lang: Lang;
   t: TFunction;
   setLanguage: (lang: Lang) => Promise<void>;
-  /** Text for a failed request: server details/message as sent, else `fallback`; "no connection" in Hindi. */
-  errorText: (error: unknown, fallback: string, options?: ErrorTextOptions) => string;
+  /**
+   * The friendly, translated sentence for a failed request (src/i18n/friendlyError.ts). Never the server's own text,
+   * a code or a status number; the original error is logged in development builds only.
+   */
+  errorText: (error: unknown, context?: ErrorContext) => string;
 }
 
 const valueFor = (lang: Lang): I18nValue => {
@@ -24,7 +27,11 @@ const valueFor = (lang: Lang): I18nValue => {
     lang,
     t,
     setLanguage: languageStore.setLanguage,
-    errorText: (error, fallback, options) => errorText(error, fallback, { lang, networkText: t("errors.network") }, options),
+    errorText: (error, context = "generic") => {
+      if (__DEV__) console.warn(`[error:${context}]`, error);
+      const friendly = friendlyError(error, context);
+      return t(friendly.key, friendly.params);
+    },
   };
 };
 

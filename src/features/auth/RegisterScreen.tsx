@@ -65,7 +65,7 @@ export const RegisterScreen = () => {
       // ("Request validation failed") — showing only the latter was the
       // actual bug: every validation failure looked identical and gave no
       // clue which field or why.
-      setError(errorText(err, t("auth.register.failed")));
+      setError(errorText(err, "register"));
     } finally {
       setIsSubmitting(false);
     }

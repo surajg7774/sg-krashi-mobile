@@ -97,7 +97,7 @@ export const DeleteAccountModal = ({ visible, onClose }: DeleteAccountModalProps
       await logout();
     } catch (err) {
       // The server says why it refuses (an order, booking or payout in flight); that message is shown as sent.
-      setError(errorText(err, t("account.deleteFailed"), { details: false }));
+      setError(errorText(err, "account"));
       setIsDeleting(false);
     }
   };

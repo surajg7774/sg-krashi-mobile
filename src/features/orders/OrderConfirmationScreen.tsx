@@ -49,7 +49,7 @@ export const OrderConfirmationScreen = () => {
   const navigation = useNavigation<Navigation>();
   const { params } = useRoute<ConfirmationRoute>();
   const { user } = useAuth();
-  const { t, lang } = useT();
+  const { t, lang, errorText } = useT();
   const queryClient = useQueryClient();
   const [initiation, setInitiation] = useState<PaymentInitiation | null>(null);
   const [paymentSubmitted, setPaymentSubmitted] = useState(false);
@@ -84,7 +84,7 @@ export const OrderConfirmationScreen = () => {
   const initiateMutation = useMutation({
     mutationFn: () => paymentService.initiatePayment({ payableType: "ORDER", payableId: params.orderId }),
     onSuccess: setInitiation,
-    onError: () => setPaymentError(t("orders.startPaymentError")),
+    onError: (err) => setPaymentError(errorText(err, "payment")),
   });
 
   const handlePayNow = () => {

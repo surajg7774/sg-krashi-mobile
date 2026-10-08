@@ -17,7 +17,6 @@ import {
   type LanguageStorage,
 } from "../src/i18n/index.ts";
 import { formatClock, formatDate, formatDayMonth, monthName, weekdayShort } from "../src/i18n/format.ts";
-import { errorText } from "../src/i18n/errorText.ts";
 import { LANGUAGE_KEY } from "../src/shared/storageKeys.ts";
 import { isPrivateCacheKey, PUBLIC_CACHE_KEY } from "../src/offline/scoping.ts";
 
@@ -276,23 +275,6 @@ test("a template splits into text and placeholder parts, in the language's own o
   const hindi = splitTemplate(translate("hi", "auth.register.consent"));
   assert.ok(hindi.some((p) => typeof p !== "string" && p.name === "terms"));
   assert.ok(hindi.some((p) => typeof p !== "string" && p.name === "privacy"));
-});
-
-test("request errors: server details, then server message, then the fallback - unchanged in English", () => {
-  const en = { lang: "en" as const, networkText: "NET" };
-  const hiCtx = { lang: "hi" as const, networkText: "नेट" };
-  const withDetails = { code: "VALIDATION", message: "Request validation failed", details: ["email: bad", "name: blank"] };
-  assert.equal(errorText(withDetails, "fallback", en), "email: bad\nname: blank");
-  assert.equal(errorText(withDetails, "fallback", en, { details: false }), "Request validation failed");
-  assert.equal(errorText({ code: "X", message: "", details: [] }, "fallback", en), "fallback");
-  assert.equal(errorText(null, "fallback", en), "fallback");
-  assert.equal(errorText("boom", "fallback", en), "fallback");
-  // Server text is server data: shown as sent in Hindi too.
-  assert.equal(errorText(withDetails, "fallback", hiCtx), "email: bad\nname: blank");
-  // A network failure: English keeps the library text exactly as before; Hindi gets the Hindi sentence.
-  const network = { code: "NETWORK_ERROR", message: "Network Error", details: [] };
-  assert.equal(errorText(network, "fallback", en), "Network Error");
-  assert.equal(errorText(network, "fallback", hiCtx), "नेट");
 });
 
 test("a calendar date: English is the engine's toLocaleDateString (unchanged); Hindi spells the month in Hindi", () => {

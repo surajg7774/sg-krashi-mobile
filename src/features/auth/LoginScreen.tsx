@@ -42,7 +42,7 @@ export const LoginScreen = () => {
     } catch (err) {
       // See RegisterScreen's identical fix — the backend's per-field reason
       // lives in `details`, not just the generic top-level `message`.
-      setError(errorText(err, t("auth.login.failed")));
+      setError(errorText(err, "login"));
     } finally {
       setIsSubmitting(false);
     }

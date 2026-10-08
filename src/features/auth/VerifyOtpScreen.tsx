@@ -61,7 +61,7 @@ export const VerifyOtpScreen = () => {
       // isAuthenticated, and RootNavigator (not this screen) reacts to that
       // by swapping the whole guest stack out, same as after a normal login.
     } catch (err) {
-      setError(errorText(err, t("auth.otp.verifyFailed")));
+      setError(errorText(err, "otp"));
     } finally {
       setIsVerifying(false);
     }
@@ -74,7 +74,7 @@ export const VerifyOtpScreen = () => {
       await authService.resendOtp({ email });
       setCooldown(RESEND_COOLDOWN_SECONDS);
     } catch (err) {
-      setError(errorText(err, t("auth.otp.resendFailed"), { details: false }));
+      setError(errorText(err, "resendOtp"));
     } finally {
       setIsResending(false);
     }

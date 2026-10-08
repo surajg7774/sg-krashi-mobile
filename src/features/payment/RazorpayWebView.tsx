@@ -79,7 +79,7 @@ const buildCheckoutHtml = (
         });
         rzp.open();
       } catch (e) {
-        post({ type: "error", message: String(e && e.message ? e.message : e) });
+        post({ type: "error", message: String(e) });
       }
     </script>
   </body>
@@ -104,8 +104,10 @@ export const RazorpayWebView = ({
       } else if (message.type === "dismiss") {
         onDismiss();
       } else {
-        // Razorpay's own description is shown as sent; with none, the app's (translated) "Payment failed".
-        onError(message.message || t("payment.failed"));
+        // Razorpay's own wording is third-party text and can be technical or English-only: it is logged in development
+        // builds, and the person gets the app's own sentence.
+        if (__DEV__) console.warn("[RazorpayWebView] payment error:", message.message);
+        onError(t("errors.paymentFailed"));
       }
     } catch {
       onError(t("payment.readError"));

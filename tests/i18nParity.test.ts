@@ -98,9 +98,11 @@ test("every key the code names exists (checked at compile time for t(), and here
   const known = new Set([...EN.keys()].map((key) => key.replace(/#other$/, "")));
   const groups = ["auth", "onboarding", "home", "weather", "crops", "store", "cart", "address", "checkout", "payment", "orders", "profile", "account", "notifications", "cropDoctor", "chat", "farmer", "mandi", "nav", "offline", "common", "language", "errors"];
   const pattern = new RegExp(`"((?:${groups.join("|")})\\.[A-Za-z0-9_.]+)"`, "g");
+  // Strings that look like a key but are not ours: the name of Razorpay's own "payment.failed" event, in its page script.
+  const notKeys = new Set(["payment.failed"]);
   const missing = new Set<string>();
   for (const match of allSource.matchAll(pattern)) {
-    if (!known.has(match[1])) missing.add(match[1]);
+    if (!known.has(match[1]) && !notKeys.has(match[1])) missing.add(match[1]);
   }
   assert.deepEqual([...missing], [], `keys used but not defined: ${[...missing].join(", ")}`);
 });

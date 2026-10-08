@@ -294,7 +294,7 @@ export const CropDoctorScreen = () => {
 
           {analyzeMutation.isError && (
             <Text style={styles.errorText}>
-              {errorText(analyzeMutation.error, t("cropDoctor.analyzeError"), { details: false })}
+              {errorText(analyzeMutation.error, "cropDoctor")}
             </Text>
           )}
 

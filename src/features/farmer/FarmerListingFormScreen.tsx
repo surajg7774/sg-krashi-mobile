@@ -107,7 +107,7 @@ export const FarmerListingFormScreen = () => {
       setMedia(detail.media);
       invalidateListingLists();
     },
-    onError: (err) => setFormError(errorText(err, t("farmer.form.saveError"), { details: false })),
+    onError: (err) => setFormError(errorText(err, "farmer")),
   });
 
   const updateMutation = useMutation({
@@ -118,7 +118,7 @@ export const FarmerListingFormScreen = () => {
       void queryClient.invalidateQueries({ queryKey: ["farmer-listing-detail", listingId] });
       Alert.alert(t("farmer.form.savedTitle"), t("farmer.form.savedBody"));
     },
-    onError: (err) => setFormError(errorText(err, t("farmer.form.saveError"), { details: false })),
+    onError: (err) => setFormError(errorText(err, "farmer")),
   });
 
   const deactivateMutation = useMutation({
@@ -139,12 +139,13 @@ export const FarmerListingFormScreen = () => {
       void queryClient.invalidateQueries({ queryKey: ["farmer-listing-detail", listingId] });
       Alert.alert(t("crops.farmer.markSoldOutDoneTitle"), t("crops.farmer.markSoldOutDoneBody"));
     },
-    onError: (err) => setFormError(errorText(err, t("crops.farmer.markSoldOutError"), { details: false })),
+    onError: (err) => setFormError(errorText(err, "soldOut")),
   });
 
   const uploadMediaMutation = useMutation({
     mutationFn: (image: { uri: string; name: string; type: string }) => farmerService.uploadListingMedia(listingId!, image),
     onSuccess: (asset) => setMedia((prev) => [...prev, asset]),
+    onError: (err) => setFormError(errorText(err, "photo")),
   });
 
   const deleteMediaMutation = useMutation({

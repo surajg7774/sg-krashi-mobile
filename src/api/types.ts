@@ -25,6 +25,8 @@ export interface ApiError {
   message: string;
   details: string[];
   status?: number;
+  /** From the Retry-After header of a 429, in seconds, when the server sent one. */
+  retryAfterSeconds?: number;
 }
 
 export interface Paginated<T> {
