@@ -8,35 +8,42 @@ import { ListRowSkeletonList } from "@/components/Skeleton";
 import { notificationService } from "./notificationService";
 import { navigateToNotificationTarget } from "@/navigation/navigationRef";
 import type { AppNotification } from "./types";
+import type { TFunction } from "@/i18n";
+import { useT } from "@/i18n/useT";
 
 const PAGE_SIZE = 20;
 export const NOTIFICATIONS_QUERY_KEY = ["notifications"];
 
-const timeAgo = (iso: string): string => {
+const timeAgo = (iso: string, t: TFunction): string => {
   const diffMs = Date.now() - new Date(iso).getTime();
   const minutes = Math.floor(diffMs / 60_000);
-  if (minutes < 1) return "just now";
-  if (minutes < 60) return `${minutes}m ago`;
+  if (minutes < 1) return t("notifications.justNow");
+  if (minutes < 60) return t("notifications.minutesAgo", { count: minutes });
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  return `${Math.floor(hours / 24)}d ago`;
+  if (hours < 24) return t("notifications.hoursAgo", { count: hours });
+  return t("notifications.daysAgo", { count: Math.floor(hours / 24) });
 };
 
-const NotificationRow = ({ item, onPress }: { item: AppNotification; onPress: () => void }) => (
-  <Pressable style={({ pressed }) => [styles.row, !item.read && styles.rowUnread, pressed && { opacity: 0.6 }]} onPress={onPress}>
-    {!item.read && <View style={styles.unreadDot} />}
-    <View style={{ flex: 1 }}>
-      <Text style={styles.title}>{item.title}</Text>
-      <Text style={styles.message} numberOfLines={2}>
-        {item.message}
-      </Text>
-      <Text style={styles.time}>{timeAgo(item.createdAt)}</Text>
-    </View>
-  </Pressable>
-);
+// The title and message come from the server and are shown as sent; only the time label is the app's own text.
+const NotificationRow = ({ item, onPress }: { item: AppNotification; onPress: () => void }) => {
+  const { t } = useT();
+  return (
+    <Pressable style={({ pressed }) => [styles.row, !item.read && styles.rowUnread, pressed && { opacity: 0.6 }]} onPress={onPress}>
+      {!item.read && <View style={styles.unreadDot} />}
+      <View style={{ flex: 1 }}>
+        <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.message} numberOfLines={2}>
+          {item.message}
+        </Text>
+        <Text style={styles.time}>{timeAgo(item.createdAt, t)}</Text>
+      </View>
+    </Pressable>
+  );
+};
 
 export const NotificationCenterScreen = () => {
   const queryClient = useQueryClient();
+  const { t } = useT();
 
   const notificationsQuery = useInfiniteQuery({
     queryKey: NOTIFICATIONS_QUERY_KEY,
@@ -78,18 +85,18 @@ export const NotificationCenterScreen = () => {
           disabled={markAllReadMutation.isPending}
           onPress={() => markAllReadMutation.mutate()}
         >
-          <Text style={styles.markAllButtonText}>Mark all {unreadCount} as read</Text>
+          <Text style={styles.markAllButtonText}>{t("notifications.markAllRead", { count: unreadCount })}</Text>
         </Pressable>
       )}
 
       {notificationsQuery.isLoading && <ListRowSkeletonList count={6} lines={3} variant="flat" />}
 
       {notificationsQuery.isError && (
-        <ErrorState message="Could not load notifications." onRetry={() => void notificationsQuery.refetch()} />
+        <ErrorState message={t("notifications.loadError")} onRetry={() => void notificationsQuery.refetch()} />
       )}
 
       {!notificationsQuery.isLoading && !notificationsQuery.isError && notifications.length === 0 && (
-        <EmptyState icon="🔔" message="You have no notifications yet." />
+        <EmptyState icon="🔔" message={t("notifications.empty")} />
       )}
 
       {notifications.length > 0 && (

@@ -353,6 +353,15 @@ export const en = {
     deleteFailed: "Couldn't delete your account. Please try again.",
     deletePermanently: "Delete permanently",
   },
+  notifications: {
+    justNow: "just now",
+    minutesAgo: "{count}m ago",
+    hoursAgo: "{count}h ago",
+    daysAgo: "{count}d ago",
+    markAllRead: "Mark all {count} as read",
+    loadError: "Could not load notifications.",
+    empty: "You have no notifications yet.",
+  },
 } as const;
 
 type Widen<T> = T extends string ? string : T extends PluralForms ? PluralForms : { readonly [K in keyof T]: Widen<T[K]> };

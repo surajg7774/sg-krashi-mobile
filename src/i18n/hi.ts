@@ -342,4 +342,13 @@ export const hi: Messages = {
     deleteFailed: "आपका खाता नहीं हटाया जा सका। कृपया फिर से कोशिश करें।",
     deletePermanently: "हमेशा के लिए हटाएं",
   },
+  notifications: {
+    justNow: "अभी-अभी",
+    minutesAgo: "{count} मिनट पहले",
+    hoursAgo: "{count} घंटे पहले",
+    daysAgo: "{count} दिन पहले",
+    markAllRead: "सभी {count} को पढ़ा हुआ मार्क करें",
+    loadError: "सूचनाएं लोड नहीं हो सकीं।",
+    empty: "अभी आपके लिए कोई सूचना नहीं है।",
+  },
 };
