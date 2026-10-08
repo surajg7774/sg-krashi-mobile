@@ -126,7 +126,7 @@ apiClient.interceptors.response.use(
         }
       : {
           code: "NETWORK_ERROR",
-          message: error.message || "Network error",
+          message: error.message || "Network error", // i18n-ignore (errorText shows a translated sentence for NETWORK_ERROR)
           details: [],
           status: error.response?.status,
         };

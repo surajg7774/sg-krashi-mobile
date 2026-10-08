@@ -57,7 +57,7 @@ export const ensurePushPermissionAndRegister = async (): Promise<void> => {
 
     if (Platform.OS === "android") {
       await Notifications.setNotificationChannelAsync(ANDROID_CHANNEL_ID, {
-        name: "Default",
+        name: "Default", // i18n-ignore (system channel name, fixed when the channel is first created)
         importance: Notifications.AndroidImportance.DEFAULT,
       });
     }

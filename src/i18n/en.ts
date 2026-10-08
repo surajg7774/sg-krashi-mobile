@@ -22,6 +22,8 @@ export const en = {
     previous: "Previous",
     total: "Total",
     loading: "Loading…",
+    new: "New",
+    select: "Select…",
     takePhoto: "📷 Take Photo",
     addFromGallery: "🖼️ Add from Gallery",
     itemCount: { one: "{count} item", other: "{count} items" },

@@ -1,19 +1,23 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { colors } from "@/theme/colors";
+import { useT } from "@/i18n/useT";
 
 interface ErrorStateProps {
   message: string;
   onRetry: () => void;
 }
 
-export const ErrorState = ({ message, onRetry }: ErrorStateProps) => (
-  <View style={styles.container}>
-    <Text style={styles.message}>{message}</Text>
-    <Pressable style={({ pressed }) => [styles.button, pressed && { opacity: 0.6 }]} onPress={onRetry}>
-      <Text style={styles.buttonText}>Retry</Text>
-    </Pressable>
-  </View>
-);
+export const ErrorState = ({ message, onRetry }: ErrorStateProps) => {
+  const { t } = useT();
+  return (
+    <View style={styles.container}>
+      <Text style={styles.message}>{message}</Text>
+      <Pressable style={({ pressed }) => [styles.button, pressed && { opacity: 0.6 }]} onPress={onRetry}>
+        <Text style={styles.buttonText}>{t("common.retry")}</Text>
+      </Pressable>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {

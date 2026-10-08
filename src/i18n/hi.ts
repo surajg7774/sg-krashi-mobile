@@ -14,6 +14,8 @@ export const hi: Messages = {
     previous: "पिछला",
     total: "कुल",
     loading: "लोड हो रहा है…",
+    new: "नया",
+    select: "चुनें…",
     takePhoto: "📷 फ़ोटो लें",
     addFromGallery: "🖼️ गैलरी से जोड़ें",
     itemCount: { one: "{count} आइटम", other: "{count} आइटम" },

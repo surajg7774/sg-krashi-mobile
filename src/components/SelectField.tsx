@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FlatList, Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import { colors } from "@/theme/colors";
+import { useT } from "@/i18n/useT";
 
 export interface SelectOption {
   value: string;
@@ -19,9 +20,10 @@ interface SelectFieldProps {
 // Doctor screen (crop/language pickers) since the Farmer listing form needs
 // the same "select" interaction for category. Avoids pulling in a picker
 // dependency for what's a handful of options in each use.
-export const SelectField = ({ label, value, options, onSelect, placeholder = "Select…" }: SelectFieldProps) => {
+export const SelectField = ({ label, value, options, onSelect, placeholder }: SelectFieldProps) => {
+  const { t } = useT();
   const [open, setOpen] = useState(false);
-  const selectedLabel = options.find((o) => o.value === value)?.label ?? placeholder;
+  const selectedLabel = options.find((o) => o.value === value)?.label ?? placeholder ?? t("common.select");
 
   return (
     <View style={{ flex: 1 }}>
