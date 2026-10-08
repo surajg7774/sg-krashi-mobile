@@ -1,5 +1,9 @@
 # Hindi (i18n) inventory - hard-coded user-facing text
 
+> **Snapshot.** This is the list found *before* the migration (stage 1). After stage 4 the scanner finds 0 hard-coded
+> strings; what remains in English on purpose is listed in `docs/I18N_DECISIONS.md` and marked `i18n-ignore` in the code.
+> How the text is organised now: `docs/I18N.md`.
+
 Stage 1 of roadmap item 8. Generated on 2026-10-08 from `master` at the branch point,
 by `node scripts/i18n-scan.cjs`, then reviewed by hand. The scanner reads the code with the TypeScript parser. It is a
 best-effort list: it can miss text that is built at runtime, and it can flag a string that never reaches a screen.
