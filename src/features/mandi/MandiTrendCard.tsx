@@ -7,6 +7,7 @@ import { ErrorState } from "@/components/ErrorState";
 import { Sparkline } from "@/components/Sparkline";
 import { BlockSkeleton } from "@/components/Skeleton";
 import { mandiService } from "./mandiService";
+import { useT } from "@/i18n/useT";
 
 /** A trend line through fewer days than this says nothing — show the awaiting-data state instead. */
 export const MIN_TREND_POINTS = 3;
@@ -23,6 +24,7 @@ interface MandiTrendCardProps {
  * synced data is ever drawn; with no data yet it says it's awaiting Agmarknet.
  */
 export const MandiTrendCard = ({ commodity, state }: MandiTrendCardProps) => {
+  const { t } = useT();
   const trendQuery = useQuery({
     queryKey: ["mandi-trend", commodity, state],
     queryFn: () => mandiService.getTrend(commodity, state),
@@ -38,7 +40,7 @@ export const MandiTrendCard = ({ commodity, state }: MandiTrendCardProps) => {
   if (trendQuery.isError) {
     return (
       <View style={styles.wrap}>
-        <ErrorState message="Could not load the price trend." onRetry={() => void trendQuery.refetch()} />
+        <ErrorState message={t("mandi.trendLoadError")} onRetry={() => void trendQuery.refetch()} />
       </View>
     );
   }
@@ -51,8 +53,8 @@ export const MandiTrendCard = ({ commodity, state }: MandiTrendCardProps) => {
           icon="📈"
           message={
             points.length === 0
-              ? "Awaiting Agmarknet data"
-              : `Awaiting Agmarknet data — a trend needs at least ${MIN_TREND_POINTS} days of prices (have ${points.length}).`
+              ? t("mandi.awaiting")
+              : t("mandi.trendAwaitingDays", { min: MIN_TREND_POINTS, count: points.length })
           }
         />
       </View>
@@ -67,13 +69,11 @@ export const MandiTrendCard = ({ commodity, state }: MandiTrendCardProps) => {
   return (
     <View style={[styles.wrap, styles.card]}>
       <View style={styles.textBlock}>
-        <Text style={styles.caption}>
-          {commodity} · avg across markets
-        </Text>
+        <Text style={styles.caption}>{t("mandi.avgAcrossMarkets", { commodity })}</Text>
         <Text style={styles.price}>₹{Math.round(latest)}</Text>
         {change !== null && (
           <Text style={[styles.change, { color: rising ? colors.success : colors.error }]}>
-            {rising ? "▲" : "▼"} {Math.abs(change).toFixed(1)}% over {points.length} days
+            {t("mandi.trendChange", { arrow: rising ? "▲" : "▼", percent: Math.abs(change).toFixed(1), days: points.length })}
           </Text>
         )}
       </View>

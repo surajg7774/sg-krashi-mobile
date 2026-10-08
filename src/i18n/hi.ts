@@ -478,4 +478,18 @@ export const hi: Messages = {
       lineItems: "आइटम-वार हिसाब",
     },
   },
+  mandi: {
+    lastSynced: "आख़िरी अपडेट {date}",
+    notSynced: "अभी अपडेट नहीं हुआ",
+    records: "{count} रिकॉर्ड",
+    minMax: "न्यूनतम ₹{min} · अधिकतम ₹{max}",
+    awaiting: "Agmarknet के आंकड़ों का इंतज़ार",
+    awaitingBody: "रोज़ के अपडेट में आंकड़े आते ही मंडी भाव यहां दिखेंगे।",
+    loadError: "मंडी भाव लोड नहीं हो सके।",
+    noMatch: "इन फ़िल्टर से मेल खाता कोई मंडी भाव नहीं मिला।",
+    trendLoadError: "भाव का रुझान लोड नहीं हो सका।",
+    trendAwaitingDays: "Agmarknet के आंकड़ों का इंतज़ार — रुझान के लिए कम से कम {min} दिन के भाव चाहिए (अभी {count} हैं)।",
+    avgAcrossMarkets: "{commodity} · सभी मंडियों का औसत",
+    trendChange: "{arrow} {days} दिन में {percent}%",
+  },
 };

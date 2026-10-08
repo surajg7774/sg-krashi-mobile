@@ -491,6 +491,20 @@ export const en = {
       lineItems: "Line Items",
     },
   },
+  mandi: {
+    lastSynced: "Last synced {date}",
+    notSynced: "Not yet synced",
+    records: "{count} records",
+    minMax: "Min ₹{min} · Max ₹{max}",
+    awaiting: "Awaiting Agmarknet data",
+    awaitingBody: "Mandi prices will appear here once the daily sync has data.",
+    loadError: "Could not load mandi prices.",
+    noMatch: "No mandi price records match these filters.",
+    trendLoadError: "Could not load the price trend.",
+    trendAwaitingDays: "Awaiting Agmarknet data — a trend needs at least {min} days of prices (have {count}).",
+    avgAcrossMarkets: "{commodity} · avg across markets",
+    trendChange: "{arrow} {percent}% over {days} days",
+  },
 } as const;
 
 type Widen<T> = T extends string ? string : T extends PluralForms ? PluralForms : { readonly [K in keyof T]: Widen<T[K]> };

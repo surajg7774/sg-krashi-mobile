@@ -9,29 +9,34 @@ import { mandiService } from "./mandiService";
 import { resolveMandiAvailability } from "./mandiAvailability";
 import { MandiTrendCard } from "./MandiTrendCard";
 import type { MandiPrice } from "./types";
+import { formatDate } from "@/i18n/format";
+import { useT } from "@/i18n/useT";
 
 const PAGE_SIZE = 20;
 
-const PriceRow = ({ item }: { item: MandiPrice }) => (
-  <View style={styles.row}>
-    <View style={styles.rowHeader}>
-      <Text style={styles.commodity}>{item.commodity}</Text>
-      <Text style={styles.modalPrice}>₹{item.modalPrice}</Text>
-    </View>
-    <Text style={styles.market}>
-      {item.marketName}, {item.district ? `${item.district}, ` : ""}
-      {item.state}
-    </Text>
-    <View style={styles.rangeRow}>
-      <Text style={styles.rangeText}>
-        Min ₹{item.minPrice} · Max ₹{item.maxPrice}
+// Commodity, market, district, state and the price date are Agmarknet data and are shown as sent.
+const PriceRow = ({ item }: { item: MandiPrice }) => {
+  const { t } = useT();
+  return (
+    <View style={styles.row}>
+      <View style={styles.rowHeader}>
+        <Text style={styles.commodity}>{item.commodity}</Text>
+        <Text style={styles.modalPrice}>₹{item.modalPrice}</Text>
+      </View>
+      <Text style={styles.market}>
+        {item.marketName}, {item.district ? `${item.district}, ` : ""}
+        {item.state}
       </Text>
-      <Text style={styles.dateText}>{item.priceDate}</Text>
+      <View style={styles.rangeRow}>
+        <Text style={styles.rangeText}>{t("mandi.minMax", { min: item.minPrice, max: item.maxPrice })}</Text>
+        <Text style={styles.dateText}>{item.priceDate}</Text>
+      </View>
     </View>
-  </View>
-);
+  );
+};
 
 export const MandiScreen = () => {
+  const { t, lang } = useT();
   const [commodity, setCommodity] = useState<string | undefined>(undefined);
   const [state, setState] = useState<string | undefined>(undefined);
 
@@ -76,9 +81,9 @@ export const MandiScreen = () => {
       {metaQuery.data && (
         <Text style={styles.syncText}>
           {metaQuery.data.lastSyncedAt
-            ? `Last synced ${new Date(metaQuery.data.lastSyncedAt).toLocaleDateString()}`
-            : "Not yet synced"}{" "}
-          · {metaQuery.data.totalRows} records
+            ? t("mandi.lastSynced", { date: formatDate(new Date(metaQuery.data.lastSyncedAt), lang) })
+            : t("mandi.notSynced")}{" "}
+          · {t("mandi.records", { count: metaQuery.data.totalRows })}
         </Text>
       )}
 
@@ -129,17 +134,17 @@ export const MandiScreen = () => {
       {availability === "awaiting" && (
         <EmptyState
           icon="📈"
-          message="Awaiting Agmarknet data"
-          description="Mandi prices will appear here once the daily sync has data."
+          message={t("mandi.awaiting")}
+          description={t("mandi.awaitingBody")}
         />
       )}
 
       {(availability === "error" || (availability === "ready" && pricesQuery.isError)) && (
-        <ErrorState message="Could not load mandi prices." onRetry={retryFailed} />
+        <ErrorState message={t("mandi.loadError")} onRetry={retryFailed} />
       )}
 
       {availability === "ready" && !pricesQuery.isLoading && !pricesQuery.isError && prices.length === 0 && (
-        <EmptyState icon="📈" message="No mandi price records match these filters." />
+        <EmptyState icon="📈" message={t("mandi.noMatch")} />
       )}
 
       {prices.length > 0 && (

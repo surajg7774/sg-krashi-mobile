@@ -16,7 +16,7 @@ import {
   type Dictionary,
   type LanguageStorage,
 } from "../src/i18n/index.ts";
-import { formatClock, formatDayMonth, monthName, weekdayShort } from "../src/i18n/format.ts";
+import { formatClock, formatDate, formatDayMonth, monthName, weekdayShort } from "../src/i18n/format.ts";
 import { errorText } from "../src/i18n/errorText.ts";
 import { LANGUAGE_KEY } from "../src/shared/storageKeys.ts";
 import { isPrivateCacheKey, PUBLIC_CACHE_KEY } from "../src/offline/scoping.ts";
@@ -292,4 +292,10 @@ test("request errors: server details, then server message, then the fallback - u
   const network = { code: "NETWORK_ERROR", message: "Network Error", details: [] };
   assert.equal(errorText(network, "fallback", en), "Network Error");
   assert.equal(errorText(network, "fallback", hiCtx), "नेट");
+});
+
+test("a calendar date: English is the engine's toLocaleDateString (unchanged); Hindi spells the month in Hindi", () => {
+  const date = new Date(2026, 9, 8, 15, 42);
+  assert.equal(formatDate(date), date.toLocaleDateString());
+  assert.equal(formatDate(date, "hi"), "8 अक्टूबर 2026");
 });

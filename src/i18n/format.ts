@@ -32,6 +32,10 @@ export const formatDayMonth = (day: number, monthIndex: number, year: number | n
 export const formatDateTime = (date: Date, lang: Lang = "en"): string =>
   lang === "en" ? date.toLocaleString() : `${formatDayMonth(date.getDate(), date.getMonth(), date.getFullYear(), lang)}, ${formatClock(date)}`;
 
+/** A calendar date: English keeps the engine's toLocaleDateString exactly; Hindi gets "8 अक्टूबर 2026". */
+export const formatDate = (date: Date, lang: Lang = "en"): string =>
+  lang === "en" ? date.toLocaleDateString() : formatDayMonth(date.getDate(), date.getMonth(), date.getFullYear(), lang);
+
 /** "3:42 PM" - the same in both languages. */
 export const formatClock = (date: Date): string => {
   const hours = date.getHours();
