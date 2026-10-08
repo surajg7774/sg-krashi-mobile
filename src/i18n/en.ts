@@ -329,9 +329,6 @@ export const en = {
   },
   profile: {
     notifications: "Notifications",
-    privacyPolicy: "Privacy Policy",
-    terms: "Terms & Conditions",
-    deleteAccount: "Delete account",
     myOrders: "My Orders",
     logout: "Log out",
     // Role codes from the server. English shows the code exactly as before; other languages name the role.
@@ -340,6 +337,17 @@ export const en = {
       CUSTOMER: "CUSTOMER",
       ADMIN: "ADMIN",
     },
+  },
+  settings: {
+    open: "Settings",
+    legal: "Legal",
+    privacyPolicy: "Privacy Policy",
+    terms: "Terms & Conditions",
+    about: "About",
+    version: "App version",
+    dangerZone: "Danger zone",
+    deleteAccount: "Delete account",
+    dangerHint: "Deleting your account cannot be undone.",
   },
   account: {
     title: "Delete your account?",
@@ -523,6 +531,7 @@ export const en = {
       mandi: "Mandi Prices",
       assistant: "AI Assistant",
       notifications: "Notifications",
+      settings: "Settings",
       store: "Store",
       cropDoctor: "AI Crop Doctor",
       scanDetail: "Scan Detail",

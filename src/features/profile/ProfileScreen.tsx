@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation, type CompositeNavigationProp } from "@react-navigation/native";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
@@ -9,16 +8,8 @@ import { colors } from "@/theme/colors";
 import { screenTopPadding } from "@/theme/insets";
 import type { TabParamList } from "@/navigation/TabNavigator";
 import type { MainStackParamList } from "@/navigation/MainStackNavigator";
-import { PRIVACY_POLICY_URL, TERMS_URL } from "@/config/legal";
-import { LanguageToggle } from "@/components/LanguageToggle";
 import type { MessageKey } from "@/i18n";
 import { useT } from "@/i18n/useT";
-import { DeleteAccountModal } from "./DeleteAccountModal";
-
-// The legal pages are the website's; open them in the browser rather than keeping a copy in the app.
-const openWebPage = (url: string) => {
-  void Linking.openURL(url).catch(() => undefined);
-};
 
 const ROLE_KEYS: Record<string, MessageKey | undefined> = {
   FARMER: "profile.roles.FARMER",
@@ -31,17 +22,14 @@ type Navigation = CompositeNavigationProp<
   NativeStackNavigationProp<MainStackParamList>
 >;
 
-// Scrollable menu list up top (just Notifications today, but built to take
-// more rows — addresses/settings etc. — without restructuring again), with
-// My Orders/Log out pinned in a fixed footer below it, never scrolling out
-// of reach the way a long menu list eventually would.
+// The person: name, email and role, their notifications, My Orders and Log out (pinned in a fixed footer so it never
+// scrolls out of reach). Everything about the app itself (language, legal pages, version, deleting the account) lives
+// on the Settings screen, opened from the gear at the top right.
 export const ProfileScreen = () => {
   const { user, logout } = useAuth();
   const { t } = useT();
   const navigation = useNavigation<Navigation>();
   const insets = useSafeAreaInsets();
-
-  const [showDeleteAccount, setShowDeleteAccount] = useState(false);
 
   const initial = user?.name?.trim().charAt(0).toUpperCase() || "?";
 
@@ -60,35 +48,23 @@ export const ProfileScreen = () => {
           <Text style={styles.roles}>{user.roles.map((role) => (ROLE_KEYS[role] ? t(ROLE_KEYS[role]) : role)).join(", ")}</Text>
         )}
 
-        <View style={styles.languageSection}>
-          <Text style={styles.sectionLabel}>{t("language.title")}</Text>
-          <LanguageToggle />
-        </View>
-
         <View style={styles.menuCard}>
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => navigation.navigate("Notifications")}
-          >
+          <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("Notifications")}>
             <Text style={styles.menuItemText}>{t("profile.notifications")}</Text>
-            <Text style={styles.menuItemChevron}>›</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.menuItem} onPress={() => openWebPage(PRIVACY_POLICY_URL)}>
-            <Text style={styles.menuItemText}>{t("profile.privacyPolicy")}</Text>
-            <Text style={styles.menuItemChevron}>›</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.menuItem} onPress={() => openWebPage(TERMS_URL)}>
-            <Text style={styles.menuItemText}>{t("profile.terms")}</Text>
-            <Text style={styles.menuItemChevron}>›</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.menuItem} onPress={() => setShowDeleteAccount(true)}>
-            <Text style={[styles.menuItemText, styles.menuItemDestructive]}>{t("profile.deleteAccount")}</Text>
             <Text style={styles.menuItemChevron}>›</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
 
-      <DeleteAccountModal visible={showDeleteAccount} onClose={() => setShowDeleteAccount(false)} />
+      {/* Top right, over the scrolling content. 44 dp square: the smallest comfortable touch target. */}
+      <TouchableOpacity
+        style={[styles.settingsButton, { top: screenTopPadding(insets.top, 4) }]}
+        onPress={() => navigation.navigate("Settings")}
+        accessibilityRole="button"
+        accessibilityLabel={t("settings.open")}
+      >
+        <Text style={styles.settingsIcon}>⚙️</Text>
+      </TouchableOpacity>
 
       <View style={[styles.footer, { paddingBottom: insets.bottom + 16 }]}>
         <TouchableOpacity style={styles.ordersButton} onPress={() => navigation.navigate("OrderHistory")}>
@@ -114,6 +90,15 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
     alignItems: "center",
   },
+  settingsButton: {
+    position: "absolute",
+    right: 12,
+    width: 44,
+    height: 44,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  settingsIcon: { fontSize: 24 },
   avatar: {
     width: AVATAR_SIZE,
     height: AVATAR_SIZE,
@@ -147,19 +132,9 @@ const styles = StyleSheet.create({
     textAlign: "center",
     textTransform: "capitalize",
   },
-  languageSection: {
-    width: "100%",
-    marginTop: 32,
-  },
-  sectionLabel: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: colors.textSecondary,
-    marginBottom: 8,
-  },
   menuCard: {
     width: "100%",
-    marginTop: 20,
+    marginTop: 32,
     backgroundColor: colors.surface,
     borderRadius: 12,
     borderWidth: 1,
@@ -177,9 +152,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.textPrimary,
     fontWeight: "500",
-  },
-  menuItemDestructive: {
-    color: colors.error,
   },
   menuItemChevron: {
     fontSize: 20,

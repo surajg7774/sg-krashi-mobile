@@ -319,9 +319,6 @@ export const hi: Messages = {
   },
   profile: {
     notifications: "सूचनाएं",
-    privacyPolicy: "गोपनीयता नीति",
-    terms: "नियम एवं शर्तें",
-    deleteAccount: "खाता हटाएं",
     myOrders: "मेरे ऑर्डर",
     logout: "लॉग आउट करें",
     roles: {
@@ -329,6 +326,17 @@ export const hi: Messages = {
       CUSTOMER: "ग्राहक",
       ADMIN: "एडमिन",
     },
+  },
+  settings: {
+    open: "सेटिंग्स खोलें",
+    legal: "कानूनी जानकारी",
+    privacyPolicy: "गोपनीयता नीति",
+    terms: "नियम एवं शर्तें",
+    about: "ऐप के बारे में",
+    version: "ऐप वर्जन",
+    dangerZone: "सावधानी",
+    deleteAccount: "खाता हटाएं",
+    dangerHint: "खाता हटाने के बाद उसे वापस नहीं लाया जा सकता।",
   },
   account: {
     title: "अपना खाता हटाएं?",
@@ -509,6 +517,7 @@ export const hi: Messages = {
       mandi: "मंडी भाव",
       assistant: "AI सहायक",
       notifications: "सूचनाएं",
+      settings: "सेटिंग्स",
       store: "स्टोर",
       cropDoctor: "AI फसल डॉक्टर",
       scanDetail: "स्कैन का विवरण",

@@ -9,6 +9,7 @@ import { OrderHistoryScreen } from "@/features/orders/OrderHistoryScreen";
 import { MandiScreen } from "@/features/mandi/MandiScreen";
 import { ChatScreen } from "@/features/chat/ChatScreen";
 import { NotificationCenterScreen } from "@/features/notifications/NotificationCenterScreen";
+import { SettingsScreen } from "@/features/settings/SettingsScreen";
 import { colors } from "@/theme/colors";
 import { useT } from "@/i18n/useT";
 
@@ -27,6 +28,7 @@ export type MainStackParamList = {
   Mandi: undefined;
   Chat: undefined;
   Notifications: undefined;
+  Settings: undefined;
 };
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
@@ -54,6 +56,7 @@ export const MainStackNavigator = () => {
       <Stack.Screen name="Mandi" component={MandiScreen} options={{ title: t("nav.headers.mandi") }} />
       <Stack.Screen name="Chat" component={ChatScreen} options={{ title: t("nav.headers.assistant") }} />
       <Stack.Screen name="Notifications" component={NotificationCenterScreen} options={{ title: t("nav.headers.notifications") }} />
+        <Stack.Screen name="Settings" component={SettingsScreen} options={{ title: t("nav.headers.settings") }} />
     </Stack.Navigator>
   );
 };

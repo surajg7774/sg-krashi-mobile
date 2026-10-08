@@ -2,7 +2,6 @@ import { useState } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
-  Linking,
   Platform,
   ScrollView,
   StyleSheet,
@@ -23,11 +22,8 @@ import { splitTemplate } from "@/i18n";
 import { scriptLineHeight } from "@/i18n/layout";
 import { useT } from "@/i18n/useT";
 import { PRIVACY_POLICY_URL, TERMS_URL } from "@/config/legal";
+import { openWebPage } from "@/shared/openWebPage";
 import type { GuestStackParamList } from "@/navigation/GuestStackNavigator";
-
-const openWebPage = (url: string) => {
-  void Linking.openURL(url).catch(() => undefined);
-};
 
 type Navigation = NativeStackNavigationProp<GuestStackParamList, "Register">;
 

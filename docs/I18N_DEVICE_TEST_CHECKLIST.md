@@ -8,7 +8,7 @@ you saw (a photo of the screen helps).
 - [ ] Fresh install, phone language English: the app opens in English.
 - [ ] Fresh install, phone language Hindi: the app opens in Hindi (onboarding slides too).
 - [ ] Login screen: the "English | हिन्दी" switch is in the top corner and works while signed out.
-- [ ] Profile > language: switch to हिन्दी. Every visible text changes at once (tabs, headers, the screen itself).
+- [ ] Profile > gear (top right) > Settings > language: switch to हिन्दी. Every visible text changes at once (tabs, headers, the screen itself).
 - [ ] Close the app fully and reopen: it is still Hindi.
 - [ ] Log out, then log in again: still Hindi.
 - [ ] Switch back to English: everything returns to English, nothing stays in Hindi.
@@ -27,7 +27,8 @@ you saw (a photo of the screen helps).
 - [ ] AI assistant: type a Hindi sentence using the Hindi keyboard.
 - [ ] AI Crop Doctor: photo, analyze, result (the report language should start as Hindi).
 - [ ] Notifications list: "x मिनट पहले" times.
-- [ ] Profile: menu, role name, delete-account window text (do not actually delete).
+- [ ] Profile: name, role, Notifications, My Orders, Log out; the gear opens Settings.
+- [ ] Settings: language, Privacy Policy and Terms (open the website), app version, and under "सावधानी" the delete-account window text (do not actually delete).
 - [ ] Farmer account: dashboard, listings, listing form, payouts and payout detail.
 
 ## Dates, numbers, orders

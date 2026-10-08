@@ -58,7 +58,7 @@ needs the owner's call is listed under **Open questions** at the end.
 - **D13 - Pure modules take the language as a parameter, defaulting to English.** Examples are `cropLogic`,
   `screenState` and `orderTimelineSteps`. Their unit tests keep checking the exact English output, and new tests check
   the Hindi output.
-- **D14 - A language switch in two places.** The required one is on the Profile screen. A small one is also on the
+- **D14 - A language switch in two places.** The required one is on the Settings screen (opened from the gear on Profile). A small one is also on the
   Login screen, because someone who is not signed in cannot reach Profile. Without it, a Hindi reader with an
   English-locale phone could not switch before signing in. Each label is in its own script: "English", "हिन्दी".
 
