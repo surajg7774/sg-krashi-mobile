@@ -281,6 +281,7 @@ export const en = {
   },
   payment: {
     readError: "Could not read the payment result. Please try again.",
+    failed: "Payment failed",
   },
   orders: {
     status: {

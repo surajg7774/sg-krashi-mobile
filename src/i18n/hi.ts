@@ -271,6 +271,7 @@ export const hi: Messages = {
   },
   payment: {
     readError: "भुगतान का नतीजा पढ़ा नहीं जा सका। कृपया फिर से कोशिश करें।",
+    failed: "भुगतान नहीं हो सका",
   },
   orders: {
     status: {

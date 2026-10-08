@@ -75,7 +75,7 @@ const buildCheckoutHtml = (
         };
         var rzp = new Razorpay(options);
         rzp.on("payment.failed", function (response) {
-          post({ type: "error", message: (response && response.error && response.error.description) || "Payment failed" });
+          post({ type: "error", message: (response && response.error && response.error.description) || "" });
         });
         rzp.open();
       } catch (e) {
@@ -104,7 +104,8 @@ export const RazorpayWebView = ({
       } else if (message.type === "dismiss") {
         onDismiss();
       } else {
-        onError(message.message);
+        // Razorpay's own description is shown as sent; with none, the app's (translated) "Payment failed".
+        onError(message.message || t("payment.failed"));
       }
     } catch {
       onError(t("payment.readError"));
