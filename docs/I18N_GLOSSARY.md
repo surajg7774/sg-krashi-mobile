@@ -37,20 +37,20 @@ for the Hindi word). Tone: simple, everyday Hindi a farmer uses, polite "आप"
 | Dashboard | डैशबोर्ड | |
 | Commission | कमीशन | |
 | Listing | लिस्टिंग | The website uses this; farmers know it |
-| Stock | स्टॉक | "स्टॉक समाप्त" = sold out / out of stock |
+| Stock | स्टॉक | "स्टॉक खत्म" = sold out / out of stock |
 
 ## Translated
 
 | English | Hindi | Where it is used |
 |---|---|---|
-| Crop Marketplace | फसल बाज़ार | Same as the website |
-| Crop Doctor / AI Crop Doctor | फसल डॉक्टर / AI फसल डॉक्टर | The website says "एआई फ़सल चिकित्सक"; the app uses the shorter "AI फसल डॉक्टर" because tab labels are tiny |
+| Crop Marketplace | फसल बाजार | Same as the website |
+| Crop Doctor / AI Crop Doctor | फसल डॉक्टर / AI फसल डॉक्टर | The website says "एआई फसल चिकित्सक"; the app uses the shorter "AI फसल डॉक्टर" because tab labels are tiny |
 | Mandi Prices | मंडी भाव | Same as the website |
 | Weather | मौसम | |
 | AI Assistant | AI सहायक | |
 | Profile | प्रोफ़ाइल | |
 | My Orders | मेरे ऑर्डर | |
-| Sold Out | स्टॉक समाप्त | Used for both crops and products |
+| Sold Out | स्टॉक खत्म | Used for both crops and products |
 | Available | उपलब्ध | |
 | Add to Cart | कार्ट में जोड़ें | |
 | Organic Certified | जैविक प्रमाणित | Same as the website |
@@ -78,6 +78,9 @@ for the Hindi word). Tone: simple, everyday Hindi a farmer uses, polite "आप"
 
 - Full stop is the Hindi danda "।"; question and exclamation marks stay "?" and "!".
 - Numbers use 0-9 (as on prices and receipts in India), never Devanagari digits.
+- Spelling decision (owner): **फसल** and **बाजार** are written WITHOUT the dot under the letter (not फ़सल / बाज़ार), in
+  every compound too (फसल बाजार, फसल डॉक्टर, फसल चिकित्सक). Other words keep their normal nukta (ऑफ़लाइन, ज़्यादा, ज़रूरी, फ़ोटो ...).
+- "Out of stock / sold out" is always **स्टॉक खत्म**.
 - Month names are written out ("अक्टूबर"); the times stay 12-hour with AM/PM.
 - A sentence with a link or a bold part in the middle (consent text, OTP "sent to") is one whole template with
   `{placeholders}`, so Hindi word order is not forced into English order.

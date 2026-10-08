@@ -19,7 +19,7 @@ you saw (a photo of the screen helps).
 - [ ] Onboarding: all five slides, "छोड़ें", "आगे", "शुरू करें".
 - [ ] Register: the line "साइन अप करके आप नियम व शर्तों और गोपनीयता नीति से सहमत होते हैं।" shows both links; tapping each opens the website page.
 - [ ] OTP screen: the email address is shown in the sentence; the "दोबारा भेजें" countdown ticks.
-- [ ] Home: quick-link tiles read well, none cut off ("फसल बाज़ार", "फसल डॉक्टर").
+- [ ] Home: quick-link tiles read well, none cut off ("फसल बाजार", "फसल डॉक्टर").
 - [ ] Store, a product page, add to cart, cart, address, review order, place order.
 - [ ] Crop Marketplace: search, filters sheet (price, dates), a crop page, reviews.
 - [ ] Weather: search a place, "आपका मौजूदा स्थान", the stats, the 7-day chart (weekday names in Hindi).

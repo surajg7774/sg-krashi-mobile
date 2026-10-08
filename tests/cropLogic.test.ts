@@ -182,7 +182,7 @@ test("in Hindi, days use Hindi month names and the harvest and screen-reader lab
   assert.equal(listingAccessibilityLabel(base, "hi"), "Green chilli, ₹51, Vegetables, जैविक प्रमाणित, उपलब्ध, कटाई हुई: 25 सितंबर 2020");
   assert.equal(
     listingAccessibilityLabel({ ...base, quantityAvailable: 0, isOrganicCertified: false, categoryName: null }, "hi"),
-    "Green chilli, ₹51, स्टॉक समाप्त, कटाई हुई: 25 सितंबर 2020"
+    "Green chilli, ₹51, स्टॉक खत्म, कटाई हुई: 25 सितंबर 2020"
   );
 });
 
