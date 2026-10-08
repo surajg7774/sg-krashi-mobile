@@ -4,13 +4,15 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
+import { StatusBar } from "expo-status-bar";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useAuth } from "@/context/AuthContext";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -29,6 +31,7 @@ export const LoginScreen = () => {
   const { t, errorText } = useT();
   const navigation = useNavigation<Navigation>();
   const insets = useSafeAreaInsets();
+  const isFocused = useIsFocused();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -49,14 +52,19 @@ export const LoginScreen = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={[styles.container, { paddingTop: screenTopPadding(insets.top) }]}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
-      <View style={styles.languageRow}>
-        <LanguageToggle compact />
+    <KeyboardAvoidingView style={styles.screen} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+      {/* The deep green band is under the status bar, so the clock and battery are drawn light while this screen is open. */}
+      {isFocused && <StatusBar style="light" />}
+      <View style={[styles.brandBand, { paddingTop: screenTopPadding(insets.top) }]}>
+        <View style={styles.languageRow}>
+          <LanguageToggle compact />
+        </View>
+        {/* The logo's gold lettering and green tree need a light card to be read on the deep green. */}
+        <View style={styles.logoCard}>
+          <Image source={require("../../../assets/logo.png")} style={styles.logo} resizeMode="contain" />
+        </View>
       </View>
-      <Image source={require("../../../assets/logo.png")} style={styles.logo} resizeMode="contain" />
+      <ScrollView style={styles.container} contentContainerStyle={styles.form} keyboardShouldPersistTaps="handled">
       <Text style={styles.title}>{t("auth.login.title")}</Text>
 
       {error && <Text style={styles.errorText}>{error}</Text>}
@@ -107,16 +115,38 @@ export const LoginScreen = () => {
       >
         <Text style={styles.guestLinkText}>{t("auth.login.guestCropDoctor")}</Text>
       </TouchableOpacity>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
+  screen: { flex: 1, backgroundColor: colors.background },
+  // Branded top area: the deep green with the gold edge (the same pair as the Home header).
+  brandBand: {
+    backgroundColor: colors.primaryDark,
+    paddingHorizontal: 24,
+    paddingBottom: 20,
+    borderBottomLeftRadius: 28,
+    borderBottomRightRadius: 28,
+    borderBottomWidth: 4,
+    borderBottomColor: colors.secondary,
+  },
+  logoCard: {
+    alignSelf: "center",
+    backgroundColor: colors.surface,
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+  },
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+  },
+  form: {
+    flexGrow: 1,
     justifyContent: "center",
     paddingHorizontal: 24,
+    paddingVertical: 24,
   },
   languageRow: {
     marginBottom: 12,
@@ -124,13 +154,11 @@ const styles = StyleSheet.create({
   logo: {
     width: 160,
     height: 60,
-    alignSelf: "center",
-    marginBottom: 24,
   },
   title: {
     fontSize: 24,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: colors.primaryDark,
     marginBottom: 24,
     textAlign: "center",
   },

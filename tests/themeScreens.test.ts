@@ -107,3 +107,20 @@ test("every order status the app knows has its own chip colours, and the screens
   assert.match(confirmation, /backgroundColor: statusTone\.bg, borderColor: statusTone\.border/);
   assert.match(confirmation, /color: statusTone\.fg/);
 });
+
+// ---- login -------------------------------------------------------------------------------------------------------
+
+test("Login: a green-and-gold branded top area with the logo on a light card, and a clear green primary button", () => {
+  const login = read("src/features/auth/LoginScreen.tsx");
+  const band = /brandBand: \{([^}]*)\}/.exec(login)![1];
+  assert.match(band, /backgroundColor: colors\.primaryDark/);
+  assert.match(band, /borderBottomColor: colors\.secondary/);
+  assert.match(login, /logoCard: \{[^}]*backgroundColor: colors\.surface/s);
+  assert.match(login, /isFocused && <StatusBar style="light" \/>/);
+  // still headerless, so it still pads under the status bar
+  assert.match(login, /screenTopPadding\(insets\.top\)/);
+  // the form can scroll on a small phone now that the band takes room
+  assert.match(login, /<ScrollView[^>]*keyboardShouldPersistTaps="handled"/);
+  assert.match(login, /\n  button: \{[^}]*backgroundColor: colors\.primary/s);
+  assert.match(login, /buttonText: \{[^}]*color: colors\.primaryContrastText/s);
+});
