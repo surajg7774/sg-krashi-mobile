@@ -1,6 +1,7 @@
 // The small decisions the screens make about offline data. Pure (no React Native / React Query imports) so they can
 // be unit-tested with Node (tests/offlineScreenState.test.ts); the screens and components only call these.
-import { OFFLINE_STRINGS } from "./strings.ts";
+import { translate, type Lang } from "../i18n/index.ts";
+import { formatClock, formatDayMonth } from "../i18n/format.ts";
 
 const MINUTE_MS = 60 * 1000;
 /** Data older than this is labelled "Last updated ..." even when the app is online (e.g. a restored copy still refreshing). */
@@ -30,31 +31,26 @@ export const shouldShowLastUpdated = (input: {
   return input.now - input.lastUpdatedAt > STALE_LABEL_AFTER_MS;
 };
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-const clockTime = (date: Date): string => {
-  const hours = date.getHours();
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-  return `${hours % 12 === 0 ? 12 : hours % 12}:${minutes} ${hours < 12 ? "AM" : "PM"}`;
-};
-
 const startOfDay = (date: Date): number => new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
 
-/** "Last updated 3:42 PM" / "... yesterday, 3:42 PM" / "... 5 Oct, 3:42 PM" / "... just now"; null when unknown. */
-export const formatLastUpdated = (timestamp: number | null | undefined, now: number): string | null => {
+/**
+ * "Last updated 3:42 PM" / "... yesterday, 3:42 PM" / "... 5 Oct, 3:42 PM" / "... just now"; null when unknown.
+ * In Hindi the sentence is built the Hindi way round ("3:42 PM पर अपडेट हुआ"), so each case is a whole template.
+ */
+export const formatLastUpdated = (timestamp: number | null | undefined, now: number, lang: Lang = "en"): string | null => {
   if (timestamp === null || timestamp === undefined || !Number.isFinite(timestamp) || timestamp <= 0) return null;
-  const prefix = OFFLINE_STRINGS.lastUpdated;
-  if (now - timestamp < MINUTE_MS) return `${prefix} ${OFFLINE_STRINGS.justNow}`;
+  if (now - timestamp < MINUTE_MS) return translate(lang, "offline.lastUpdatedJustNow");
 
   const then = new Date(timestamp);
   const today = startOfDay(new Date(now));
   const thenDay = startOfDay(then);
   const dayMs = 24 * 60 * MINUTE_MS;
-  if (thenDay === today) return `${prefix} ${clockTime(then)}`;
-  if (thenDay === today - dayMs) return `${prefix} ${OFFLINE_STRINGS.yesterday}, ${clockTime(then)}`;
+  const time = formatClock(then);
+  if (thenDay === today) return translate(lang, "offline.lastUpdatedAt", { time });
+  if (thenDay === today - dayMs) return translate(lang, "offline.lastUpdatedYesterday", { time });
   const sameYear = then.getFullYear() === new Date(now).getFullYear();
-  const date = `${then.getDate()} ${MONTHS[then.getMonth()]}${sameYear ? "" : ` ${then.getFullYear()}`}`;
-  return `${prefix} ${date}, ${clockTime(then)}`;
+  const date = formatDayMonth(then.getDate(), then.getMonth(), sameYear ? null : then.getFullYear(), lang);
+  return translate(lang, "offline.lastUpdatedOn", { date, time });
 };
 
 /**
@@ -81,14 +77,17 @@ const text = (value: string | null | undefined): string => (typeof value === "st
  * What to show where an order's delivery address goes. The stored offline copy has every address field removed
  * (empty strings / null), and a malformed copy may have them missing altogether: all of that must render safely.
  */
-export const orderAddressView = (order: OrderAddressFields | null | undefined): { kind: "address"; lines: string[] } | { kind: "online-only"; note: string } => {
+export const orderAddressView = (
+  order: OrderAddressFields | null | undefined,
+  lang: Lang = "en"
+): { kind: "address"; lines: string[] } | { kind: "online-only"; note: string } => {
   const line1 = text(order?.shippingLine1);
   const line2 = text(order?.shippingLine2);
   const cityState = [text(order?.shippingCity), text(order?.shippingState)].filter(Boolean).join(", ");
   const pincode = text(order?.shippingPincode);
   const lines = [line1, line2, [cityState, pincode].filter(Boolean).join(" - ")].filter(Boolean);
   if (line1 === "" && pincode === "") {
-    return { kind: "online-only", note: OFFLINE_STRINGS.addressOnlineOnly };
+    return { kind: "online-only", note: translate(lang, "offline.addressOnlineOnly") };
   }
   return { kind: "address", lines };
 };

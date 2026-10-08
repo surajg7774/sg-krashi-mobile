@@ -22,7 +22,6 @@ import { LastUpdated } from "@/components/LastUpdated";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { useOfflineData } from "@/offline/useOfflineData";
 import { canOfferPayment, orderAddressView, shouldShowFullError, shouldShowOfflineBanner } from "@/offline/screenState";
-import { OFFLINE_STRINGS } from "@/offline/strings";
 import { useT } from "@/i18n/useT";
 
 type Navigation = NativeStackNavigationProp<MainStackParamList, "OrderConfirmation">;
@@ -129,7 +128,7 @@ export const OrderConfirmationScreen = () => {
   }
 
   const order = orderQuery.data;
-  const addressView = orderAddressView(order);
+  const addressView = orderAddressView(order, lang);
   const offerPayment = canOfferPayment({ status: order.status, isShowingOfflineData: offline.isShowingOfflineData });
 
   return (
@@ -143,7 +142,7 @@ export const OrderConfirmationScreen = () => {
         <LastUpdated
           timestamp={offline.lastUpdatedAt}
           isShowingOfflineData={offline.isShowingOfflineData}
-          offlineNote={OFFLINE_STRINGS.orderMayBeOutOfDate}
+          offlineNote={t("offline.orderMayBeOutOfDate")}
         />
 
         {order.items.map((item) => (
@@ -169,7 +168,7 @@ export const OrderConfirmationScreen = () => {
         ))}
 
         {order.status === "PENDING_PAYMENT" && !paymentSubmitted && !offerPayment && offline.isShowingOfflineData && (
-          <Text style={styles.waitingText}>{OFFLINE_STRINGS.payNeedsInternet}</Text>
+          <Text style={styles.waitingText}>{t("offline.payNeedsInternet")}</Text>
         )}
 
         {offerPayment && !paymentSubmitted && (

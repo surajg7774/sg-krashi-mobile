@@ -523,4 +523,18 @@ export const hi: Messages = {
       payoutDetail: "भुगतान का विवरण",
     },
   },
+  offline: {
+    bannerTitle: "आप ऑफ़लाइन हैं",
+    bannerBody: "आख़िरी बार सेव की गई जानकारी दिख रही है।",
+    retry: "फिर देखें",
+    retryA11y: "फिर देखें: दोबारा लोड करने की कोशिश करें",
+    lastUpdatedJustNow: "अभी-अभी अपडेट हुआ",
+    lastUpdatedAt: "{time} पर अपडेट हुआ",
+    lastUpdatedYesterday: "कल {time} पर अपडेट हुआ",
+    lastUpdatedOn: "{date}, {time} पर अपडेट हुआ",
+    orderMayBeOutOfDate: "आप ऑफ़लाइन हैं, इसलिए ऑर्डर की स्थिति पुरानी हो सकती है।",
+    addressOnlineOnly: "पता ऑनलाइन होने पर दिखेगा",
+    addToCartNeedsInternet: "कार्ट में जोड़ने के लिए इंटरनेट से जुड़ें",
+    payNeedsInternet: "भुगतान के लिए इंटरनेट से जुड़ें।",
+  },
 };

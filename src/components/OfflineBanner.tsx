@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { colors } from "@/theme/colors";
-import { OFFLINE_STRINGS } from "@/offline/strings";
+import { useT } from "@/i18n/useT";
 
 interface OfflineBannerProps {
   /** From shouldShowOfflineBanner(useOfflineData(query)): offline AND saved data is on screen. */
@@ -13,21 +13,22 @@ interface OfflineBannerProps {
  * visible, so there is no space reserved (and nothing flashes) while the data is fresh.
  */
 export const OfflineBanner = ({ visible, onRetry }: OfflineBannerProps) => {
+  const { t } = useT();
   if (!visible) return null;
   return (
     <View style={styles.container} accessibilityRole="alert" accessibilityLiveRegion="polite">
       <View style={styles.textBlock}>
-        <Text style={styles.title}>{OFFLINE_STRINGS.bannerTitle}</Text>
-        <Text style={styles.body}>{OFFLINE_STRINGS.bannerBody}</Text>
+        <Text style={styles.title}>{t("offline.bannerTitle")}</Text>
+        <Text style={styles.body}>{t("offline.bannerBody")}</Text>
       </View>
       <Pressable
         style={({ pressed }) => [styles.retryButton, pressed && { opacity: 0.6 }]}
         onPress={onRetry}
         accessibilityRole="button"
-        accessibilityLabel={`${OFFLINE_STRINGS.retry}: try to refresh`}
+        accessibilityLabel={t("offline.retryA11y")}
         hitSlop={{ top: 4, bottom: 4 }}
       >
-        <Text style={styles.retryText}>{OFFLINE_STRINGS.retry}</Text>
+        <Text style={styles.retryText}>{t("offline.retry")}</Text>
       </Pressable>
     </View>
   );

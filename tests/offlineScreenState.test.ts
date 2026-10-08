@@ -154,12 +154,23 @@ for (const [path, decision] of SCREENS) {
 
 test("weather uses the 'Last updated' label always; the order screens add the 'may be out of date' note", () => {
   assert.match(read("../src/features/weather/WeatherScreen.tsx"), /<LastUpdated[^>]*\balways\b/);
-  assert.match(read("../src/features/orders/OrderHistoryScreen.tsx"), /offlineNote=\{OFFLINE_STRINGS\.orderMayBeOutOfDate\}/);
-  assert.match(read("../src/features/orders/OrderConfirmationScreen.tsx"), /offlineNote=\{OFFLINE_STRINGS\.orderMayBeOutOfDate\}/);
+  assert.match(read("../src/features/orders/OrderHistoryScreen.tsx"), /offlineNote=\{t\("offline\.orderMayBeOutOfDate"\)\}/);
+  assert.match(read("../src/features/orders/OrderConfirmationScreen.tsx"), /offlineNote=\{t\("offline\.orderMayBeOutOfDate"\)\}/);
 });
 
 test("the order screen offers payment only through canOfferPayment", () => {
   const source = read("../src/features/orders/OrderConfirmationScreen.tsx");
   assert.match(source, /canOfferPayment\(\{ status: order\.status, isShowingOfflineData: offline\.isShowingOfflineData \}\)/);
   assert.match(source, /\{offerPayment && !paymentSubmitted && \(/);
+});
+
+test("in Hindi, 'Last updated' reads the Hindi way round and the address note is Hindi; English above is unchanged", () => {
+  const now = at(2026, 9, 7, 16, 30);
+  assert.equal(formatLastUpdated(now - 20_000, now, "hi"), "अभी-अभी अपडेट हुआ");
+  assert.equal(formatLastUpdated(at(2026, 9, 7, 15, 42), now, "hi"), "3:42 PM पर अपडेट हुआ");
+  assert.equal(formatLastUpdated(at(2026, 9, 6, 21, 9), now, "hi"), "कल 9:09 PM पर अपडेट हुआ");
+  assert.equal(formatLastUpdated(at(2026, 9, 1, 8, 0), now, "hi"), "1 अक्टूबर, 8:00 AM पर अपडेट हुआ");
+  assert.equal(formatLastUpdated(at(2025, 11, 25, 18, 30), now, "hi"), "25 दिसंबर 2025, 6:30 PM पर अपडेट हुआ");
+  assert.equal(formatLastUpdated(null, now, "hi"), null);
+  assert.deepEqual(orderAddressView({ shippingLine1: "", shippingPincode: "" }, "hi"), { kind: "online-only", note: "पता ऑनलाइन होने पर दिखेगा" });
 });

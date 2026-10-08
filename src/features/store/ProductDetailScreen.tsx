@@ -26,7 +26,6 @@ import { LastUpdated } from "@/components/LastUpdated";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { useOfflineData } from "@/offline/useOfflineData";
 import { canAddToCart, shouldShowFullError, shouldShowOfflineBanner } from "@/offline/screenState";
-import { OFFLINE_STRINGS } from "@/offline/strings";
 import { useT } from "@/i18n/useT";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -156,7 +155,7 @@ export const ProductDetailScreen = () => {
           )}
         </Pressable>
 
-        {!cartAllowed && <Text style={styles.errorText}>{OFFLINE_STRINGS.addToCartNeedsInternet}</Text>}
+        {!cartAllowed && <Text style={styles.errorText}>{t("offline.addToCartNeedsInternet")}</Text>}
 
         {addToCartMutation.isError && (
           <Text style={styles.errorText}>{t("store.product.addError")}</Text>

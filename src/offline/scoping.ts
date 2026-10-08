@@ -6,7 +6,7 @@ export const CACHE_STORAGE_VERSION = 1;
 const BASE = `sgkrashi.cache.v${CACHE_STORAGE_VERSION}`;
 
 export const PUBLIC_CACHE_KEY = `${BASE}.public`;
-export const PRIVATE_CACHE_PREFIX = `${BASE}.user.`;
+export const PRIVATE_CACHE_PREFIX = `${BASE}.user.`; // i18n-ignore (storage key, not text)
 
 export const userCacheKey = (userId: number): string => `${PRIVATE_CACHE_PREFIX}${userId}`;
 

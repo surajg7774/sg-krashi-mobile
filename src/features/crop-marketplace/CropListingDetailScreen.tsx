@@ -11,7 +11,6 @@ import { LastUpdated } from "@/components/LastUpdated";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { useOfflineData } from "@/offline/useOfflineData";
 import { canAddToCart, shouldShowFullError, shouldShowOfflineBanner } from "@/offline/screenState";
-import { OFFLINE_STRINGS } from "@/offline/strings";
 import { EmptyState } from "@/components/EmptyState";
 import { Rating } from "@/components/Rating";
 import { cartService, CART_QUERY_KEY } from "@/features/cart/cartService";
@@ -158,7 +157,7 @@ export const CropListingDetailScreen = () => {
 
         {!soldOut && !cartAllowed && (
           <Text style={styles.errorText} accessibilityLiveRegion="polite">
-            {OFFLINE_STRINGS.addToCartNeedsInternet}
+            {t("offline.addToCartNeedsInternet")}
           </Text>
         )}
 

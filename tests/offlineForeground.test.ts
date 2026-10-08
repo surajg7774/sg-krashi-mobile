@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { queriesToRefetchOnForeground, refetchOfflineErrors, type ForegroundQueryLike } from "../src/offline/foregroundRefetch.ts";
 import { canAddToCart } from "../src/offline/screenState.ts";
-import { OFFLINE_STRINGS } from "../src/offline/strings.ts";
+import { translate } from "../src/i18n/index.ts";
 
 const offlineErr = { code: "NETWORK_ERROR" };
 const q = (queryKey: unknown[], state: ForegroundQueryLike["state"], observers = 1): ForegroundQueryLike => ({
@@ -47,7 +47,7 @@ test("refetchOfflineErrors refetches each picked query once, exact and active on
 test("add to cart is disabled while a saved copy is on screen, with the wording asked for", () => {
   assert.equal(canAddToCart({ isShowingOfflineData: true }), false);
   assert.equal(canAddToCart({ isShowingOfflineData: false }), true);
-  assert.equal(OFFLINE_STRINGS.addToCartNeedsInternet, "Connect to the internet to add to cart");
+  assert.equal(translate("en", "offline.addToCartNeedsInternet"), "Connect to the internet to add to cart");
 });
 
 const read = (path: string) => readFileSync(new URL(path, import.meta.url), "utf8").replace(/\/\/.*$/gm, "");
@@ -57,7 +57,7 @@ test("wiring: both detail screens gate their add button, and the foreground refe
     const source = read(path);
     assert.match(source, /const cartAllowed = canAddToCart\(offline\)/);
     assert.match(source, /disabled=\{[^}]*!cartAllowed\}/);
-    assert.match(source, /OFFLINE_STRINGS\.addToCartNeedsInternet/);
+    assert.match(source, /t\("offline\.addToCartNeedsInternet"\)/);
   }
   const provider = read("../src/offline/OfflineCacheProvider.tsx");
   assert.match(provider, /void refetchOfflineErrors\(queryClient\)/);

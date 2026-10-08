@@ -15,7 +15,6 @@ import { LastUpdated } from "@/components/LastUpdated";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { useOfflineData } from "@/offline/useOfflineData";
 import { shouldShowFullError, shouldShowOfflineBanner } from "@/offline/screenState";
-import { OFFLINE_STRINGS } from "@/offline/strings";
 import { useT } from "@/i18n/useT";
 
 type Navigation = NativeStackNavigationProp<MainStackParamList, "OrderHistory">;
@@ -105,7 +104,7 @@ export const OrderHistoryScreen = () => {
           <LastUpdated
             timestamp={offline.lastUpdatedAt}
             isShowingOfflineData={offline.isShowingOfflineData}
-            offlineNote={OFFLINE_STRINGS.orderMayBeOutOfDate}
+            offlineNote={t("offline.orderMayBeOutOfDate")}
           />
         </>
       }

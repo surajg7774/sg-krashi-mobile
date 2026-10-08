@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { colors } from "@/theme/colors";
 import { formatLastUpdated, shouldShowLastUpdated } from "@/offline/screenState";
+import { useT } from "@/i18n/useT";
 
 interface LastUpdatedProps {
   /** dataUpdatedAt of the query on screen (for weather this is the fetch time: the payload has no timestamp). */
@@ -27,8 +28,9 @@ const useNow = (): number => {
 
 export const LastUpdated = ({ timestamp, isShowingOfflineData, always, offlineNote }: LastUpdatedProps) => {
   const now = useNow();
+  const { lang } = useT();
   if (!shouldShowLastUpdated({ isShowingOfflineData, lastUpdatedAt: timestamp, now, always })) return null;
-  const label = formatLastUpdated(timestamp, now);
+  const label = formatLastUpdated(timestamp, now, lang);
   if (!label) return null;
   return (
     <View style={styles.container}>

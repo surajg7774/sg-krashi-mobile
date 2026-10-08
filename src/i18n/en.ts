@@ -537,6 +537,21 @@ export const en = {
       payoutDetail: "Payout Detail",
     },
   },
+  // Offline UI (moved here unchanged from the former src/offline/strings.ts).
+  offline: {
+    bannerTitle: "You're offline",
+    bannerBody: "Showing the last saved information.",
+    retry: "Retry",
+    retryA11y: "Retry: try to refresh",
+    lastUpdatedJustNow: "Last updated just now",
+    lastUpdatedAt: "Last updated {time}",
+    lastUpdatedYesterday: "Last updated yesterday, {time}",
+    lastUpdatedOn: "Last updated {date}, {time}",
+    orderMayBeOutOfDate: "Order status may be out of date while you're offline.",
+    addressOnlineOnly: "Address shown when online",
+    addToCartNeedsInternet: "Connect to the internet to add to cart",
+    payNeedsInternet: "Connect to the internet to pay.",
+  },
 } as const;
 
 type Widen<T> = T extends string ? string : T extends PluralForms ? PluralForms : { readonly [K in keyof T]: Widen<T[K]> };
