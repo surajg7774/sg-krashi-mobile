@@ -1,4 +1,4 @@
-import { colors } from "@/theme/colors";
+import { NEUTRAL_TONE, statusTones, type Tone } from "@/theme/colors";
 import { translate, type Lang, type MessageKey } from "@/i18n";
 import type { OrderStatus } from "./types";
 
@@ -10,15 +10,6 @@ const ORDER_STATUS_LABEL_KEY: Record<OrderStatus, MessageKey> = {
   DELIVERED: "orders.status.DELIVERED",
   PAYMENT_FAILED: "orders.status.PAYMENT_FAILED",
   REFUNDED: "orders.status.REFUNDED",
-};
-
-export const ORDER_STATUS_COLOR: Record<OrderStatus, string> = {
-  PENDING_PAYMENT: colors.warning,
-  CONFIRMED: colors.success,
-  SHIPPED: colors.primary,
-  DELIVERED: colors.info,
-  PAYMENT_FAILED: colors.error,
-  REFUNDED: colors.textSecondary,
 };
 
 /** Headline on the order screen. */
@@ -47,5 +38,8 @@ export const orderStatusTitle = (status: string, lang: Lang = "en"): string => {
   return translate(lang, key ?? "orders.fallbackTitle");
 };
 
-export const orderStatusColor = (status: string): string =>
-  (ORDER_STATUS_COLOR as Record<string, string>)[status] ?? colors.textSecondary;
+/** The chip colours for a status: tinted background, readable text, a slightly deeper border (src/theme/colors.ts). */
+export const orderStatusTone = (status: string): Tone => (statusTones as Record<string, Tone>)[status] ?? NEUTRAL_TONE;
+
+/** The text colour of the status chip. */
+export const orderStatusColor = (status: string): string => orderStatusTone(status).fg;

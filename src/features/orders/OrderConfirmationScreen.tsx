@@ -15,7 +15,7 @@ import { RazorpayWebView, type RazorpaySuccessPayload } from "@/features/payment
 import type { PaymentInitiation } from "@/features/payment/types";
 import { OrderTimeline } from "./OrderTimeline";
 import { isActiveOrderStatus } from "./orderTimelineSteps";
-import { orderStatusColor, orderStatusLabel, orderStatusTitle } from "./orderStatusDisplay";
+import { orderStatusLabel, orderStatusTitle, orderStatusTone } from "./orderStatusDisplay";
 import type { MainStackParamList } from "@/navigation/MainStackNavigator";
 import { ErrorState } from "@/components/ErrorState";
 import { LastUpdated } from "@/components/LastUpdated";
@@ -129,6 +129,7 @@ export const OrderConfirmationScreen = () => {
   }
 
   const order = orderQuery.data;
+  const statusTone = orderStatusTone(order.status);
   const addressView = orderAddressView(order, lang);
   const offerPayment = canOfferPayment({ status: order.status, isShowingOfflineData: offline.isShowingOfflineData });
 
@@ -137,7 +138,9 @@ export const OrderConfirmationScreen = () => {
       <View style={styles.card}>
         <Text style={styles.title}>{orderStatusTitle(order.status, lang)}</Text>
         <Text style={styles.orderNumber}>{t("orders.orderNumber", { number: order.orderNumber })}</Text>
-        <Text style={[styles.statusBadge, { color: orderStatusColor(order.status) }]}>{orderStatusLabel(order.status, lang)}</Text>
+        <View style={[styles.statusChip, { backgroundColor: statusTone.bg, borderColor: statusTone.border }]}>
+          <Text style={[styles.statusBadge, { color: statusTone.fg }]}>{orderStatusLabel(order.status, lang)}</Text>
+        </View>
         {/* The status below may have moved on since the copy was saved: say so right under it. */}
         {offline.isShowingOfflineData && <StaleOrderCue />}
         <Text style={styles.amount}>₹{order.totalAmount}</Text>
@@ -259,10 +262,10 @@ const styles = StyleSheet.create({
   },
   title: { fontSize: 20, fontWeight: "700", color: colors.textPrimary },
   orderNumber: { fontSize: 14, color: colors.textSecondary, marginTop: 4 },
+  statusChip: { alignSelf: "flex-start", marginTop: 8, borderWidth: 1, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 3 },
   statusBadge: {
     fontSize: 12,
     fontWeight: "700",
-    marginTop: 8,
     textTransform: "uppercase",
   },
   amount: { fontSize: 22, fontWeight: "700", color: colors.primary, marginTop: 8, marginBottom: 12 },

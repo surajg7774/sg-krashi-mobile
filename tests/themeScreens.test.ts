@@ -85,3 +85,25 @@ test("Weather: the current-weather and 7-day cards are sky-blue tints with deep-
   assert.match(weather, /forecastSummary: \{[^}]*color: colors\.textSecondary/);
   assert.match(weather, /screenTitle: \{[^}]*color: colors\.primaryDark/);
 });
+
+// ---- orders ------------------------------------------------------------------------------------------------------
+
+test("every order status the app knows has its own chip colours, and the screens draw them (tinted background, readable text)", async () => {
+  const { statusTones } = await import("../src/theme/colors.ts");
+  const types = read("src/features/orders/types.ts");
+  const union = /export type OrderStatus =([^;]*);/.exec(types)![1];
+  const statuses = [...union.matchAll(/"([A-Z_]+)"/g)].map((m) => m[1]);
+  assert.ok(statuses.length >= 6);
+  for (const status of statuses) assert.ok(status in statusTones, `${status} has no chip colours`);
+  // the display module takes them from the theme (and falls back to neutral for a status from a newer server)
+  const display = read("src/features/orders/orderStatusDisplay.ts");
+  assert.match(display, /statusTones as Record<string, Tone>\)\[status\] \?\? NEUTRAL_TONE/);
+  assert.doesNotMatch(display, /colors\.(warning|success|info|error)/);
+  // the list chip and the order-page chip use the tone's background, border and text colour
+  const history = read("src/features/orders/OrderHistoryScreen.tsx");
+  assert.match(history, /borderColor: tone\.border, backgroundColor: tone\.bg/);
+  assert.match(history, /color: tone\.fg/);
+  const confirmation = read("src/features/orders/OrderConfirmationScreen.tsx");
+  assert.match(confirmation, /backgroundColor: statusTone\.bg, borderColor: statusTone\.border/);
+  assert.match(confirmation, /color: statusTone\.fg/);
+});

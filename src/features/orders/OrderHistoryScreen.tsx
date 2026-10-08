@@ -7,7 +7,7 @@ import { colors } from "@/theme/colors";
 import { ICONS } from "@/theme/icons";
 import { orderService } from "./orderService";
 import type { OrderSummary } from "./types";
-import { orderStatusColor, orderStatusLabel } from "./orderStatusDisplay";
+import { orderStatusLabel, orderStatusTone } from "./orderStatusDisplay";
 import type { MainStackParamList } from "@/navigation/MainStackNavigator";
 import { ErrorState } from "@/components/ErrorState";
 import { EmptyState } from "@/components/EmptyState";
@@ -25,6 +25,7 @@ const PAGE_SIZE = 10;
 
 const OrderRow = ({ order, onPress, stale }: { order: OrderSummary; onPress: () => void; stale: boolean }) => {
   const { t, lang } = useT();
+  const tone = orderStatusTone(order.status);
   return (
     <Pressable style={({ pressed }) => [styles.row, pressed && { opacity: 0.6 }]} onPress={onPress}>
       <View style={styles.rowMain}>
@@ -36,8 +37,8 @@ const OrderRow = ({ order, onPress, stale }: { order: OrderSummary; onPress: () 
       </View>
       <View style={styles.rowRight}>
         <Text style={styles.amount}>₹{order.totalAmount}</Text>
-        <View style={[styles.statusChip, stale && styles.statusChipStale, { borderColor: orderStatusColor(order.status), backgroundColor: `${orderStatusColor(order.status)}1A` }]}>
-          <Text style={[styles.statusChipText, { color: orderStatusColor(order.status) }]}>{orderStatusLabel(order.status, lang)}</Text>
+        <View style={[styles.statusChip, stale && styles.statusChipStale, { borderColor: tone.border, backgroundColor: tone.bg }]}>
+          <Text style={[styles.statusChipText, { color: tone.fg }]}>{orderStatusLabel(order.status, lang)}</Text>
         </View>
       </View>
       </View>
