@@ -48,7 +48,7 @@ const buildCheckoutHtml = (
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
   </head>
-  <body style="margin:0;background:#fff;">
+  <body style="margin:0;background:${colors.white};">
     <script src="${CHECKOUT_SCRIPT_SRC}"></script>
     <script>
       function post(message) {
@@ -63,7 +63,7 @@ const buildCheckoutHtml = (
           description: ${JSON.stringify(description)},
           order_id: ${JSON.stringify(initiation.gatewayOrderId)},
           prefill: ${JSON.stringify(prefill ?? {})},
-          theme: { color: "#2e7d32" },
+          theme: { color: "${colors.primary}" },
           handler: function (response) {
             post({ type: "success", payload: response });
           },

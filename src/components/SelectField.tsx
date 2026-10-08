@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   selectButtonText: { color: colors.textPrimary, fontSize: 14 },
-  modalBackdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.4)", justifyContent: "center", padding: 24 },
+  modalBackdrop: { flex: 1, backgroundColor: colors.scrim, justifyContent: "center", padding: 24 },
   modalCard: { backgroundColor: colors.surface, borderRadius: 12, maxHeight: 400, overflow: "hidden" },
   modalOption: { paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: colors.divider },
   modalOptionText: { fontSize: 15, color: colors.textPrimary },

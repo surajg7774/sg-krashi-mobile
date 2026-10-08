@@ -332,7 +332,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 3,
   },
   iconBadgeText: {
-    color: "#fff",
+    color: colors.white,
     fontSize: 9,
     fontWeight: "700",
   },

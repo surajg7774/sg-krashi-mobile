@@ -157,7 +157,7 @@ export const CropFilterSheet = ({ visible, value, onApply, onClear, onClose }: C
 };
 
 const styles = StyleSheet.create({
-  backdrop: { flex: 1, justifyContent: "flex-end", backgroundColor: "rgba(0,0,0,0.35)" },
+  backdrop: { flex: 1, justifyContent: "flex-end", backgroundColor: colors.scrim },
   backdropTap: { flex: 1 },
   sheet: { backgroundColor: colors.surface, borderTopLeftRadius: 16, borderTopRightRadius: 16, maxHeight: "85%" },
   sheetContent: { padding: 16, paddingBottom: 8 },

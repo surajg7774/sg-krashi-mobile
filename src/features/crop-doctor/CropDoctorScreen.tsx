@@ -402,11 +402,11 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: "rgba(0,0,0,0.6)",
+    backgroundColor: colors.scrim,
     justifyContent: "center",
     alignItems: "center",
   },
-  removeImageButtonText: { color: "#fff", fontSize: 14, lineHeight: 16 },
+  removeImageButtonText: { color: colors.white, fontSize: 14, lineHeight: 16 },
   pickButtonRow: { flexDirection: "row", gap: 10, marginTop: 14 },
   pickButton: {
     flex: 1,

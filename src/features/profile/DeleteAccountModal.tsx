@@ -178,7 +178,7 @@ export const DeleteAccountModal = ({ visible, onClose }: DeleteAccountModalProps
 };
 
 const styles = StyleSheet.create({
-  backdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "center", padding: 24 },
+  backdrop: { flex: 1, backgroundColor: colors.scrim, justifyContent: "center", padding: 24 },
   card: { backgroundColor: colors.surface, borderRadius: 16, padding: 20 },
   title: { fontSize: 18, fontWeight: "700", color: colors.textPrimary, marginBottom: 10 },
   body: { fontSize: 14, lineHeight: 20, color: colors.textSecondary },
