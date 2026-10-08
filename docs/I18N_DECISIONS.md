@@ -62,6 +62,18 @@ needs the owner's call is listed under **Open questions** at the end.
   Login screen, because someone who is not signed in cannot reach Profile. Without it, a Hindi reader with an
   English-locale phone could not switch before signing in. Each label is in its own script: "English", "हिन्दी".
 
+- **D15 - Crop Doctor report language follows Hindi.**
+  - When the app is in Hindi, the Crop Doctor "Report language" starts as Hindi instead of English. Without this, a
+    Hindi reader would get an English AI report unless they noticed the setting.
+  - The person can still pick any language.
+  - In English nothing changes: the default is still "en".
+  - The AI's report text itself is server data and is not translated by the app.
+- **D16 - Server codes shown as words.**
+  - Some screens showed a raw server code: health "HEALTHY", role "FARMER".
+  - In Hindi these are named ("स्वस्थ", "किसान").
+  - English keeps showing the code exactly as before.
+  - A code the app does not know is shown as sent.
+
 ## Open questions
 
 - **Q1 - Server error messages.** Should the server send translated messages, or should the app map known error codes

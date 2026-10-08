@@ -24,36 +24,46 @@ import { SelectField } from "@/components/SelectField";
 import { cropDoctorService } from "./cropDoctorService";
 import { OTHER_CROP_VALUE, SUPPORTED_LANGUAGES, type CropScan, type CropScanSummary, type PickedImage } from "./types";
 import type { CropDoctorStackParamList } from "@/navigation/CropDoctorStackNavigator";
+import { CONFIDENCE_KEY, HEALTH_KEY } from "./labels";
+import { useT } from "@/i18n/useT";
 
 const HISTORY_PAGE_SIZE = 12;
 
 type Navigation = NativeStackNavigationProp<CropDoctorStackParamList, "CropDoctorHome">;
 
-const confidenceLabel: Record<string, string> = { HIGH: "High confidence", MODERATE: "Moderate confidence", LOW: "Low confidence" };
+
 const healthColor: Record<string, string> = { HEALTHY: colors.success, DISEASED: colors.error, UNCERTAIN: colors.warning };
 
-const HistoryRow = ({ item, onPress }: { item: CropScanSummary; onPress: () => void }) => (
-  <Pressable style={({ pressed }) => [styles.historyRow, pressed && { opacity: 0.6 }]} onPress={onPress}>
-    <Image source={item.imageUrl} style={styles.historyThumb} contentFit="cover" />
-    <View style={{ flex: 1 }}>
-      <Text style={styles.historyCrop}>{item.identifiedCrop}</Text>
-      <Text style={styles.historyProblem} numberOfLines={1}>
-        {item.problem ?? "No issue detected"}
-      </Text>
-    </View>
-    <Text style={[styles.historyStatus, { color: healthColor[item.healthStatus] }]}>{item.healthStatus}</Text>
-  </Pressable>
-);
+const HistoryRow = ({ item, onPress }: { item: CropScanSummary; onPress: () => void }) => {
+  const { t } = useT();
+  const healthKey = HEALTH_KEY[item.healthStatus];
+  return (
+    <Pressable style={({ pressed }) => [styles.historyRow, pressed && { opacity: 0.6 }]} onPress={onPress}>
+      <Image source={item.imageUrl} style={styles.historyThumb} contentFit="cover" />
+      <View style={{ flex: 1 }}>
+        <Text style={styles.historyCrop}>{item.identifiedCrop}</Text>
+        <Text style={styles.historyProblem} numberOfLines={1}>
+          {item.problem ?? t("cropDoctor.noIssue")}
+        </Text>
+      </View>
+      <Text style={[styles.historyStatus, { color: healthColor[item.healthStatus] }]}>{healthKey ? t(healthKey) : item.healthStatus}</Text>
+    </Pressable>
+  );
+};
 
 export const CropDoctorScreen = () => {
   const { isAuthenticated } = useAuth();
   const navigation = useNavigation<Navigation>();
   const queryClient = useQueryClient();
+  const { t, lang, errorText } = useT();
+  // The AI report starts in the app's language when that is Hindi (the person can still pick another); English
+  // keeps its old default. See docs/I18N_DECISIONS.md, D15.
+  const defaultReportLanguage = lang === "hi" ? "hi" : "en";
 
   const [images, setImages] = useState<PickedImage[]>([]);
   const [selectedCrop, setSelectedCrop] = useState("");
   const [otherCropName, setOtherCropName] = useState("");
-  const [language, setLanguage] = useState("en");
+  const [language, setLanguage] = useState(defaultReportLanguage);
   const [historyPage, setHistoryPage] = useState(0);
 
   const supportedCropsQuery = useQuery({
@@ -85,9 +95,9 @@ export const CropDoctorScreen = () => {
   const cropOptions = [
     ...(supportedCropsQuery.data ?? []).map((crop) => ({
       value: crop.cropName,
-      label: crop.hasLimitedCoverage ? `${crop.cropName} (limited AI coverage)` : crop.cropName,
+      label: crop.hasLimitedCoverage ? t("cropDoctor.limitedCoverage", { crop: crop.cropName }) : crop.cropName,
     })),
-    { value: OTHER_CROP_VALUE, label: "Other / Not listed" },
+    { value: OTHER_CROP_VALUE, label: t("cropDoctor.otherCrop") },
   ];
   const languageOptions = SUPPORTED_LANGUAGES.map((lang) => ({ value: lang.code, label: lang.label }));
   const selectedCropNote = supportedCropsQuery.data?.find((c) => c.cropName === selectedCrop)?.coverageNote;
@@ -96,7 +106,7 @@ export const CropDoctorScreen = () => {
     setImages([]);
     setSelectedCrop("");
     setOtherCropName("");
-    setLanguage("en");
+    setLanguage(defaultReportLanguage);
     analyzeMutation.reset();
     reportMutation.reset();
   };
@@ -138,13 +148,13 @@ export const CropDoctorScreen = () => {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>AI Crop Doctor</Text>
-      <Text style={styles.subtitle}>Photograph a crop or leaf and get an instant AI-powered health check.</Text>
+      <Text style={styles.title}>{t("cropDoctor.title")}</Text>
+      <Text style={styles.subtitle}>{t("cropDoctor.subtitle")}</Text>
 
       {analyzeMutation.isPending && (
         <View style={styles.card}>
           <ActivityIndicator color={colors.primary} />
-          <Text style={styles.helperText}>Analyzing your photo…</Text>
+          <Text style={styles.helperText}>{t("cropDoctor.analyzing")}</Text>
         </View>
       )}
 
@@ -156,47 +166,45 @@ export const CropDoctorScreen = () => {
             )}
             <View style={styles.resultHeaderRow}>
               <Text style={styles.resultCrop}>{scan.identifiedCrop}</Text>
-              <Text style={[styles.resultStatus, { color: healthColor[scan.healthStatus] }]}>{scan.healthStatus}</Text>
+              <Text style={[styles.resultStatus, { color: healthColor[scan.healthStatus] }]}>
+                {HEALTH_KEY[scan.healthStatus] ? t(HEALTH_KEY[scan.healthStatus]!) : scan.healthStatus}
+              </Text>
             </View>
-            <Text style={styles.resultConfidence}>{confidenceLabel[scan.confidenceBand]}</Text>
+            <Text style={styles.resultConfidence}>{CONFIDENCE_KEY[scan.confidenceBand] ? t(CONFIDENCE_KEY[scan.confidenceBand]!) : ""}</Text>
 
             {scan.cropMismatch && (
               <View style={styles.warningBanner}>
-                <Text style={styles.warningBannerText}>
-                  This photo doesn't look like the crop you selected — the analysis below may be less reliable.
-                </Text>
+                <Text style={styles.warningBannerText}>{t("cropDoctor.cropMismatch")}</Text>
               </View>
             )}
             {scan.isUncertain && (
               <View style={styles.warningBanner}>
-                <Text style={styles.warningBannerText}>
-                  The AI wasn't fully confident in this result. Treat it as a starting point, not a diagnosis.
-                </Text>
+                <Text style={styles.warningBannerText}>{t("cropDoctor.uncertain")}</Text>
               </View>
             )}
 
-            {scan.problem && <Text style={styles.sectionHeading}>Problem: {scan.problem}</Text>}
+            {scan.problem && <Text style={styles.sectionHeading}>{t("cropDoctor.problem", { value: scan.problem })}</Text>}
             {scan.pathogenScientificName && (
-              <Text style={styles.metaText}>Pathogen: {scan.pathogenScientificName}</Text>
+              <Text style={styles.metaText}>{t("cropDoctor.pathogen", { value: scan.pathogenScientificName })}</Text>
             )}
-            {scan.severity && <Text style={styles.metaText}>Severity: {scan.severity}</Text>}
+            {scan.severity && <Text style={styles.metaText}>{t("cropDoctor.severity", { value: scan.severity })}</Text>}
 
-            <ResultList heading="Symptoms" items={scan.symptoms} />
-            <ResultList heading="Possible causes" items={scan.possibleCauses} />
-            <ResultList heading="Environmental factors" items={scan.environmentalFactors} />
-            <ResultList heading="What to do now" items={scan.actionsNow} />
-            <ResultList heading="Prevention" items={scan.prevention} />
+            <ResultList heading={t("cropDoctor.symptoms")} items={scan.symptoms} />
+            <ResultList heading={t("cropDoctor.possibleCauses")} items={scan.possibleCauses} />
+            <ResultList heading={t("cropDoctor.environmentalFactors")} items={scan.environmentalFactors} />
+            <ResultList heading={t("cropDoctor.actionsNow")} items={scan.actionsNow} />
+            <ResultList heading={t("cropDoctor.prevention")} items={scan.prevention} />
             {scan.monitoringGuidance && (
               <>
-                <Text style={styles.sectionHeading}>Monitoring guidance</Text>
+                <Text style={styles.sectionHeading}>{t("cropDoctor.monitoring")}</Text>
                 <Text style={styles.bodyText}>{scan.monitoringGuidance}</Text>
               </>
             )}
-            <ResultList heading="Escalate if you see" items={scan.warningSignsToEscalate} />
+            <ResultList heading={t("cropDoctor.escalate")} items={scan.warningSignsToEscalate} />
 
             {scan.groundingSources.length > 0 && (
               <>
-                <Text style={styles.sectionHeading}>Sources</Text>
+                <Text style={styles.sectionHeading}>{t("cropDoctor.sources")}</Text>
                 {scan.groundingSources.map((source, i) => (
                   <Text key={i} style={styles.sourceText}>
                     • {source.title} ({source.crop})
@@ -216,7 +224,7 @@ export const CropDoctorScreen = () => {
                 {reportMutation.isPending ? (
                   <ActivityIndicator color={colors.primary} />
                 ) : (
-                  <Text style={styles.secondaryButtonText}>Download / Share PDF Report</Text>
+                  <Text style={styles.secondaryButtonText}>{t("cropDoctor.downloadReport")}</Text>
                 )}
               </Pressable>
             )}
@@ -224,8 +232,8 @@ export const CropDoctorScreen = () => {
 
           {scan.id === null && (
             <View style={styles.guestPrompt}>
-              <Text style={styles.guestPromptTitle}>Want to keep this result?</Text>
-              <Text style={styles.guestPromptText}>Log in to save this scan to your history and download a PDF report.</Text>
+              <Text style={styles.guestPromptTitle}>{t("cropDoctor.guestTitle")}</Text>
+              <Text style={styles.guestPromptText}>{t("cropDoctor.guestBody")}</Text>
             </View>
           )}
 
@@ -234,7 +242,7 @@ export const CropDoctorScreen = () => {
             onPress={handleReset}
             hitSlop={{ top: 8, bottom: 8 }}
           >
-            <Text style={styles.linkText}>Scan another photo</Text>
+            <Text style={styles.linkText}>{t("cropDoctor.scanAnother")}</Text>
           </Pressable>
         </View>
       )}
@@ -242,15 +250,15 @@ export const CropDoctorScreen = () => {
       {!analyzeMutation.isPending && !scan && (
         <View style={styles.card}>
           <View style={styles.row}>
-            <SelectField label="What crop is this?" value={selectedCrop} options={cropOptions} onSelect={setSelectedCrop} />
+            <SelectField label={t("cropDoctor.whatCrop")} value={selectedCrop} options={cropOptions} onSelect={setSelectedCrop} />
             <View style={{ width: 12 }} />
-            <SelectField label="Report language" value={language} options={languageOptions} onSelect={setLanguage} />
+            <SelectField label={t("cropDoctor.reportLanguage")} value={language} options={languageOptions} onSelect={setLanguage} />
           </View>
 
           {isOtherCrop && (
             <TextInput
               style={styles.textInput}
-              placeholder="Type the crop's name"
+              placeholder={t("cropDoctor.otherCropPlaceholder")}
               placeholderTextColor={colors.textSecondary}
               value={otherCropName}
               onChangeText={setOtherCropName}
@@ -276,16 +284,16 @@ export const CropDoctorScreen = () => {
 
           <View style={styles.pickButtonRow}>
             <Pressable style={({ pressed }) => [styles.pickButton, pressed && { opacity: 0.6 }]} onPress={pickFromCamera}>
-              <Text style={styles.pickButtonText}>📷 Take Photo</Text>
+              <Text style={styles.pickButtonText}>{t("common.takePhoto")}</Text>
             </Pressable>
             <Pressable style={({ pressed }) => [styles.pickButton, pressed && { opacity: 0.6 }]} onPress={pickFromGallery}>
-              <Text style={styles.pickButtonText}>🖼️ Add from Gallery</Text>
+              <Text style={styles.pickButtonText}>{t("common.addFromGallery")}</Text>
             </Pressable>
           </View>
 
           {analyzeMutation.isError && (
             <Text style={styles.errorText}>
-              {(analyzeMutation.error as { message?: string })?.message || "Something went wrong analyzing this photo."}
+              {errorText(analyzeMutation.error, t("cropDoctor.analyzeError"), { details: false })}
             </Text>
           )}
 
@@ -294,22 +302,22 @@ export const CropDoctorScreen = () => {
             disabled={images.length === 0 || !declaredCrop}
             onPress={() => analyzeMutation.mutate()}
           >
-            <Text style={styles.primaryButtonText}>Analyze</Text>
+            <Text style={styles.primaryButtonText}>{t("cropDoctor.analyze")}</Text>
           </Pressable>
         </View>
       )}
 
       {isAuthenticated && (
         <View style={styles.historySection}>
-          <Text style={styles.sectionTitle}>Scan History</Text>
+          <Text style={styles.sectionTitle}>{t("cropDoctor.history")}</Text>
           {historyQuery.isLoading && (
             <ListRowSkeletonList count={3} thumbnailSize={48} lines={2} trailing />
           )}
           {historyQuery.isError && (
-            <ErrorState message="Could not load scan history." onRetry={() => void historyQuery.refetch()} />
+            <ErrorState message={t("cropDoctor.historyError")} onRetry={() => void historyQuery.refetch()} />
           )}
           {!historyQuery.isLoading && scans.length === 0 && (
-            <EmptyState icon="🌿" message="No scans yet — analyze your first photo above." />
+            <EmptyState icon="🌿" message={t("cropDoctor.historyEmpty")} />
           )}
           {scans.map((item) => (
             <HistoryRow key={item.id} item={item} onPress={() => navigation.navigate("ScanDetail", { scanId: item.id })} />
@@ -322,18 +330,16 @@ export const CropDoctorScreen = () => {
                 onPress={() => setHistoryPage((p) => p - 1)}
                 hitSlop={{ top: 14, bottom: 14, left: 10, right: 10 }}
               >
-                <Text style={[styles.pagerText, historyPage === 0 && styles.pagerTextDisabled]}>Previous</Text>
+                <Text style={[styles.pagerText, historyPage === 0 && styles.pagerTextDisabled]}>{t("common.previous")}</Text>
               </Pressable>
-              <Text style={styles.pagerLabel}>
-                Page {historyPage + 1} of {totalPages}
-              </Text>
+              <Text style={styles.pagerLabel}>{t("cropDoctor.pageOf", { page: historyPage + 1, total: totalPages })}</Text>
               <Pressable
                 style={({ pressed }) => pressed && { opacity: 0.6 }}
                 disabled={historyPage + 1 >= totalPages}
                 onPress={() => setHistoryPage((p) => p + 1)}
                 hitSlop={{ top: 14, bottom: 14, left: 10, right: 10 }}
               >
-                <Text style={[styles.pagerText, historyPage + 1 >= totalPages && styles.pagerTextDisabled]}>Next</Text>
+                <Text style={[styles.pagerText, historyPage + 1 >= totalPages && styles.pagerTextDisabled]}>{t("common.next")}</Text>
               </Pressable>
             </View>
           )}

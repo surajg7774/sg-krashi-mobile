@@ -5,6 +5,8 @@ import { useRoute, type RouteProp } from "@react-navigation/native";
 import { colors } from "@/theme/colors";
 import { ErrorState } from "@/components/ErrorState";
 import { cropDoctorService } from "./cropDoctorService";
+import { HEALTH_KEY } from "./labels";
+import { useT } from "@/i18n/useT";
 import type { CropDoctorStackParamList } from "@/navigation/CropDoctorStackNavigator";
 
 type DetailRoute = RouteProp<CropDoctorStackParamList, "ScanDetail">;
@@ -13,6 +15,7 @@ const healthColor: Record<string, string> = { HEALTHY: colors.success, DISEASED:
 
 export const ScanDetailScreen = () => {
   const { params } = useRoute<DetailRoute>();
+  const { t } = useT();
 
   const scanQuery = useQuery({
     queryKey: ["crop-doctor-scan-detail", params.scanId],
@@ -34,7 +37,7 @@ export const ScanDetailScreen = () => {
   if (scanQuery.isError || !scanQuery.data) {
     return (
       <View style={styles.centered}>
-        <ErrorState message="Could not load this scan." onRetry={() => void scanQuery.refetch()} />
+        <ErrorState message={t("cropDoctor.scanLoadError")} onRetry={() => void scanQuery.refetch()} />
       </View>
     );
   }
@@ -47,14 +50,16 @@ export const ScanDetailScreen = () => {
         {scan.imageUrls.length > 0 && <Image source={scan.imageUrls[0]} style={styles.image} contentFit="cover" />}
         <View style={styles.headerRow}>
           <Text style={styles.crop}>{scan.identifiedCrop}</Text>
-          <Text style={[styles.status, { color: healthColor[scan.healthStatus] }]}>{scan.healthStatus}</Text>
+          <Text style={[styles.status, { color: healthColor[scan.healthStatus] }]}>
+            {HEALTH_KEY[scan.healthStatus] ? t(HEALTH_KEY[scan.healthStatus]!) : scan.healthStatus}
+          </Text>
         </View>
-        {scan.problem && <Text style={styles.sectionHeading}>Problem: {scan.problem}</Text>}
-        {scan.severity && <Text style={styles.metaText}>Severity: {scan.severity}</Text>}
+        {scan.problem && <Text style={styles.sectionHeading}>{t("cropDoctor.problem", { value: scan.problem })}</Text>}
+        {scan.severity && <Text style={styles.metaText}>{t("cropDoctor.severity", { value: scan.severity })}</Text>}
 
-        <ResultList heading="Symptoms" items={scan.symptoms} />
-        <ResultList heading="What to do now" items={scan.actionsNow} />
-        <ResultList heading="Prevention" items={scan.prevention} />
+        <ResultList heading={t("cropDoctor.symptoms")} items={scan.symptoms} />
+        <ResultList heading={t("cropDoctor.actionsNow")} items={scan.actionsNow} />
+        <ResultList heading={t("cropDoctor.prevention")} items={scan.prevention} />
 
         <Text style={styles.limitationsText}>{scan.limitations}</Text>
 
@@ -66,7 +71,7 @@ export const ScanDetailScreen = () => {
           {reportMutation.isPending ? (
             <ActivityIndicator color={colors.primary} />
           ) : (
-            <Text style={styles.reportButtonText}>Download / Share PDF Report</Text>
+            <Text style={styles.reportButtonText}>{t("cropDoctor.downloadReport")}</Text>
           )}
         </Pressable>
       </View>

@@ -63,11 +63,11 @@ export interface SupportedLanguage {
 }
 
 export const SUPPORTED_LANGUAGES: SupportedLanguage[] = [
-  { code: "en", label: "English" },
-  { code: "hi", label: "हिन्दी (Hindi)" },
-  { code: "mr", label: "मराठी (Marathi)" },
-  { code: "gu", label: "ગુજરાતી (Gujarati)" },
-  { code: "hinglish", label: "Hinglish" },
+  { code: "en", label: "English" }, // i18n-ignore (each language named in its own script, D6)
+  { code: "hi", label: "हिन्दी (Hindi)" }, // i18n-ignore
+  { code: "mr", label: "मराठी (Marathi)" }, // i18n-ignore
+  { code: "gu", label: "ગુજરાતી (Gujarati)" }, // i18n-ignore
+  { code: "hinglish", label: "Hinglish" }, // i18n-ignore
 ];
 
 // Frontend-only sentinel — never sent to the backend. Selecting it swaps the
