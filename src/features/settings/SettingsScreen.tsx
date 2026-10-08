@@ -10,6 +10,7 @@ import { useT } from "@/i18n/useT";
 import { openWebPage } from "@/shared/openWebPage";
 import { colors } from "@/theme/colors";
 import { ICONS } from "@/theme/icons";
+import { IconBadge } from "@/components/IconBadge";
 
 /**
  * App-wide choices and the less-used account actions, moved off the Profile screen so Profile stays about the person:
@@ -30,7 +31,7 @@ export const SettingsScreen = () => {
       <View style={styles.card}>
         <TouchableOpacity style={styles.row} onPress={() => openWebPage(PRIVACY_POLICY_URL)} accessibilityRole="link">
           <View style={styles.rowLeft}>
-            <Ionicons name={ICONS.privacy} size={22} color={colors.primary} />
+            <IconBadge icon={ICONS.privacy} accent="blue" />
             <Text style={styles.rowText}>{t("settings.privacyPolicy")}</Text>
           </View>
           <Ionicons name={ICONS.chevron} size={20} color={colors.textSecondary} />
@@ -38,7 +39,7 @@ export const SettingsScreen = () => {
         <View style={styles.divider} />
         <TouchableOpacity style={styles.row} onPress={() => openWebPage(TERMS_URL)} accessibilityRole="link">
           <View style={styles.rowLeft}>
-            <Ionicons name={ICONS.terms} size={22} color={colors.primary} />
+            <IconBadge icon={ICONS.terms} accent="purple" />
             <Text style={styles.rowText}>{t("settings.terms")}</Text>
           </View>
           <Ionicons name={ICONS.chevron} size={20} color={colors.textSecondary} />
@@ -49,7 +50,7 @@ export const SettingsScreen = () => {
       <View style={styles.card}>
         <View style={styles.row}>
           <View style={styles.rowLeft}>
-            <Ionicons name={ICONS.version} size={22} color={colors.primary} />
+            <IconBadge icon={ICONS.version} accent="teal" />
             <Text style={styles.rowText}>{t("settings.version")}</Text>
           </View>
           <Text style={styles.value}>{APP_VERSION}</Text>
@@ -61,7 +62,7 @@ export const SettingsScreen = () => {
       <View style={[styles.card, styles.dangerCard]}>
         <TouchableOpacity style={styles.row} onPress={() => setShowDeleteAccount(true)} accessibilityRole="button">
           <View style={styles.rowLeft}>
-            <Ionicons name={ICONS.deleteAccount} size={22} color={colors.error} />
+            <IconBadge icon={ICONS.deleteAccount} accent="red" />
             <Text style={[styles.rowText, styles.dangerText]}>{t("settings.deleteAccount")}</Text>
           </View>
           <Ionicons name={ICONS.chevron} size={20} color={colors.textSecondary} />
@@ -77,7 +78,7 @@ export const SettingsScreen = () => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   content: { padding: 16 },
-  sectionLabel: { fontSize: 13, fontWeight: "600", color: colors.textSecondary, marginTop: 24, marginBottom: 8 },
+  sectionLabel: { fontSize: 13, fontWeight: "600", color: colors.primaryDark, marginTop: 24, marginBottom: 8 },
   card: {
     backgroundColor: colors.surface,
     borderRadius: 12,

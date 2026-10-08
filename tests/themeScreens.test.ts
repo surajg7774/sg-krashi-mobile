@@ -124,3 +124,22 @@ test("Login: a green-and-gold branded top area with the logo on a light card, an
   assert.match(login, /\n  button: \{[^}]*backgroundColor: colors\.primary/s);
   assert.match(login, /buttonText: \{[^}]*color: colors\.primaryContrastText/s);
 });
+
+// ---- profile and settings: colour only, structure untouched ----------------------------------------------------
+
+test("menu rows get coloured icon badges (a tinted circle and a deep-coloured icon); the structure and the actions are unchanged", () => {
+  const badge = read("src/components/IconBadge.tsx");
+  assert.match(badge, /backgroundColor: accents\[accent\]\.tint/);
+  assert.match(badge, /color=\{accents\[accent\]\.icon\}/);
+  const profile = read("src/features/profile/ProfileScreen.tsx");
+  assert.match(profile, /<IconBadge icon=\{ICONS\.notifications\} accent="gold" \/>/);
+  const settings = read("src/features/settings/SettingsScreen.tsx");
+  for (const [icon, accent] of [["privacy", "blue"], ["terms", "purple"], ["version", "teal"], ["deleteAccount", "red"]]) {
+    assert.match(settings, new RegExp(`<IconBadge icon=\{ICONS\.${icon}\} accent="${accent}" />`), icon);
+  }
+  // the danger section stays red, last and alone (tests/settings.test.ts holds the structure checks)
+  assert.match(settings, /dangerCard: \{ borderColor: colors\.error \}/);
+  assert.match(settings, /dangerLabel: \{ marginTop: 40, color: colors\.error \}/);
+  // every badge accent keeps its icon readable on its tint (3:1) - asserted for all accents in theme.test.ts
+  for (const accent of ["gold", "blue", "purple", "teal", "red"]) assert.ok(accent in accents, accent);
+});

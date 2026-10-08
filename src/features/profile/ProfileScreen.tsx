@@ -7,6 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { colors } from "@/theme/colors";
 import { ICONS } from "@/theme/icons";
+import { IconBadge } from "@/components/IconBadge";
 import { screenTopPadding } from "@/theme/insets";
 import type { TabParamList } from "@/navigation/TabNavigator";
 import type { MainStackParamList } from "@/navigation/MainStackNavigator";
@@ -53,7 +54,7 @@ export const ProfileScreen = () => {
         <View style={styles.menuCard}>
           <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("Notifications")}>
             <View style={styles.menuItemLeft}>
-              <Ionicons name={ICONS.notifications} size={22} color={colors.primary} />
+              <IconBadge icon={ICONS.notifications} accent="gold" />
               <Text style={styles.menuItemText}>{t("profile.notifications")}</Text>
             </View>
             <Ionicons name={ICONS.chevron} size={20} color={colors.textSecondary} />
