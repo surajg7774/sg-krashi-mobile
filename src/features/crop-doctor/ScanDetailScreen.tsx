@@ -6,6 +6,7 @@ import { colors } from "@/theme/colors";
 import { ErrorState } from "@/components/ErrorState";
 import { cropDoctorService } from "./cropDoctorService";
 import { HEALTH_KEY } from "./labels";
+import { contentLineHeight } from "@/i18n/layout";
 import { useT } from "@/i18n/useT";
 import type { CropDoctorStackParamList } from "@/navigation/CropDoctorStackNavigator";
 
@@ -85,7 +86,7 @@ const ResultList = ({ heading, items }: { heading: string; items: string[] }) =>
     <>
       <Text style={styles.sectionHeading}>{heading}</Text>
       {items.map((item, i) => (
-        <Text key={i} style={styles.bodyText}>
+        <Text key={i} style={[styles.bodyText, { lineHeight: contentLineHeight(item, 13, 19) }]}>
           • {item}
         </Text>
       ))}

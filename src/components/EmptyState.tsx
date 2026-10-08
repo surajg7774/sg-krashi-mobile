@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { colors } from "@/theme/colors";
+import { scriptLineHeight } from "@/i18n/layout";
+import { useT } from "@/i18n/useT";
 
 interface EmptyStateProps {
   icon?: string;
@@ -16,14 +18,18 @@ interface EmptyStateProps {
 // app's existing convention (TabNavigator/HomeScreen are plain emoji too;
 // no icon library is installed, and this one component isn't worth adding
 // one for).
-export const EmptyState = ({ icon = "📭", message, description, action }: EmptyStateProps) => (
-  <View style={styles.container}>
-    <Text style={styles.icon}>{icon}</Text>
-    <Text style={styles.message}>{message}</Text>
-    {description ? <Text style={styles.description}>{description}</Text> : null}
-    {action}
-  </View>
-);
+export const EmptyState = ({ icon = "📭", message, description, action }: EmptyStateProps) => {
+  // Devanagari needs more line height than these English values (src/i18n/layout.ts).
+  const { lang } = useT();
+  return (
+    <View style={styles.container}>
+      <Text style={styles.icon}>{icon}</Text>
+      <Text style={[styles.message, { lineHeight: scriptLineHeight(lang, 14, 20) }]}>{message}</Text>
+      {description ? <Text style={[styles.description, { lineHeight: scriptLineHeight(lang, 13, 18) }]}>{description}</Text> : null}
+      {action}
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {

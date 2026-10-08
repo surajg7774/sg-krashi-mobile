@@ -17,6 +17,7 @@ import { colors } from "@/theme/colors";
 import { useAuth } from "@/context/AuthContext";
 import { authService } from "./authService";
 import { splitTemplate } from "@/i18n";
+import { scriptLineHeight } from "@/i18n/layout";
 import { useT } from "@/i18n/useT";
 import type { GuestStackParamList } from "@/navigation/GuestStackNavigator";
 
@@ -33,7 +34,7 @@ export const VerifyOtpScreen = () => {
   const route = useRoute<Route>();
   const { email } = route.params;
   const { verifyOtp } = useAuth();
-  const { t, errorText } = useT();
+  const { t, lang, errorText } = useT();
 
   const [otp, setOtp] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
@@ -80,7 +81,7 @@ export const VerifyOtpScreen = () => {
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : undefined}>
       <View style={styles.content}>
         <Text style={styles.title}>{t("auth.otp.title")}</Text>
-        <Text style={styles.subtitle}>
+        <Text style={[styles.subtitle, { lineHeight: scriptLineHeight(lang, 15, 22) }]}>
           {splitTemplate(t("auth.otp.sentTo")).map((part, index) =>
             typeof part === "string" ? (
               part
@@ -203,6 +204,7 @@ const styles = StyleSheet.create({
   },
   resendRow: {
     flexDirection: "row",
+    flexWrap: "wrap", // longer languages wrap instead of running off the edge
     justifyContent: "center",
     alignItems: "center",
     gap: 6,

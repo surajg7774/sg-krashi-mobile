@@ -12,6 +12,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "@/theme/colors";
 import type { MessageKey } from "@/i18n";
+import { scriptLineHeight } from "@/i18n/layout";
 import { useT } from "@/i18n/useT";
 
 export interface OnboardingScreenProps {
@@ -49,7 +50,7 @@ const { width } = Dimensions.get("window");
  */
 export const OnboardingScreen = ({ onDone }: OnboardingScreenProps) => {
   const insets = useSafeAreaInsets();
-  const { t } = useT();
+  const { t, lang } = useT();
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollRef = useRef<ScrollView>(null);
   const isLastSlide = activeIndex === SLIDES.length - 1;
@@ -89,7 +90,7 @@ export const OnboardingScreen = ({ onDone }: OnboardingScreenProps) => {
           <View key={slide.id} style={[styles.slide, { width }]}>
             <Text style={styles.emoji}>{slide.emoji}</Text>
             <Text style={styles.title}>{t(slide.title)}</Text>
-            <Text style={styles.description}>{t(slide.description)}</Text>
+            <Text style={[styles.description, { lineHeight: scriptLineHeight(lang, 15, 22) }]}>{t(slide.description)}</Text>
           </View>
         ))}
       </ScrollView>

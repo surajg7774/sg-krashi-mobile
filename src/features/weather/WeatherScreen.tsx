@@ -36,7 +36,7 @@ export const WeatherScreen = () => {
     useCurrentLocation,
     retryGeolocation,
   } = useWeatherLocation();
-  const { t } = useT();
+  const { t, lang } = useT();
   const [searchInput, setSearchInput] = useState("");
   const [hasSearchedOnce, setHasSearchedOnce] = useState(false);
   const search = useDebouncedValue(searchInput, 300);
@@ -198,7 +198,8 @@ export const WeatherScreen = () => {
 
       {location && weatherQuery.data && (
         <View style={styles.trendCard}>
-          <Text style={styles.trendTitle}>{t("weather.next7Days")}</Text>
+          {/* Letter spacing pulls Devanagari letters and their vowel signs apart, so it is English-only. */}
+          <Text style={[styles.trendTitle, lang !== "en" && { letterSpacing: 0 }]}>{t("weather.next7Days")}</Text>
           {(weatherQuery.data.daily?.length ?? 0) >= 2 ? (
             <WeatherForecastChart daily={weatherQuery.data.daily ?? []} />
           ) : (

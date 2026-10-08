@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
     borderTopColor: colors.divider,
   },
   sectionTitle: { fontSize: 14, fontWeight: "700", color: colors.textPrimary, marginBottom: 12 },
-  buttonRow: { flexDirection: "row", gap: 12, marginTop: 24 },
+  buttonRow: { flexDirection: "row", flexWrap: "wrap", gap: 12, marginTop: 24 },
   secondaryButton: {
     borderWidth: 1,
     borderColor: colors.primary,

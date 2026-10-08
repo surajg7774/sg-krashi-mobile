@@ -24,6 +24,7 @@ import { useAuth } from "@/context/AuthContext";
 import { colors } from "@/theme/colors";
 import { DELETE_ACCOUNT_URL } from "@/config/legal";
 import { ensureGoogleSignInConfigured } from "@/features/auth/googleAuth";
+import { scriptLineHeight } from "@/i18n/layout";
 import { useT } from "@/i18n/useT";
 import { accountService } from "./accountService";
 
@@ -42,7 +43,7 @@ interface DeleteAccountModalProps {
  */
 export const DeleteAccountModal = ({ visible, onClose }: DeleteAccountModalProps) => {
   const { logout } = useAuth();
-  const { t, errorText } = useT();
+  const { t, lang, errorText } = useT();
   const [password, setPassword] = useState("");
   const [googleToken, setGoogleToken] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -110,7 +111,7 @@ export const DeleteAccountModal = ({ visible, onClose }: DeleteAccountModalProps
       <KeyboardAvoidingView style={styles.backdrop} behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <View style={styles.card}>
           <Text style={styles.title}>{t("account.title")}</Text>
-          <Text style={styles.body}>{t("account.body")}</Text>
+          <Text style={[styles.body, { lineHeight: scriptLineHeight(lang, 14, 20) }]}>{t("account.body")}</Text>
           <Pressable
             onPress={() => void Linking.openURL(DELETE_ACCOUNT_URL).catch(() => undefined)}
             style={({ pressed }) => [styles.linkRow, pressed && { opacity: 0.6 }]}
@@ -206,7 +207,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   googleButtonText: { color: colors.primary, fontWeight: "600" },
-  actions: { flexDirection: "row", justifyContent: "flex-end", gap: 12, marginTop: 18 },
+  actions: { flexDirection: "row", flexWrap: "wrap", justifyContent: "flex-end", gap: 12, marginTop: 18 },
   cancelButton: { minHeight: 44, paddingHorizontal: 16, justifyContent: "center" },
   cancelText: { color: colors.textSecondary, fontWeight: "600" },
   deleteButton: {

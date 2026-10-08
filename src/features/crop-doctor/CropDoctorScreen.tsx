@@ -25,6 +25,7 @@ import { cropDoctorService } from "./cropDoctorService";
 import { OTHER_CROP_VALUE, SUPPORTED_LANGUAGES, type CropScan, type CropScanSummary, type PickedImage } from "./types";
 import type { CropDoctorStackParamList } from "@/navigation/CropDoctorStackNavigator";
 import { CONFIDENCE_KEY, HEALTH_KEY } from "./labels";
+import { contentLineHeight } from "@/i18n/layout";
 import { useT } from "@/i18n/useT";
 
 const HISTORY_PAGE_SIZE = 12;
@@ -197,7 +198,7 @@ export const CropDoctorScreen = () => {
             {scan.monitoringGuidance && (
               <>
                 <Text style={styles.sectionHeading}>{t("cropDoctor.monitoring")}</Text>
-                <Text style={styles.bodyText}>{scan.monitoringGuidance}</Text>
+                <Text style={[styles.bodyText, { lineHeight: contentLineHeight(scan.monitoringGuidance, 13, 19) }]}>{scan.monitoringGuidance}</Text>
               </>
             )}
             <ResultList heading={t("cropDoctor.escalate")} items={scan.warningSignsToEscalate} />
@@ -355,7 +356,7 @@ const ResultList = ({ heading, items }: { heading: string; items: string[] }) =>
     <>
       <Text style={styles.sectionHeading}>{heading}</Text>
       {items.map((item, i) => (
-        <Text key={i} style={styles.bodyText}>
+        <Text key={i} style={[styles.bodyText, { lineHeight: contentLineHeight(item, 13, 19) }]}>
           • {item}
         </Text>
       ))}

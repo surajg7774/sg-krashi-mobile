@@ -18,6 +18,7 @@ import { PasswordField } from "@/components/PasswordField";
 import { GoogleSignInButton } from "@/components/GoogleSignInButton";
 import { authService } from "./authService";
 import { splitTemplate } from "@/i18n";
+import { scriptLineHeight } from "@/i18n/layout";
 import { useT } from "@/i18n/useT";
 import { PRIVACY_POLICY_URL, TERMS_URL } from "@/config/legal";
 import type { GuestStackParamList } from "@/navigation/GuestStackNavigator";
@@ -36,7 +37,7 @@ const isPlausibleEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(va
 
 export const RegisterScreen = () => {
   const navigation = useNavigation<Navigation>();
-  const { t, errorText } = useT();
+  const { t, lang, errorText } = useT();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -125,7 +126,7 @@ export const RegisterScreen = () => {
         </TouchableOpacity>
 
         {/* The links sit wherever the language's word order puts them ({terms}, {privacy} in the text). */}
-        <Text style={styles.consentText}>
+        <Text style={[styles.consentText, { lineHeight: scriptLineHeight(lang, 12, 18) }]}>
           {splitTemplate(t("auth.register.consent")).map((part, index) =>
             typeof part === "string" ? (
               part
