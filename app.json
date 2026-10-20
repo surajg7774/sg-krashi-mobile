@@ -3,6 +3,12 @@
     "name": "sg-krashi-mobile",
     "slug": "sg-krashi-mobile",
     "version": "1.0.0",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/d2941b57-03df-405c-b5eb-f2112c46755e"
+    },
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
