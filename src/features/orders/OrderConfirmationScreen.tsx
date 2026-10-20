@@ -74,11 +74,15 @@ export const OrderConfirmationScreen = () => {
   // is looking at a PENDING_PAYMENT order, not only right after Pay Now.
   useEffect(() => {
     if (status !== "PENDING_PAYMENT") {
-      setPollTimedOut(false);
       return;
     }
     const timer = setTimeout(() => setPollTimedOut(true), POLL_TIMEOUT_MS);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      // Leaving PENDING_PAYMENT (or switching order) clears the flag, as before; done in the cleanup so no state is set
+      // synchronously inside the effect body.
+      setPollTimedOut(false);
+    };
   }, [status, params.orderId]);
 
   const initiateMutation = useMutation({

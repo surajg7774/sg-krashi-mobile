@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ActivityIndicator,
@@ -80,21 +80,23 @@ export const FarmerListingFormScreen = () => {
     enabled: listingId !== undefined,
   });
 
-  useEffect(() => {
-    if (detailQuery.data) {
-      setForm({
-        categoryId: detailQuery.data.category?.id ?? null,
-        name: detailQuery.data.name,
-        slug: detailQuery.data.slug,
-        description: detailQuery.data.description,
-        quantityAvailable: detailQuery.data.quantityAvailable,
-        unitPrice: detailQuery.data.unitPrice,
-        harvestDate: detailQuery.data.harvestDate,
-        isOrganicCertified: detailQuery.data.isOrganicCertified,
-      });
-      setMedia([...detailQuery.data.media].sort((a, b) => a.sortOrder - b.sortOrder));
-    }
-  }, [detailQuery.data]);
+  // Copy the loaded listing into the form whenever a new copy of it arrives. Done while rendering (React's documented way
+  // to adjust state when data changes) instead of in an effect, so the form never paints once with stale values.
+  const [syncedDetail, setSyncedDetail] = useState<typeof detailQuery.data>(undefined);
+  if (detailQuery.data && detailQuery.data !== syncedDetail) {
+    setSyncedDetail(detailQuery.data);
+    setForm({
+      categoryId: detailQuery.data.category?.id ?? null,
+      name: detailQuery.data.name,
+      slug: detailQuery.data.slug,
+      description: detailQuery.data.description,
+      quantityAvailable: detailQuery.data.quantityAvailable,
+      unitPrice: detailQuery.data.unitPrice,
+      harvestDate: detailQuery.data.harvestDate,
+      isOrganicCertified: detailQuery.data.isOrganicCertified,
+    });
+    setMedia([...detailQuery.data.media].sort((a, b) => a.sortOrder - b.sortOrder));
+  }
 
   const invalidateListingLists = () => {
     void queryClient.invalidateQueries({ queryKey: ["farmer-listings"] });
