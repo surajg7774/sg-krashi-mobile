@@ -6,7 +6,7 @@ import { timeoutForRequest } from "@/offline/queryPolicy";
 // Same production backend the web app (sg-krashi-client) already talks to.
 // No .env wiring for this milestone — a single real target, matching the
 // task's explicit instruction to hit production, not a mock.
-export const API_BASE_URL = "https://sg-krashi-server-production-8583.up.railway.app/api/v1";
+export const API_BASE_URL = "https://sg-krashi-server-production-f86e.up.railway.app/api/v1";
 const REFRESH_ENDPOINT = "/auth/mobile/refresh";
 // A 401 here must never escalate to onAuthFailure() (full logout) — this is
 // a best-effort background call (see pushNotifications.ts's own try/catch),
